@@ -1,0 +1,21 @@
+{
+  "name": "course-management-system",
+  "version": "1.0.0",
+  "description": "This project focuses on replicating an academic registration service such as carleton central.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "cucumber-js"
+  },
+  "author": "Zahid Dawod",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-handlebars": "^5.2.0",
+    "mongoose": "^5.10.11",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^7.0.0-rc.0"
+  }
+}
