@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 
 // routes
 const index = require("./routes/index.js");
-const registration = require("./routes/registration.js");
+const accountRegistration = require("./routes/accountregistration.js");
 
 // connect to db
 mongoose.connect("mongodb://localhost/cmsApp");
@@ -29,6 +29,9 @@ app.post("/", (req, res) => {
     res.render("login", { title: "Login", response: "is-invalid" });
 });
 
+// The user is not logged in when trying to access the Account Registration.
+app.use("/accountregistration", accountRegistration);
+
 // middleware (this will execute before every route declared after this)
 app.use((req, res, next) => {
     // is user logged in?
@@ -39,8 +42,8 @@ app.use((req, res, next) => {
     else next(); // otherwise continue to what user was trying to do
 });
 
+// Any routes that appear below here will be checked by the middleware first.
 app.use("/", index);
-app.use("/account-management", registration);
 /*
  *
  * Add more routes here

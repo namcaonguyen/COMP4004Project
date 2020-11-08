@@ -1,0 +1,52 @@
+<div class="container">
+	<h3>Course Management System</h3>
+	<p>Account Registration</p>
+	{{#if error}}
+		<div class="alert alert-danger">{{error}}</div>
+	{{/if}}
+	<form name="account_registration_form" method="post">
+		<label for="accountType">Select your account type</label>
+		<select name="accountType" id="accountType">
+			<option value="student">Student</option>
+			<option value="professor">Professor</option>
+			<option value="administrator">Administrator</option>
+		</select>
+
+		<br><br>
+
+		<div class="form-label-group">
+			<label for="inputFirstName">First Name</label>
+			<input id="inputFirstName" name="inputFirstName" class="form-control {{response}}" placeholder="First Name" required autofocus>
+        </div>
+
+		<br><br>
+
+		<div class="form-label-group">
+			<label for="inputLastName">Last Name</label>
+			<input id="inputLastName" name="inputLastName" class="form-control {{response}}" placeholder="Last Name" required autofocus>
+        </div>
+
+		<br><br>
+
+		<div class="form-label-group">
+			<label for="inputEmail">Email address</label>
+			<input type="email" id="inputEmail" name="inputEmail" class="form-control {{response}}" placeholder="Email address" required autofocus>
+        </div>
+
+		<br><br>
+
+        <div class="form-label-group">
+			<label for="inputPassword">Password</label>
+			<input type="password" id="inputPassword" name="inputPassword" class="form-control {{response}}" placeholder="Password" required>
+        </div>
+
+		<div class="form-label-group">
+			<label for="inputConfirmPassword">Confirm Password</label>
+			<input type="password" id="inputConfirmPassword" name="inputConfirmPassword" class="form-control {{response}}" placeholder="Confirm Password" required>
+        </div>
+
+		<br><br>
+
+		<input type="submit" value="Submit" >
+	</form>
+</div>
