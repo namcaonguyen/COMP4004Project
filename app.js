@@ -14,6 +14,9 @@ mongoose.connect("mongodb://localhost/cmsApp");
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB Connection Error:"));
 
+// Require User object used in finding if a user exist when logging in
+const User = require("./db/user.js");
+
 // setup handlebar engine
 app.engine("hbs", hbs({extname: "hbs", defaultLayout: "layout", layoutsDir: __dirname + "/views/layouts/"}));
 app.set("views", path.join(__dirname, "views"));
@@ -21,12 +24,31 @@ app.set("view engine", "hbs");
 
 app.use(express.static(path.join(__dirname, "public"))); // set public folder
 
+// Middleware to parse the body of the request.
+app.use(express.json());
+app.use(express.urlencoded());
+
+// Validates the user email/password when logging in
+async function validateLogin(userEmail, userPassword, resp) {
+    var findUser = await User.find({ email: userEmail, password: userPassword });
+
+    if (findUser.length > 0) {
+        resp.render('administrator_home_page');
+        //resp.redirect('administrator_home_page');
+    } else {
+        // return back to login page notifying user of failed validation
+        resp.render("login", { title: "Login", response: "is-invalid" });
+    }
+}
+
 // POST login page.
 app.post("/", (req, res) => {
+    
     // validate login info
+    var userEmail = req.body.inputEmail;
+    var userPassword = req.body.inputPassword;
 
-    // return back to login page notifying user of failed validation
-    res.render("login", { title: "Login", response: "is-invalid" });
+    validateLogin(userEmail, userPassword, res);
 });
 
 // The user is not logged in when trying to access the Account Registration.
