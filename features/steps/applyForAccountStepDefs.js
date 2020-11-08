@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { Given, When, Then } = require('@cucumber/cucumber');
-const ApplicationValidation = require("../../public/ApplicationValidation.js");
+const applicationValidation = require("../../public/js/applicationvalidation.js");
 const User = require("../../db/user.js");
 
 // Set up the MongoDB.
@@ -8,7 +8,6 @@ const mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost/cmsApp");
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB Connection Error:"));
-
 
 Given("There are no unapproved {string} applications", async function(accountTypeParam) {
     // Delete all unapproved Users with this specific Account Type.
@@ -33,7 +32,7 @@ Given("There are no unapproved {string} applications", async function(accountTyp
     // Go through all the users.
     for ( i = 0; i < allUsers.length; ++i ) {
         // If a User in the list is unapproved and of this specific Account Type, set the boolean to true.
-        if ( allUsers[i].approved == false && allUsers[i].accountType == accountTypeParam ) {
+        if ( allUsers[i].approved === false && allUsers[i].accountType === accountTypeParam ) {
             foundUnapprovedUser = true;  
 		}
 	}
@@ -60,15 +59,15 @@ When("User password {string} is confirmed as {string}", function(passwordParam, 
 
 Then("Input fields are valid", function() {
     // Check for errors in the inputs.
-    this.errorArray = ApplicationValidation.checkInputFieldValidity(this.accountType, this.firstName, this.lastName, this.email, this.password, this.confirmPassword);
+    this.errorArray = applicationValidation.CheckInputFieldValidity(this.accountType, this.firstName, this.lastName, this.email, this.password, this.confirmPassword);
 
     // Assert that there were no errors.
-    assert.equal(true, this.errorArray.length == 0);
+    assert.equal(true, this.errorArray.length === 0);
 });
 
 Then("The Application is saved to the database", async function() {
     // If there were no errors, then we can proceed to save.
-    if ( this.errorArray.length == 0 ) {
+    if ( this.errorArray.length === 0 ) {
         // Create the User object to save to the database.
         const createdUser = new User({
             email: this.email,
@@ -99,7 +98,7 @@ Then("The Application is saved to the database", async function() {
 
 Then("Input fields are not valid with {int} errors", function(numberOfErrors) {
     // Check for errors in the inputs.
-    this.errorArray = ApplicationValidation.checkInputFieldValidity(this.accountType, this.firstName, this.lastName, this.email, this.password, this.confirmPassword);
+    this.errorArray = applicationValidation.CheckInputFieldValidity(this.accountType, this.firstName, this.lastName, this.email, this.password, this.confirmPassword);
 
     // Assert that there were errors.
     assert.equal(true, this.errorArray.length == numberOfErrors);
@@ -107,7 +106,7 @@ Then("Input fields are not valid with {int} errors", function(numberOfErrors) {
 
 Then("The Application is not saved to the database", async function() {
     // If there were no errors, then we can proceed to save. (THIS SHOULDN'T HAPPEN)
-    if ( this.errorArray.length == 0 ) {
+    if ( this.errorArray.length === 0 ) {
         // Create the User object to save to the database.
         const createdUser = new User({
             email: this.email,
@@ -135,6 +134,6 @@ Then("The Application is not saved to the database", async function() {
         var findUser = await User.find({ email: this.email, password: this.password, fullName: this.fullName, accountType: this.accountType, approved: false });
 
         // Assert that no User was found.
-        assert.equal(true, findUser.length == 0);
+        assert.equal(true, findUser.length === 0);
 	}
 });

@@ -1,5 +1,5 @@
 // Function to check if the input fields are valid.
-exports.checkInputFieldValidity = function checkInputFieldValidity(accountTypeParam, firstNameParam, lastNameParam, emailParam, passwordParam, confirmPasswordParam) {
+exports.CheckInputFieldValidity = function CheckInputFieldValidity(accountTypeParam, firstNameParam, lastNameParam, emailParam, passwordParam, confirmPasswordParam) {
     // Declaration of array varible to hold error messages.
     var errorArray = [];
     
