@@ -1,0 +1,50 @@
+<style>
+    .card {
+        margin: 0 auto;
+        float: none;
+        margin-bottom: 10px;
+    }
+</style>
+<div class="container">
+<div class="row">
+    <div class="col-sm-9 col-md-7 col-lg-8 mx-auto">
+    <div class="card card-signin my-5">
+        <div class="card-body">
+            <h3 class="card-title text-center">Course Management System</h3>
+            <h5 class="card-title text-center">Account Requests</h5>
+            <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">View Account Reqests</li>
+            </ol>
+            </nav>
+            <hr class="my-4">
+            <div id="message" style="text-align: center;"></div>
+            <br>
+			<form name="account_registration_form" method="POST">
+                {{#each accounts}}
+                    <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{this.fullname}}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{this.email}}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">{{this.accountType}}</h6>
+                        <input id="userId" name="userId" type="hidden" value="{{this._id}}">
+                        <button class="btn btn-lg btn-primary btn-block text-uppercase" name="approve" type="submit">Approve</button>
+                        <button class="btn btn-lg btn-danger btn-block text-uppercase" name="decline" type="submit">Decline</button>
+                    </div>
+                    </div>
+                {{/each}}
+            </form>
+        </div>
+    </div>
+    </div>
+</div>
+</div>
+<script>
+    var data = "{{accounts}}";
+    if (data.length === 0) {
+        $("#message").html("Welcome Admin, there are currently no accounts that need to be approved.<br>Please check back again later.");
+    } else {
+        $("#message").html("Welcome Admin, here are a list of accounts that need to be approved.");
+    }
+</script>

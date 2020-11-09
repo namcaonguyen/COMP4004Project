@@ -10,7 +10,7 @@
                     {{/if}}
                     <hr class="my-4">
                     <div class="list-group">
-                        <a href="/" class="list-group-item list-group-item-action">View Accounts</a>
+                        <a href="/manage-accounts/view-account-requests" class="list-group-item list-group-item-action">View Account Requests</a>
                         <a href="/logout" class="list-group-item list-group-item-action">Logout</a>
                     </div>
                 </div>
@@ -22,7 +22,7 @@
     var email = "{{cookieEmail}}";
     var password = "{{cookiePassword}}";
     if (email !== "" && password !== "") {
-        document.cookie = "email=\"" + email + "\"; max-age=60*30*1000";
-        document.cookie = "password=\"" + password + "\"; max-age=60*30*1000";
+        document.cookie = "email=\"" + email + "\"; max-age=1800";
+        document.cookie = "password=\"" + password + "\"; max-age=1800";
     }
 </script>
