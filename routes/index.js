@@ -3,12 +3,14 @@ const router = express.Router();
 
 // GET home page.
 router.get("/", (req, res) => {
-    res.render("index", { title: "Welcome" });
+    var data = { title: "Welcome" };
+    data[res.locals.user.accountType] = true;
+    res.render("index", data);
 });
 
 // GET logout page.
 router.get("/logout", (req, res) => {
-    res.send("Logged out.");
+    res.render("logout");
 });
 
 module.exports = router;

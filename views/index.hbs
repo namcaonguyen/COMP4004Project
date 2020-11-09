@@ -1,1 +1,28 @@
-Success!
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+            <div class="card card-signin my-5">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Course Management System</h3>
+                    <h5 class="card-title text-center">Welcome</h5>
+                    {{#if Administrator}}
+                        {{>adminIndex}}
+                    {{/if}}
+                    <hr class="my-4">
+                    <div class="list-group">
+                        <a href="/" class="list-group-item list-group-item-action">View Accounts</a>
+                        <a href="/logout" class="list-group-item list-group-item-action">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var email = "{{cookieEmail}}";
+    var password = "{{cookiePassword}}";
+    if (email !== "" && password !== "") {
+        document.cookie = "email=\"" + email + "\"; max-age=60*30*1000";
+        document.cookie = "password=\"" + password + "\"; max-age=60*30*1000";
+    }
+</script>

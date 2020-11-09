@@ -4,6 +4,7 @@ const port = 3000;
 const hbs = require("express-handlebars");
 const path = require("path");
 const mongoose = require("mongoose");
+const cookieParser = require('cookie-parser');
 
 // routes
 const index = require("./routes/index.js");
@@ -19,7 +20,7 @@ db.on("error", console.error.bind(console, "MongoDB Connection Error:"));
 const User = require("./db/user.js");
 
 // setup handlebar engine
-app.engine("hbs", hbs({extname: "hbs", defaultLayout: "layout", layoutsDir: __dirname + "/views/layouts/"}));
+app.engine("hbs", hbs({extname: "hbs", defaultLayout: "layout", layoutsDir: __dirname + "/views/layouts/", partialsDir: __dirname + "/views/partials/"}));
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "hbs");
 
@@ -28,28 +29,27 @@ app.use(express.static(path.join(__dirname, "public"))); // set public folder
 // Middleware to parse the body of the request.
 app.use(express.json());
 app.use(express.urlencoded());
-
-// Validates the user email/password when logging in
-async function validateLogin(userEmail, userPassword, resp) {
-    var findUser = await User.find({ email: userEmail, password: userPassword });
-
-    if (findUser.length > 0) {
-        resp.render('administrator_home_page');
-        //resp.redirect('administrator_home_page');
-    } else {
-        // return back to login page notifying user of failed validation
-        resp.render("login", { title: "Login", response: "is-invalid" });
-    }
-}
+app.use(cookieParser());
 
 // POST login page.
 app.post("/", (req, res) => {
-    
-    // validate login info
     var userEmail = req.body.inputEmail;
     var userPassword = req.body.inputPassword;
 
-    validateLogin(userEmail, userPassword, res);
+    // TO-DO: sanitize user input
+
+
+    // validate login info
+    User.find({ email: userEmail, password: userPassword }, function(err, result) {
+        if (err) throw err;
+        if (result.length === 0) { // return back to login page notifying user of failed validation
+            res.render("login", { title: "Login", response: "is-invalid" });
+        } else { // serve home page and give credentials back to client to save in cookies
+            var data = { title: "Welcome", cookieEmail: result[0].email, cookiePassword: result[0].password };
+            data[result[0].accountType] = true;
+            res.render("index", data);
+        }
+    });
 });
 
 // The user is not logged in when trying to access the Account Registration.
@@ -57,12 +57,20 @@ app.use("/register", accountRegistration);
 
 // middleware (this will execute before every route declared after this)
 app.use((req, res, next) => {
-    // is user logged in?
-    var loggedIn = false; // ***** fake check, remove later *****
-
-    // if not then request login
-    if (!loggedIn) res.render("login", { title: "Login" });
-    else next(); // otherwise continue to what user was trying to do
+    // authenticate user
+    if ("email" in req.cookies && "password" in req.cookies) {
+        User.find({ email: req.cookies.email, password: req.cookies.password }, function(err, result) {
+            if (err) throw err;
+            if (result.length === 0) {
+                res.render("login", { title: "Login" });
+            } else {
+                res.locals.user = result[0];
+                next(); // if user credentials are valid then continue to what user was trying to do
+            }
+        });
+    } else {
+        res.render("login", { title: "Login" });
+    }
 });
 
 // Any routes that appear below here will be checked by the middleware first.
