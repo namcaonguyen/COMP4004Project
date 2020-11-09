@@ -106,3 +106,45 @@ process.on("SIGINT", () => {
 	console.log("\nSERVER: Shutting down with SIGINT signal.");
 	process.exit(1);
 });
+
+// Handy dev example, creates a user, course, and class (course instance)
+// {
+//     const createdUser = new User({
+//         email: "dan@gmail.com",
+//         password: "password",
+//         fullname: "Dr Dan",
+//         accountType: "professor",
+//         approved: true
+//     });
+
+//     createdUser.save(function (err, createdUser) {
+//         if ( err ) {
+//             return console.error(err);
+//         }
+
+//         const Course = require("./db/course.js");
+//         const createdCourse = new Course({
+//             courseCode: "COMP4004",
+//             title: "Software QA",
+//         });
+
+//         createdCourse.save(function (err, createdCourse) {
+//             if ( err ) {
+//                 return console.error(err);
+//             }
+            
+//             const Class = require("./db/class.js");
+//             const createdClass = new Class({
+//                 course: createdCourse,
+//                 professor: createdUser,
+//                 totalCapacity: 69
+//             });
+
+//             createdClass.save(function (err, createdClass) {
+//                 if ( err ) {
+//                     return console.error(err);
+//                 }
+//             });
+//         });
+//     });
+// }

@@ -2,11 +2,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 var userSchema  = new Schema({
-    id: Schema.Types.ObjectId,
     email: String,
     password: String,
     fullname: String,
-    accountType: String,
+    accountType: {type: String, enum: ["student", "professor", "administrator"]},
     coursesEnrolled: [String],
     coursesTaken: [String],
     approved: Boolean

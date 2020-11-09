@@ -9,13 +9,13 @@ Feature: Apply for Account Feature
 		And The Application is saved to the database
 	Examples:
 		| accountType		|
-		| "Student"			|
-		| "Professor"		|
-		| "Administrator"	|
+		| "student"			|
+		| "professor"		|
+		| "administrator"	|
 
 	Scenario Outline: A student applies for an account and enters their information incorrectly.
-		Given There are no unapproved "Student" applications
-		When A "Student" user tries to apply with name <firstName> <lastName>
+		Given There are no unapproved "student" applications
+		When A "student" user tries to apply with name <firstName> <lastName>
 		And User email is <email>
 		And User password <password> is confirmed as <confirmPassword>
 		Then Input fields are not valid with <number> errors

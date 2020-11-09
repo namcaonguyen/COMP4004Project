@@ -2,7 +2,7 @@ Feature: Login
 
 	Scenario: A student logs in and enters their information correctly.
 		Given There are no accounts in the database
-		And There is an "Student" account made in the database with "tj@gmail.com" and "12345678"
+		And There is an "student" account made in the database with "tj@gmail.com" and "12345678"
 		When A user tries to login with email "tj@gmail.com" and password "12345678"
 		Then User logs in
 
@@ -14,6 +14,6 @@ Feature: Login
 
 	Examples:
 		| accountType			| email						| password			| attemptedEmail			| attemptedPassword |
-		| "Student"				| "tj@gmail.com"			| "password"		| "bademail@bademail.com"	| "password"		|
-		| "Administrator"		| "tj@gmail.com"			| "password"		| "tj@gmail.com"			| "badpassword"		|
-		| "Administrator"		| "tj@gmail.com"			| "password"		| "bademail@bademail.com"	| "badpassword"		|
+		| "student"				| "tj@gmail.com"			| "password"		| "bademail@bademail.com"	| "password"		|
+		| "administrator"		| "tj@gmail.com"			| "password"		| "tj@gmail.com"			| "badpassword"		|
+		| "administrator"		| "tj@gmail.com"			| "password"		| "bademail@bademail.com"	| "badpassword"		|
