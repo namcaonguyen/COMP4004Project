@@ -12,7 +12,7 @@ router.get("/", (req, res) => {
 
 // Middleware to parse the body of the request.
 router.use(express.json());
-router.use(express.urlencoded());
+router.use(express.urlencoded( { extended: true } ));
 
 // Handle a POST request on the Account Registration page.
 router.post("/", (req, res) => {
@@ -47,7 +47,7 @@ router.post("/", (req, res) => {
         });
 
         // Go back to the Login page.
-        res.render("login", { title: "Login" });
+        res.redirect('/');
 	} else {
         // Declaration of variable for an Error Message.
         var errorMessage = "ERROR" + ((errorArray.length > 1) ? "S:\n" : "");
