@@ -1,0 +1,48 @@
+<style>
+    .card {
+        margin: 0 auto;
+        float: none;
+        margin-bottom: 10px;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-8 mx-auto">
+            <div class="card card-signin my-5">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Course Management System</h3>
+                    <h5 class="card-title text-center">View Courses</h5>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">View Courses</li>
+                        </ol>
+                    </nav>
+                    <hr class="my-4">
+                    <div id="message" style="text-align: center;"></div>
+                    <br>
+                    <form method="POST" action="delete-course">
+                        <div class="card" style="width: 18rem;">
+                            <a href="/create-course" class="list-group-item list-group-item-action">Create New
+                                Course</a>
+                        </div>
+                        {{#each courses}}
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{this.courseCode}}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{this.title}}</h6>
+                                <input id="_id" name="_id" type="hidden" value="3">
+                                <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete"
+                                    type="submit">Delete</button>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    if ("{{courses}}".length === 0) $("#message").html("No courses to display");
+</script>
