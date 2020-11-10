@@ -27,6 +27,6 @@ exports.CheckInputFieldValidity = function CheckInputFieldValidity(accountTypePa
     if ( passwordParam !== confirmPasswordParam ) {
         errorArray.push("Passwords do not match.");
 	}
-    
+
     return errorArray;
 }
