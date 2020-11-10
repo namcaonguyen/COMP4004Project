@@ -81,18 +81,14 @@ Then("The Application is saved to the database", async function() {
         });
 
         // Save the unapproved user to the database.
-        createdUser.save(async function (err, createdUser) {
-            if ( err ) {
-                return console.error(err);
-	        } else {
-                // The User has been saved.
-                // After the User has been saved, look for the user in the database.
-                var findUser = await User.find({ email: createdUser.email, password: createdUser.password, fullName: createdUser.fullName, accountType: createdUser.accountType, approved: false });
+        await createdUser.save();
 
-                // Assert that the created User was found.
-                assert.equal(true, findUser.length != 0);
-		    }
-        });
+        // The User has been saved.
+        // After the User has been saved, look for the user in the database.
+        var findUser = await User.find({ email: createdUser.email, password: createdUser.password, fullName: createdUser.fullName, accountType: createdUser.accountType, approved: false });
+
+        // Assert that the created User was found.
+        assert.equal(true, findUser.length != 0);
 	} else {
      // If we reach this else statement that means something went wrong, so assert something that's false.
      assert.equal(1, 2);
