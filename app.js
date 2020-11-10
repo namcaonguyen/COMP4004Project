@@ -42,7 +42,7 @@ app.post("/", (req, res) => {
     // validate login info
     User.find({ email: userEmail, password: userPassword }, function(err, result) {
         if (err) throw err;
-        if (result.length === 0) { // return back to login page notifying user of failed validation
+        if (result.length === 0 || !result[0].approved) { // return back to login page notifying user of failed validation
             res.render("login", { title: "Login", response: "is-invalid" });
         } else { // serve home page and give credentials back to client to save in cookies
             var data = { title: "Welcome", cookieEmail: result[0].email, cookiePassword: result[0].password };
@@ -62,7 +62,7 @@ app.use((req, res, next) => {
         User.find({ email: req.cookies.email, password: req.cookies.password }, function(err, result) {
             if (err) throw err;
             if (result.length === 0) {
-                res.render("login", { title: "Login" });
+                res.render("login", { title: "Login", response: "is-invalid" });
             } else {
                 res.locals.user = result[0];
                 next(); // if user credentials are valid then continue to what user was trying to do
@@ -75,7 +75,7 @@ app.use((req, res, next) => {
 
 // Any routes that appear below here will be checked by the middleware first.
 app.use("/", index);
-app.use("/account-management", accountMangement);
+app.use("/manage-accounts", accountMangement);
 /*
  *
  * Add more routes here
