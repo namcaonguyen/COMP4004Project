@@ -18,21 +18,9 @@ router.get("/", (req, res) => {
 router.post("/", async (req, res) => {
     if (res.locals.user.accountType === "administrator") {
         const {courseCode, title} = req.body;
-
-        let error;
-        if(!courseCode) error = "Please enter a course code";
-        else if(!title) error = "Please enter a course title";
-        else {
-            const id = await tryCreateCourse(courseCode, title);
-            if(!id) error = "Failed, course code already in use";
-            else {
-                res.redirect('/view-courses');
-                return;
-            }
-        };
-
-        // if error, redisplay page with error
-        res.render("course-management/create-course", { error });
+        const { id, error } = await tryCreateCourse(courseCode, title);
+        if(!id) res.render("course-management/create-course", { error });
+        else res.redirect('/view-courses');
     } else {
         res.render("forbidden", { title: "Access Denied" });
     }
