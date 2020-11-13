@@ -38,7 +38,6 @@ app.post("/", (req, res) => {
 
     // TO-DO: sanitize user input
 
-
     // validate login info
     User.find({ email: userEmail, password: userPassword }, function(err, result) {
         if (err) throw err;
@@ -80,6 +79,8 @@ app.use("/manage-accounts", accountMangement);
 app.use("/view-courses", require("./routes/course-management/view-courses"));
 app.use("/delete-course", require("./routes/course-management/delete-course"));
 app.use("/create-course", require("./routes/course-management/create-course"));
+
+app.use("/create-class", require("./routes/class-management/create-class"));
 
 /*
  *
