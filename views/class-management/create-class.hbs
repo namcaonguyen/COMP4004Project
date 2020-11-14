@@ -5,6 +5,13 @@
                 <div class="card-body">
                     <h3 class="card-title text-center">Course Management System</h3>
                     <h5 class="card-title text-center">{{title}}</h5>
+                    <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item"><a href="/view-courses">View Courses</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Create Class</li>
+                    </ol>
+                    </nav>
                     <hr class="my-4">
                     {{#if error}}
                     <div class="alert alert-danger">{{error}}</div>

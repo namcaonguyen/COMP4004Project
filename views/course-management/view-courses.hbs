@@ -7,7 +7,7 @@
 </style>
 <div class="container">
     <div class="row">
-        <div class="col-sm-9 col-md-7 col-lg-8 mx-auto">
+        <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
             <div class="card card-signin my-5">
                 <div class="card-body">
                     <h3 class="card-title text-center">Course Management System</h3>
@@ -19,27 +19,21 @@
                         </ol>
                     </nav>
                     <hr class="my-4">
-                    <div id="message" style="text-align: center;"></div>
+                    <a href="/create-course" class="list-group-item list-group-item-action">Create New Course</a>
+                    <a href="/create-class" class="list-group-item list-group-item-action">Create New Class</a>
+                    <hr class="my-4">
+                    <div class="md-form mt-0">
+                        <input class="form-control" type="text" placeholder="Search" aria-label="Search">
+                    </div>
                     <br>
                     <form method="POST" action="delete-course">
-                        <div class="card" style="width: 18rem;">
-                            <a href="/create-course" class="list-group-item list-group-item-action">Create New
-                                Course</a>
-                        </div>
-                        <div class="card" style="width: 18rem;" name="create-class" type="submit">
-                              <a class ="btn btn-lg btn-primary btn-block text-uppercase" href="/create-class" role="button">
-                                   Create New
-                                   Class
-                              </a>
-                        </div>
                         {{#each courses}}
-                        <div class="card" style="width: 18rem;">
+                        <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">{{this.courseCode}}</h5>
                                 <h6 class="card-subtitle mb-2 text-muted">{{this.title}}</h6>
                                 <input id="_id" name="_id" type="hidden" value="3">
-                                <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete"
-                                    type="submit">Delete</button>
+                                <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" type="submit" onclick="onSubmit('{{this.courseCode}}');">Delete</button>
                             </div>
                         </div>
                         {{/each}}
@@ -51,4 +45,9 @@
 </div>
 <script>
     if ("{{courses}}".length === 0) $("#message").html("No courses to display");
+
+    function onSubmit(courseCode) {
+        if (!confirm("Are you sure you want to delete " + courseCode + "?"))
+            event.preventDefault();
+    }
 </script>

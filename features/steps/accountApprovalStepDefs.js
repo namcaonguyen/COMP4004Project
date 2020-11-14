@@ -2,7 +2,9 @@ const assert = require('assert');
 const { Given, When, Then } = require('@cucumber/cucumber');
 const User = require("../../db/user.js");
 
-Given("A user registers with the account info {string}, {string}, {string}, {string}", function(accountTypeParam, fullnameParam, emailParam, passwordParam) {
+Given("A user registers with the account info {string}, {string}, {string}, {string}", async function(accountTypeParam, fullnameParam, emailParam, passwordParam) {
+    await User.deleteMany({});
+
     this.user = new User({
         email: emailParam,
         password: passwordParam,
@@ -11,17 +13,12 @@ Given("A user registers with the account info {string}, {string}, {string}, {str
         approved: false
     });
 
-    this.user.save(function (err) {
-        if ( err ) {
-            assert(false);
-            throw err;
-        }
-        assert(true);
-    });
+    await this.user.save();
+    assert(true);
 });
 
 When("The admin approves them", async function() {
-    await User.update({ _id: this.user._id }, { $set: { approved: true }}, function(err) {
+    await User.updateOne({ _id: this.user._id }, { $set: { approved: true }}, function(err) {
         if (err) {
             assert(false);
             throw err;

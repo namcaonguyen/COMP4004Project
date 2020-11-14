@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "cucumber-js"
+    "test": "cucumber-js",
+    "populate-db": "node ./db/populate-for-testing.js"
   },
   "author": "Zahid Dawod",
   "license": "ISC",

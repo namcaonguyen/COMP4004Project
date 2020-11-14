@@ -6,11 +6,6 @@ const path = require("path");
 const mongoose = require("mongoose");
 const cookieParser = require('cookie-parser');
 
-// routes
-const index = require("./routes/index.js");
-const accountRegistration = require("./routes/accountregistration.js");
-const accountMangement = require("./routes/accountmanagement.js");
-
 // connect to db
 mongoose.connect("mongodb://localhost/cmsApp");
 const db = mongoose.connection;
@@ -42,7 +37,8 @@ app.post("/", (req, res) => {
     User.find({ email: userEmail, password: userPassword }, function(err, result) {
         if (err) throw err;
         if (result.length === 0 || !result[0].approved) { // return back to login page notifying user of failed validation
-            res.render("login", { title: "Login", response: "is-invalid" });
+            var error = ((result.length === 0) ? "Incorrect email or password." : "Please contact an administrator.");
+            res.render("login", { title: "Login", errorMessage: error,  isInvalid: "is-invalid" });
         } else { // serve home page and give credentials back to client to save in cookies
             var data = { title: "Welcome", cookieEmail: result[0].email, cookiePassword: result[0].password };
             data[result[0].accountType] = true;
@@ -52,7 +48,7 @@ app.post("/", (req, res) => {
 });
 
 // The user is not logged in when trying to access the Account Registration.
-app.use("/register", accountRegistration);
+app.use("/register", require("./routes/accountregistration.js"));
 
 // middleware (this will execute before every route declared after this)
 app.use((req, res, next) => {
@@ -60,8 +56,9 @@ app.use((req, res, next) => {
     if ("email" in req.cookies && "password" in req.cookies) {
         User.find({ email: req.cookies.email, password: req.cookies.password }, function(err, result) {
             if (err) throw err;
-            if (result.length === 0) {
-                res.render("login", { title: "Login", response: "is-invalid" });
+            if (result.length === 0 || !result[0].approved) {
+                var error = ((result.length === 0) ? "Incorrect email or password." : "Please contact an administrator.");
+                res.render("login", { title: "Login", errorMessage: error, isInvalid: "is-invalid" });
             } else {
                 res.locals.user = result[0];
                 next(); // if user credentials are valid then continue to what user was trying to do
@@ -73,8 +70,8 @@ app.use((req, res, next) => {
 });
 
 // Any routes that appear below here will be checked by the middleware first.
-app.use("/", index);
-app.use("/manage-accounts", accountMangement);
+app.use("/", require("./routes/index.js"));
+app.use("/manage-accounts", require("./routes/accountmanagement.js"));
 
 app.use("/view-courses", require("./routes/course-management/view-courses"));
 app.use("/delete-course", require("./routes/course-management/delete-course"));

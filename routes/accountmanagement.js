@@ -27,23 +27,15 @@ router.get("/view-account-requests", (req, res) => {
 });
 
 // POST view account requests page.
-router.post("/view-account-requests", (req, res) => {
+router.post("/view-account-requests", async (req, res) => {
     if (res.locals.user.accountType === "administrator") {
         if ("userId" in req.body) {
             var query = { _id: req.body.userId };
             if ("approve" in req.body) {
                 var updateValues = { $set: { approved: true }};
-                User.update(query, updateValues, function(err) {
-                    if (err) {
-                        throw err;
-                    }
-                });
+                await User.updateOne(query, updateValues);
             } else if ("decline" in req.body) {
-                User.deleteOne(query, function(err) { 
-                    if (err) {
-                        throw err;
-                    }
-                });
+                await User.deleteOne(query);
             }
             res.redirect("/manage-accounts/view-account-requests");
         }

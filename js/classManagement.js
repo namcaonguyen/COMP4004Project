@@ -4,11 +4,8 @@ const Course = require("../db/course.js");
 
 //ensure that the class capacity > 1
 function validateClassCapacity(cap) {
-    if (cap < 1) {
-        return false;
-    }
-
-    return true;
+    if (isNaN(cap)) return false;
+    return (cap >= 1);
 }
 
 module.exports.tryCreateClass = async function (course, professor, totalCapacity, prereqs, precludes) { // returns {id:string} if success, returns {error:string} if failed
