@@ -1,0 +1,77 @@
+const Class = require("../db/class.js");
+const User = require("../db/user.js");
+const Course = require("../db/course.js");
+const ClassEnrollment = require("../db/classEnrollment.js");
+
+// Function to get a Class List of the available Classes. It includes data that is used to display information to the user.
+// Return a list of Classes.
+module.exports.getClassList = async function() {
+	var classList = [];
+
+	// Find all the Classes in the database.
+	var foundClasses = await Class.find({});
+
+	// Go through the results of the query.
+	for ( let i = 0; i < foundClasses.length; ++i ) {
+		// Declare temporary Class variable.
+		let tempClass = {};
+		tempClass._id = foundClasses[i]._id;
+		tempClass.totalCapacity = foundClasses[i].totalCapacity;
+		tempClass.prereqs = foundClasses[i].prereqs;
+		tempClass.precludes = foundClasses[i].precludes;
+
+		// Find the Course associated with the Class.
+		var associatedCourse = await Course.find({ _id: foundClasses[i].course });
+
+		tempClass.courseCode = associatedCourse[0].courseCode;
+		tempClass.title = associatedCourse[0].title;
+
+		// Find the Professor associated with the Class.
+		var associatedProfessor = await User.find({ _id: foundClasses[i].professor });
+
+		tempClass.professor = associatedProfessor[0].fullname;
+		classList.push(tempClass);
+	}
+
+	return classList;
+}
+
+// Function to check if the Class is full.
+// Param:	classObjectID	ID of the Class to check
+// Return boolean for if the Class is full or not.
+async function isClassFull(classObjectID) {
+	// Get the Total Capacity of the Class.
+	var currentClass = await Class.find( { _id: classObjectID } );
+
+	var currentlyEnrolled = ( await ClassEnrollment.find( { class: classObjectID } ) ).length;
+	
+	// Count the number of students enrolled in the Class.
+	// If the number of students enrolled in the Class reaches the Total Capacity, then the Class is full.
+	if ( ( await ClassEnrollment.find( { class: classObjectID } ) ).length >= currentClass[0].totalCapacity ) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+// Function to try and enroll a student User in a Class.
+// Param:	studentUserObjectID	ID of the student User enrolling
+// Param:	classObjectID		ID of the Class to enroll in
+// Return {id:string} for a success, and {error:string} for a failure.
+module.exports.tryEnrollStudentInClass = async function(studentUserObjectID, classObjectID) {
+	var test = await ClassEnrollment.find({ student: studentUserObjectID, class: classObjectID });
+
+	// Check if the student User is already enrolled in the Class.
+	if ( ( await ClassEnrollment.find( { student: studentUserObjectID, class: classObjectID } ) ).length ) {
+		return { error: "You are already enrolled in that Class!" };
+	}
+	// Check if the Class is full.
+	if ( await isClassFull(classObjectID) ) {
+		return { error: "The Class is already full." };
+	}
+	// TODO: Check for prerequisites.
+
+	// Save the Enrollment record to the database.
+	const enrollment = await new ClassEnrollment({ student: studentUserObjectID, class: classObjectID, finalGrade: "IN PROGRESS" }).save();
+	return { id: enrollment._id };
+}
