@@ -79,6 +79,8 @@ app.use("/create-course", require("./routes/course-management/create-course"));
 
 app.use("/create-class", require("./routes/class-management/create-class"));
 
+app.use("/student", require("./routes/student-account/view-available-classes"));
+
 /*
  *
  * Add more routes here
@@ -110,40 +112,55 @@ process.on("SIGINT", () => {
 	process.exit(1);
 });
 
+//{
+//    const createdAdmin = new User({
+//        email: "admin@admin.com",
+//        password: "password",
+//        fullname: "admin guy",
+//        accountType: "administrator",
+//        approved: true
+//	});
+//    createdAdmin.save(function(err, createdAdmin) {
+//        if (err) {
+//      return console.error(err);  
+//		}
+//	});
+//}
+
 // Handy dev example, creates a user, course, and class (course instance)
 // {
-//     const createdUser = new User({
+//     const createduser = new user({
 //         email: "dan@gmail.com",
 //         password: "password",
-//         fullname: "Dr Dan",
-//         accountType: "professor",
+//         fullname: "dr dan",
+//         accounttype: "professor",
 //         approved: true
 //     });
 
-//     createdUser.save(function (err, createdUser) {
+//     createduser.save(function (err, createduser) {
 //         if ( err ) {
 //             return console.error(err);
 //         }
 
-//         const Course = require("./db/course.js");
-//         const createdCourse = new Course({
-//             courseCode: "COMP4004",
-//             title: "Software QA",
+//         const course = require("./db/course.js");
+//         const createdcourse = new course({
+//             coursecode: "comp4004",
+//             title: "software qa",
 //         });
 
-//         createdCourse.save(function (err, createdCourse) {
+//         createdcourse.save(function (err, createdcourse) {
 //             if ( err ) {
 //                 return console.error(err);
 //             }
             
-//             const Class = require("./db/class.js");
-//             const createdClass = new Class({
-//                 course: createdCourse,
-//                 professor: createdUser,
-//                 totalCapacity: 69
+//             const class = require("./db/class.js");
+//             const createdclass = new class({
+//                 course: createdcourse,
+//                 professor: createduser,
+//                 totalcapacity: 69
 //             });
 
-//             createdClass.save(function (err, createdClass) {
+//             createdclass.save(function (err, createdclass) {
 //                 if ( err ) {
 //                     return console.error(err);
 //                 }

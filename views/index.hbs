@@ -7,9 +7,27 @@
                     <h5 class="card-title text-center">Welcome</h5>
 
                     {{#if administrator}}
-                    {{>adminIndex}}
+                        {{>adminIndex}}
+                        <hr class="my-4">
+                        <div class="list-group">
+                            <a href="/manage-accounts/view-account-requests"
+                               class="list-group-item list-group-item-action">View Account Requests</a>
+                            <a href="/view-courses" class="list-group-item list-group-item-action">
+                                View and Delete Existing
+                                Courses
+                            </a>
+                            <a href="/create-course" class="list-group-item list-group-item-action">Create New Course</a>
+                        </div>
                     {{/if}}
-                    <hr class="my-4">
+
+                    {{#if student}}
+                        {{>studentIndex}}
+                        <hr class="my-4">
+                        <div class="list-group">
+                            <a href="/student/view-available-classes" class="list-group-item list-group-item-action">View Available Classes</a>
+                        </div>
+                    {{/if}}
+
                     <div class="list-group">
                         <a href="/logout" class="list-group-item list-group-item-action">Logout</a>
                     </div>

@@ -6,7 +6,6 @@ var userSchema  = new Schema({
     password: String,
     fullname: String,
     accountType: {type: String, enum: ["student", "professor", "administrator"]},
-    coursesEnrolled: [String],
     coursesTaken: [String],
     approved: Boolean
 });
