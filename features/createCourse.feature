@@ -16,7 +16,7 @@ Feature: Create Course
         Given There are no courses in the database
 		When An admin tries to create a course with code <courseCode> and title <courseTitle>
         Then No new course is created and an error is returned
-		And There does not exists a course with code <courseCode> and title <courseTitle>
+		And There does not exist a course with code <courseCode> and title <courseTitle>
     
     Examples:
 		| courseCode | courseTitle                      |

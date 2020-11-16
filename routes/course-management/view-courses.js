@@ -6,8 +6,8 @@ const Course = require("../../db/course.js");
 router.get("/", async (req, res) => {
     if (res.locals.user.accountType === "administrator") {
         const courses = (await Course.find({})).map(result => {
-            const {courseCode, title} = result;
-            return {courseCode, title};
+            const {courseCode, title, _id} = result;
+            return {courseCode, title, _id};
         });
         res.render("course-management/view-courses", { courses });
     } else {

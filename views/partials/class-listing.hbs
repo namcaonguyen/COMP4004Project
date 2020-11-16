@@ -11,11 +11,11 @@
             <h7 class="card-subtitle mb-2 text-muted">Precludes: {{this.precludes}}</h7>
             <br>
             {{#if ../student}}
-            <button class="btn btn-lg btn-primary btn-block text-uppercase" name="enrollInClass" value={{this._id}}
+            <button class="btn btn-lg btn-primary btn-block text-uppercase" name="enrollInClass" value="{{this._id}}"
                 type="submit">Enroll in Class</button>
             {{/if}}
             {{#if ../administrator}}
-            <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" value={{this._id}}
+            <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" value="{{this._id}}"
                 type="submit">Delete</button>
             {{/if}}
         </div>

@@ -52,6 +52,10 @@ module.exports.tryCreateClass = async function (course, professor, totalCapacity
 // deletes class and associated data
 // - delete class enrollment data
 module.exports.deleteClass = async function (id) {
-    await ClassEnrollment.deleteMany({ class: id });
+    const classes = await Class.find({_id: id});
+    if(!classes.length) return;
+    const class_ = classes[0];
+
+    await ClassEnrollment.deleteMany({ class: class_ });
     await Class.deleteMany({_id: id});
 }

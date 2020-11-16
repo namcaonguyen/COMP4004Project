@@ -20,7 +20,6 @@
                     </nav>
                     <hr class="my-4">
                     <a href="/create-course" class="list-group-item list-group-item-action">Create New Course</a>
-                    <a href="/create-class" class="list-group-item list-group-item-action">Create New Class</a>
                     <hr class="my-4">
                     <div class="md-form mt-0">
                         <input class="form-control" type="text" placeholder="Search" aria-label="Search">
@@ -32,9 +31,8 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{this.courseCode}}</h5>
                                 <h6 class="card-subtitle mb-2 text-muted">{{this.title}}</h6>
-                                <input id="_id" name="_id" type="hidden" value="3">
                                 <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete"
-                                    type="submit" onclick="onSubmit('{{this}}');">Delete</button>
+                                    type="submit" value="{{this._id}}">Delete</button>
                             </div>
                         </div>
                         {{/each}}
@@ -46,9 +44,4 @@
 </div>
 <script>
     if ("{{courses}}".length === 0) $("#message").html("No courses to display");
-
-    function onSubmit(course) {
-        if (!confirm("Are you sure you want to delete " + course.courseCode + "?"))
-            event.preventDefault();
-    }
 </script>

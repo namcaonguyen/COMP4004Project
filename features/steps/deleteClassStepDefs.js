@@ -3,6 +3,7 @@ const Course = require("../../db/course.js");
 const User = require("../../db/user.js");
 const { Given, When, Then } = require('@cucumber/cucumber');
 const assert = require('assert');
+const { deleteClass } = require("../../js/classManagement.js");
 
 Then("An Admin deletes a class for course code {string} with {string}", async function (courseCodeString, classProfessorString) {
 
@@ -17,8 +18,8 @@ Then("An Admin deletes a class for course code {string} with {string}", async fu
     const allClasses = await Class.find({ course, professor });
     assert.strictEqual(allClasses.length, 1);
     const class_ = allClasses[0];
-
-    await Class.deleteOne(class_);
+    
+    await deleteClass(class_.id);
 });
 
 Then("There does not exist a class for course code {string} with {string}", async function (courseCodeString, classProfessorString) {
@@ -33,4 +34,9 @@ Then("There does not exist a class for course code {string} with {string}", asyn
 
     const allClasses = await Class.find({ course, professor });
     assert.strictEqual(allClasses.length, 0);
+});
+
+Then("The number of classes in the database is {int}", async function (numClasses) {
+    const classes = await Class.find({});
+    assert.strictEqual(numClasses, classes.length);
 });

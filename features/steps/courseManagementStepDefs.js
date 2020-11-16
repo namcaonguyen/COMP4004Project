@@ -2,7 +2,7 @@ const assert = require('assert');
 const { Given, When, Then } = require('@cucumber/cucumber');
 const Course = require("../../db/course.js");
 const {
-    tryCreateCourse
+    tryCreateCourse, deleteCourse
 } = require("../../js/courseManagement.js");
 
 // Set up the MongoDB.
@@ -37,7 +37,13 @@ Then("There exists a course with code {string} and title {string}", async functi
     assert(!!courses.length);
 });
 
-Then("There does not exists a course with code {string} and title {string}", async function (courseCode, title) {
+Then("There does not exist a course with code {string} and title {string}", async function (courseCode, title) {
     const courses = await Course.find({courseCode, title});
     assert(!courses.length);
+});
+
+When("An admin deletes a course with code {string}", async function (courseCode) {
+    const courses = await Course.find({courseCode});
+    assert.strictEqual(1, courses.length);
+    await deleteCourse(courses[0]._id);
 });

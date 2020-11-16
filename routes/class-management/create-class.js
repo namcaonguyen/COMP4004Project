@@ -76,7 +76,7 @@ router.post("/", async (req, res) => {
         var { id, error } = await tryCreateClass(course, professor, capacity, prereqs, precludes);
 
         if (!id) res.render("class-management/create-class", { error, professors: professorList, courses: coursesList });
-        else res.redirect('/view-courses');
+        else res.redirect('/view-classes');
     } else {
         res.render("forbidden", { title: "Access Denied" });
     }

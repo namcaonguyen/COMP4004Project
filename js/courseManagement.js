@@ -1,4 +1,6 @@
 const Course = require("../db/course.js");
+const Class = require("../db/class.js");
+const { deleteClass } = require("./classManagement.js");
 
 function validateCourseCode(courseCode) {
     if(courseCode.length != 8) return false;
@@ -30,6 +32,14 @@ module.exports.tryCreateCourse = async function(courseCode, title) { // returns 
 // - delete prereqs
 // - deletes classes (by classing classManagement.deleteClass)
 // - deletes class enrollments (vicariously, by calling classManagement.deleteClass)
-module.exports.deleteCourse = async function(course) {
-    // NOT IMPLEMENTED
+module.exports.deleteCourse = async function(courseID) {
+    const courses = await Course.find({_id: courseID});
+    if(!courses.length) return;
+    const course = courses[0];
+
+    const classes = await Class.find({course});
+    for(const class_ of classes) {
+        await deleteClass(class_._id);
+    }
+    await Course.deleteOne(course);
 }

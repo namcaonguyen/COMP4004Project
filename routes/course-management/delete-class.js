@@ -3,7 +3,7 @@ const router = express.Router();
 const Course = require("../../db/course.js");
 const { deleteClass } = require("../../js/classManagement.js");
 
-// delete course
+// delete class
 router.post("/", (req, res) => {
     if (res.locals.user.accountType === "administrator") {
         const classID = req.body.delete;
