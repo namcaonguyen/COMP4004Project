@@ -79,6 +79,8 @@ app.use("/delete-course", require("./routes/course-management/delete-course"));
 app.use("/delete-class", require("./routes/course-management/delete-class"));
 app.use("/create-course", require("./routes/course-management/create-course"));
 
+app.use("/professor-view-classes", require("./routes/professor-class-management/view-classes"));
+
 app.use("/create-class", require("./routes/class-management/create-class"));
 
 app.use("/student", require("./routes/student-account/view-available-classes"));
@@ -115,14 +117,14 @@ process.on("SIGINT", () => {
 });
 
 //{
-//    const createdAdmin = new User({
+//    const createdadmin = new user({
 //        email: "admin@admin.com",
 //        password: "password",
 //        fullname: "admin guy",
-//        accountType: "administrator",
+//        accounttype: "administrator",
 //        approved: true
 //	});
-//    createdAdmin.save(function(err, createdAdmin) {
+//    createdadmin.save(function(err, createdadmin) {
 //        if (err) {
 //      return console.error(err);  
 //		}

@@ -80,3 +80,19 @@ module.exports.tryEnrollStudentInClass = async function(studentUserObjectID, cla
 	const enrollment = await new ClassEnrollment({ student: studentUserObjectID, class: classObjectID, finalGrade: "IN PROGRESS" }).save();
 	return { id: enrollment._id };
 }
+
+// Function to get all classes where the specified professor is the prof of the class. It includes data that is used to display information to the user.
+// Return a list of Classes of a specific professor.
+module.exports.getProfessorClassList = async function (profID) {
+	var classList = [];
+
+	// Find all the Classes in the database.
+	var foundClasses = await Class.find({ professor: profID });
+
+	// Go through the results of the query.
+	for (let i = 0; i < foundClasses.length; ++i) {
+		classList.push(await getClassInfo(foundClasses[i]));
+	}
+
+	return classList;
+}
