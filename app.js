@@ -13,6 +13,8 @@ db.on("error", console.error.bind(console, "MongoDB Connection Error:"));
 
 // Require User object used in finding if a user exist when logging in
 const User = require("./db/user.js");
+// Require Academic Deadline object.
+const AcademicDeadline = require("./db/academicDeadline.js");
 
 // setup handlebar engine
 app.engine("hbs", hbs({extname: "hbs", defaultLayout: "layout", layoutsDir: __dirname + "/views/layouts/", partialsDir: __dirname + "/views/partials/"}));
@@ -83,6 +85,8 @@ app.use("/create-class", require("./routes/class-management/create-class"));
 
 app.use("/student", require("./routes/student-account/view-available-classes"));
 
+app.use("/view-academic-deadline", require("./routes/view-academic-deadline.js"));
+
 /*
  *
  * Add more routes here
@@ -113,6 +117,34 @@ process.on("SIGINT", () => {
 	console.log("\nSERVER: Shutting down with SIGINT signal.");
 	process.exit(1);
 });
+
+// On startup, set an Academic Deadline if there isn't one already.
+{
+    // Find an Academic Deadline in the database.
+    AcademicDeadline.find(async function(err, findAcademicDeadline) {
+        if ( err ) {
+            return console.error(err);  
+		} else {
+            // If there is no Academic Deadline in the database yet...
+            if ( findAcademicDeadline.length === 0 ) {
+                console.log("Couldn't find an Academic Deadline. Creating one now...");
+                // Create an Academic Deadline and save it to the database.
+                const createdAcademicDeadline = new AcademicDeadline({
+                    date: new Date(2020, 11, 30, 23, 59, 59)
+				});
+
+                // Save a new Academic Deadline.
+                createdAcademicDeadline.save(function(err, createdAcademicDeadline) {
+                    if ( err ) {
+                        return console.error(err);
+					} else {
+                        console.log("Saved!");
+					}
+				});
+            }
+		}
+    });
+}
 
 //{
 //    const createdAdmin = new User({
