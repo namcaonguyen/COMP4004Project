@@ -13,28 +13,33 @@ module.exports.getClassList = async function() {
 
 	// Go through the results of the query.
 	for ( let i = 0; i < foundClasses.length; ++i ) {
-		// Declare temporary Class variable.
-		let tempClass = {};
-		tempClass._id = foundClasses[i]._id;
-		tempClass.totalCapacity = foundClasses[i].totalCapacity;
-		tempClass.prereqs = foundClasses[i].prereqs;
-		tempClass.precludes = foundClasses[i].precludes;
-
-		// Find the Course associated with the Class.
-		var associatedCourse = await Course.find({ _id: foundClasses[i].course });
-
-		tempClass.courseCode = associatedCourse[0].courseCode;
-		tempClass.title = associatedCourse[0].title;
-
-		// Find the Professor associated with the Class.
-		var associatedProfessor = await User.find({ _id: foundClasses[i].professor });
-
-		tempClass.professor = associatedProfessor[0].fullname;
-		classList.push(tempClass);
+		classList.push(await getClassInfo(foundClasses[i]));
 	}
 
 	return classList;
 }
+
+async function getClassInfo(class_) {
+	// Declare temporary Class variable.
+	let tempClass = {};
+	tempClass._id = class_._id;
+	tempClass.totalCapacity = class_.totalCapacity;
+	tempClass.prereqs = class_.prereqs;
+	tempClass.precludes = class_.precludes;
+
+	// Find the Course associated with the Class.
+	var associatedCourse = await Course.find({ _id: class_.course });
+
+	tempClass.courseCode = associatedCourse[0].courseCode;
+	tempClass.title = associatedCourse[0].title;
+
+	// Find the Professor associated with the Class.
+	var associatedProfessor = await User.find({ _id: class_.professor });
+
+	tempClass.professor = associatedProfessor[0].fullname;
+	return tempClass;
+}
+module.exports.getClassInfo = getClassInfo;
 
 // Function to check if the Class is full.
 // Param:	classObjectID	ID of the Class to check

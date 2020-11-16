@@ -25,3 +25,11 @@ module.exports.tryCreateCourse = async function(courseCode, title) { // returns 
     const course = await new Course({courseCode, title}).save();
     return {id: course._id};
 }
+
+// deletes it properly so that associated data is removed. first arg is course itself, NOT course code
+// - delete prereqs
+// - deletes classes (by classing classManagement.deleteClass)
+// - deletes class enrollments (vicariously, by calling classManagement.deleteClass)
+module.exports.deleteCourse = async function(course) {
+    // NOT IMPLEMENTED
+}

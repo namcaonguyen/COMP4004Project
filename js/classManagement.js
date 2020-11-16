@@ -1,6 +1,7 @@
 const Class = require("../db/class.js");
 const User = require("../db/user.js");
 const Course = require("../db/course.js");
+const ClassEnrollment = require("../db/classEnrollment.js");
 
 //ensure that the class capacity > 1
 function validateClassCapacity(cap) {
@@ -46,4 +47,11 @@ module.exports.tryCreateClass = async function (course, professor, totalCapacity
     //save the class to the database and return its _id
     const someClass = await new Class({ course, professor, totalCapacity, prereqs, precludes }).save();
     return { id: someClass._id };
+}
+
+// deletes class and associated data
+// - delete class enrollment data
+module.exports.deleteClass = async function (id) {
+    await ClassEnrollment.deleteMany({ class: id });
+    await Class.deleteMany({_id: id});
 }

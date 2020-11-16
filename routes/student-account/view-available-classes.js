@@ -15,7 +15,10 @@ router.get("/view-available-classes", async (req, res) => {
         // Get the list of available Classes.
         var classList = await getClassList();
 
-        res.render("student-account/view-available-classes", { title: "View Available Classes", classes: classList });
+        const data = { title: "View Available Classes", classes: classList };
+        data[res.locals.user.accountType] = true;
+
+        res.render("student-account/view-available-classes", data);
     } else {
         res.render("forbidden", { title: "Access Denied" });
     }
@@ -43,7 +46,10 @@ router.post("/view-available-classes", async (req, res) => {
             // Get the list of available Classes.
             var classList = await getClassList();
             
-            res.render("student-account/view-available-classes", { title: "View Available Classes", classes: classList, error: error })  
+            const data = { title: "View Available Classes", classes: classList, error: error };
+            data[res.locals.user.accountType] = true;
+            
+            res.render("student-account/view-available-classes", data)  
 		} else {
             res.redirect("/");
 		}

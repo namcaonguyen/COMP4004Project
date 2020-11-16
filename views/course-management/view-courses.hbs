@@ -33,7 +33,8 @@
                                 <h5 class="card-title">{{this.courseCode}}</h5>
                                 <h6 class="card-subtitle mb-2 text-muted">{{this.title}}</h6>
                                 <input id="_id" name="_id" type="hidden" value="3">
-                                <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" type="submit" onclick="onSubmit('{{this.courseCode}}');">Delete</button>
+                                <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete"
+                                    type="submit" onclick="onSubmit('{{this}}');">Delete</button>
                             </div>
                         </div>
                         {{/each}}
@@ -46,8 +47,8 @@
 <script>
     if ("{{courses}}".length === 0) $("#message").html("No courses to display");
 
-    function onSubmit(courseCode) {
-        if (!confirm("Are you sure you want to delete " + courseCode + "?"))
+    function onSubmit(course) {
+        if (!confirm("Are you sure you want to delete " + course.courseCode + "?"))
             event.preventDefault();
     }
 </script>

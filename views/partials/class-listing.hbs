@@ -1,0 +1,32 @@
+{{#each classes}}
+<form method="POST" action="delete-class">
+    <div class="card" style="width: 30rem;">
+        <div class="card-body">
+            <h5 class="card-title">{{this.courseCode}}</h5>
+            <h5 class="card-title">{{this.title}}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Taught by: {{this.professor}}</h6>
+            <h6 class="card-subtitle mb-2 text-muted">Total Capacity: {{this.totalCapacity}}</h6>
+            <h7 class="card-subtitle mb-2 text-muted">Prerequisites: {{this.prereqs}}</h7>
+            <br>
+            <h7 class="card-subtitle mb-2 text-muted">Precludes: {{this.precludes}}</h7>
+            <br>
+            {{#if ../student}}
+            <button class="btn btn-lg btn-primary btn-block text-uppercase" name="enrollInClass" value={{this._id}}
+                type="submit">Enroll in Class</button>
+            {{/if}}
+            {{#if ../administrator}}
+            <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" value={{this._id}}
+                type="submit">Delete</button>
+            {{/if}}
+        </div>
+    </div>
+</form>
+{{/each}}
+<script>
+    var data = "{{classes}}";
+    if (data.length === 0) {
+        $("#message").html("There are no Classes at this moment!");
+    } else {
+        $("#message").html("Here are the Classes available for you to register in.");
+    }
+</script>
