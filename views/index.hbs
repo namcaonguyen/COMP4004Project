@@ -8,18 +8,13 @@
 
                     {{#if administrator}}
                     {{>adminIndex}}
-                    <hr class="my-4">
                     {{/if}}
 
                     {{#if student}}
                     {{>studentIndex}}
-                    <hr class="my-4">
-                    <div class="list-group">
-                        <a href="/student/view-available-classes" class="list-group-item list-group-item-action">View
-                            Available Classes</a>
-                    </div>
                     {{/if}}
 
+                    <hr class="my-4">
                     <div class="list-group">
                         <a href="/view-academic-deadline" class="list-group-item list-group-item-action">View Academic Deadline</a>
                         <a href="/logout" class="list-group-item list-group-item-action">Logout</a>
