@@ -36,7 +36,7 @@ router.post("/view-available-classes", async (req, res) => {
         const studentUserObjectID = currentUser[0]._id;
 
         // Get the Class's Object ID.
-        const classObjectID = req.body.enrollInClass;
+        const classObjectID = req.body.classID;
 
         // Try to create a record for this student's enrollment in the Class.
         const { id, error } = await tryEnrollStudentInClass(studentUserObjectID, classObjectID);

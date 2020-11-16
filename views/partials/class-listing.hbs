@@ -1,26 +1,29 @@
 {{#each classes}}
-<form method="POST" action="delete-class">
-    <div class="card" style="width: 30rem;">
-        <div class="card-body">
-            <h5 class="card-title">{{this.courseCode}}</h5>
-            <h5 class="card-title">{{this.title}}</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Taught by: {{this.professor}}</h6>
-            <h6 class="card-subtitle mb-2 text-muted">Total Capacity: {{this.totalCapacity}}</h6>
-            <h7 class="card-subtitle mb-2 text-muted">Prerequisites: {{this.prereqs}}</h7>
-            <br>
-            <h7 class="card-subtitle mb-2 text-muted">Precludes: {{this.precludes}}</h7>
-            <br>
+<div class="card" style="width: 30rem;">
+    <div class="card-body">
+        <h5 class="card-title">{{this.courseCode}}</h5>
+        <h5 class="card-title">{{this.title}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">Taught by: {{this.professor}}</h6>
+        <h6 class="card-subtitle mb-2 text-muted">Total Capacity: {{this.totalCapacity}}</h6>
+        <h7 class="card-subtitle mb-2 text-muted">Prerequisites: {{this.prereqs}}</h7>
+        <br>
+        <h7 class="card-subtitle mb-2 text-muted">Precludes: {{this.precludes}}</h7>
+        <br>
+        <form method="POST">
             {{#if ../student}}
-            <button class="btn btn-lg btn-primary btn-block text-uppercase" name="enrollInClass" value="{{this._id}}"
-                type="submit">Enroll in Class</button>
+            <input type="hidden" value="{{this._id}}" name="classID">
+            <button class="btn btn-lg btn-primary btn-block text-uppercase" name="enrollInClass" type="submit">Enroll in
+                Class</button>
             {{/if}}
+        </form>
+        <form method="POST" action="delete-class">
             {{#if ../administrator}}
-            <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" value="{{this._id}}"
-                type="submit">Delete</button>
+            <input type="hidden" value="{{this._id}}" name="classID">
+            <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" type="submit">Delete</button>
             {{/if}}
-        </div>
+        </form>
     </div>
-</form>
+</div>
 {{/each}}
 <script>
     var data = "{{classes}}";
