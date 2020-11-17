@@ -2,6 +2,7 @@ const Class = require("../db/class.js");
 const User = require("../db/user.js");
 const Course = require("../db/course.js");
 const ClassEnrollment = require("../db/classEnrollment.js");
+const AcademicDeadline = require("../db/academicDeadline.js");
 
 // Function to get a Class List of the available Classes. It includes data that is used to display information to the user.
 // Return a list of Classes.
@@ -41,6 +42,27 @@ async function getClassInfo(class_) {
 }
 module.exports.getClassInfo = getClassInfo;
 
+// Function to check if it is past the Academic Deadline.
+// Return whether or not it is past the Academic Deadline.
+async function isPastAcademicDeadline() {
+	// Get the Academic Deadline.
+	var findAcademicDeadline = await AcademicDeadline.find({});
+	// Get the current date.
+	var currentDate = new Date();
+
+	// If there isn't exactly one Academic Deadline in the database...
+	if ( findAcademicDeadline.length != 1 ) {
+		return console.error("Something went wrong. Unexpected Academic Deadline...");
+	}
+
+	// If the Academic Deadline has already past...
+	if ( findAcademicDeadline[0].date.getTime() < currentDate.getTime() ) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 // Function to check if the Class is full.
 // Param:	classObjectID	ID of the Class to check
 // Return boolean for if the Class is full or not.
@@ -64,7 +86,10 @@ async function isClassFull(classObjectID) {
 // Param:	classObjectID		ID of the Class to enroll in
 // Return {id:string} for a success, and {error:string} for a failure.
 module.exports.tryEnrollStudentInClass = async function(studentUserObjectID, classObjectID) {
-	var test = await ClassEnrollment.find({ student: studentUserObjectID, class: classObjectID });
+	// Check if it is past the Academic Deadline.
+	if ( await isPastAcademicDeadline() ) {
+		return { error: "Sorry, it's too late to enroll in any Classes." };
+	}
 
 	// Check if the student User is already enrolled in the Class.
 	if ( ( await ClassEnrollment.find( { student: studentUserObjectID, class: classObjectID } ) ).length ) {
