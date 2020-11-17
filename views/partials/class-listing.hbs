@@ -19,7 +19,7 @@
         <form method="POST" action="delete-class">
             {{#if ../administrator}}
             <input type="hidden" value="{{this._id}}" name="classID">
-            <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" type="submit">Delete</button>
+            <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" type="submit" onclick="onSubmit('{{this.courseCode}}')">Delete</button>
             {{/if}}
         </form>
     </div>
@@ -32,4 +32,10 @@
     } else {
         $("#message").html("Here are the Classes available for you to register in.");
     }
+    function onSubmit(name) {
+        if (!confirm("Are you sure you want to delete " + name + "?")) {
+            event.preventDefault();
+        }
+    }
+
 </script>
