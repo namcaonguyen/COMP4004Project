@@ -81,6 +81,21 @@ async function isClassFull(classObjectID) {
 	}
 }
 
+// Function to check if the Class still exists in the database.
+// Param:	classObjectID	ID of the Class to check
+// Return boolean for if the Class still exists or not.
+async function doesClassStillExist(classObjectID) {
+	// Look for the current Class in the database.
+	var currentClass = await Class.find( { _id: classObjectID } );
+
+	// If a Class with the Object ID could not be found...
+	if ( currentClass.length === 0 ) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
 // Function to try and enroll a student User in a Class.
 // Param:	studentUserObjectID	ID of the student User enrolling
 // Param:	classObjectID		ID of the Class to enroll in
@@ -95,11 +110,20 @@ module.exports.tryEnrollStudentInClass = async function(studentUserObjectID, cla
 	if ( ( await ClassEnrollment.find( { student: studentUserObjectID, class: classObjectID } ) ).length ) {
 		return { error: "You are already enrolled in that Class!" };
 	}
+	// Check if the Class still exists, in case an administrator User cancelled it.
+	if ( await doesClassStillExist(classObjectID) == false ) {
+		return { error: "Sorry, that Class has been cancelled." };
+	}
 	// Check if the Class is full.
 	if ( await isClassFull(classObjectID) ) {
 		return { error: "The Class is already full." };
 	}
 	// TODO: Check for prerequisites.
+
+	// Check again before enrolling if the Class still exists.
+	if ( await doesClassStillExist(classObjectID) == false ) {
+		return { error: "Sorry, that Class has been cancelled." };
+	}
 
 	// Save the Enrollment record to the database.
 	const enrollment = await new ClassEnrollment({ student: studentUserObjectID, class: classObjectID, finalGrade: "IN PROGRESS" }).save();

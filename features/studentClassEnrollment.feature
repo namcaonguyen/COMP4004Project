@@ -80,3 +80,21 @@ Feature: A student User can enroll in a Class.
 		And Student is successfully enrolled
 		And Student with email "slow@guy.com" wants to enroll in the Class
 		And Student does not enroll and an error is returned
+
+	Scenario: A student User tries to enroll in a Class. But an administrator User cancelled the Class before the student could enroll.
+		Given There is an Academic Deadline set in the database
+		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
+		And There are no existing Users in the database
+		And There are no existing Courses in the database
+		And There are no existing Classes in the database
+		And There are no existing ClassEnrollments in the database
+		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password"
+		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password"
+		And There exists a Course "NAMO1001" with title "How to be Rad"
+		And There exists a Class for "NAMO1001" with capacity 150, prerequisites "", and precludes ""
+		When Student User tries to view list of available Classes
+		Then There are available Classes
+		# Delete all the Classes right before the student User decides to enroll.
+		And There are no existing Classes in the database
+		And Student with email "gmail@gmail.com" wants to enroll in the Class
+		And Student does not enroll and an error is returned
