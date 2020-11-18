@@ -1,0 +1,48 @@
+<style>
+    .card {
+        margin: 0 auto;
+        float: none;
+        margin-bottom: 10px;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-8 mx-auto">
+            <div class="card card-signin my-5">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Course Management System</h3>
+                    <h5 class="card-title text-center">View Classes</h5>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">View Classes</li>
+                        </ol>
+                    </nav>
+
+                    {{#each classes}}
+                    <div class="card" style="width: 30rem;">
+                        <a class="card-body" href="/classes/{{this._id}}">
+                            <h5 class="card-title">{{this.courseCode}}</h5>
+                            <h5 class="card-title">{{this.title}}</h5>
+                            {{#if ../student}}
+                            <h6 class="card-subtitle mb-2 text-muted">Taught by: {{this.professor}}</h6>
+                            {{/if}}
+                            {{#if ../professor}}
+                            <h6 class="card-subtitle mb-2 text-muted">Students Enrolled: {{this.numOfEnrolled}}</h6>
+                            {{/if}}
+                        </a>
+                    </div>
+                    {{/each}}
+
+                    <hr class=" my-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">View Classes</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
