@@ -91,8 +91,43 @@ module.exports.getProfessorClassList = async function (profID) {
 
 	// Go through the results of the query.
 	for (let i = 0; i < foundClasses.length; ++i) {
-		classList.push(await getClassInfo(foundClasses[i]));
+		var currentClassInfo = await getClassInfo(foundClasses[i]);
+		classList.push({
+			_id: currentClassInfo._id,
+			title: currentClassInfo.title,
+			courseCode: currentClassInfo.courseCode,
+			numOfEnrolled: (await ClassEnrollment.find({ class: currentClassInfo._id })).length + "/" + currentClassInfo.totalCapacity
+		});
 	}
 
 	return classList;
+}
+
+// function to get all classes that the specified student is enrolled in.
+module.exports.getStudentClassList = async function (id) {
+	var classList = [];
+
+	var classes = await ClassEnrollment.find({ student: id });
+
+	for (let i = 0; i < classes.length; ++i) {
+		var currentClass = await Class.findById(classes[i].class);
+		var currentClassInfo = await getClassInfo(currentClass);
+		classList.push({
+			_id: currentClassInfo._id,
+			title: currentClassInfo.title,
+			courseCode: currentClassInfo.courseCode,
+			professor: currentClassInfo.professor
+		});
+	}
+
+	return classList;
+}
+
+/**
+ * @description Checks whether or not the user with the ID is enrolled in a specific class.
+ * @param {string} id - The id of the user to check.
+ * @param {string} classId - The id of the class.
+ */
+module.exports.isEnrolled = async function (id, classId) {
+	return (await ClassEnrollment.find({ student: id, class: classId })).length !== 0;
 }

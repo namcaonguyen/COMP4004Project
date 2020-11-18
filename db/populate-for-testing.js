@@ -22,6 +22,13 @@ var users = [
         approved: true
     }),
     new User({
+        email: "jean_pierre@cms.com",
+        password: "password",
+        fullname: "Jean-Pierre Corriveau",
+        accountType: "professor",
+        approved: true
+    }),
+    new User({
         email: "mike_hunt@cms.com",
         password: "password",
         fullname: "Mike Hunt",
@@ -45,11 +52,64 @@ var users = [
 ];
 
 var courses = [
-
+    new Course({
+        courseCode: "COMP1405",
+        title: "Introduction to Computer Science I",
+    }),
+    new Course({
+        courseCode: "COMP1406",
+        title: "Introduction to Computer Science II",
+    }),
+    new Course({
+        courseCode: "COMP1501",
+        title: "Introduction to Computer Game Design",
+    }),
+    new Course({
+        courseCode: "COMP1601",
+        title: "Introduction to Mobile Application DevelopmenT",
+    }),
+    new Course({
+        courseCode: "COMP1805",
+        title: "Discrete Structures I",
+    }),
 ];
 
 var classes = [
-
+    new Class({
+        course: courses[0]._id,
+        professor: users[1]._id,
+        totalCapacity: 500,
+        prereqs: [],
+        precludes: []
+    }),
+    new Class({
+        course: courses[1]._id,
+        professor: users[1]._id,
+        totalCapacity: 400,
+        prereqs: [courses[0].courseCode],
+        precludes: []
+    }),
+    new Class({
+        course: courses[2]._id,
+        professor: users[2]._id,
+        totalCapacity: 150,
+        prereqs: [courses[0].courseCode],
+        precludes: []
+    }),
+    new Class({
+        course: courses[3]._id,
+        professor: users[2]._id,
+        totalCapacity: 220,
+        prereqs: [courses[0].courseCode],
+        precludes: []
+    }),
+    new Class({
+        course: courses[4]._id,
+        professor: users[2]._id,
+        totalCapacity: 300,
+        prereqs: [],
+        precludes: []
+    }),
 ];
 
 // delete everything from the database before adding the new content
