@@ -33,32 +33,7 @@ router.post("/", async (req, res) => {
     if (res.locals.user.accountType === "administrator") {
 
         //get input to make the class
-        var { course, professor, capacity, prereqs, precludes } = req.body;
-
-        // if the admin did not select any prereqs or precludes, just set them to an empty array
-        if (prereqs == undefined) {
-            prereqs = [];
-        }
-        if (precludes == undefined) {
-            precludes = [];
-        }
-
-        //if an empty space was inputted as a prereq or precluded class, remove it
-        //remove empty prereqs
-        for (var i = 0; i < prereqs.length; i++) {
-            if (prereqs[i] === "") {
-                prereqs.splice(i, 1);
-                i++;
-            }
-        }
-
-        //remove empty precludes
-        for (var i = 0; i < precludes.length; i++) {
-            if (precludes[i] === "") {
-                precludes.splice(i, 1);
-                i++;
-            }
-        }
+        var { course, professor, capacity } = req.body;
 
         //get list of courses offered
         const coursesList = (await Course.find({})).map(result => {
@@ -73,7 +48,7 @@ router.post("/", async (req, res) => {
         });
 
         //create class in database
-        var { id, error } = await tryCreateClass(course, professor, capacity, prereqs, precludes);
+        var { id, error } = await tryCreateClass(course, professor, capacity);
 
         if (!id) res.render("class-management/create-class", { error, professors: professorList, courses: coursesList });
         else res.redirect('/view-classes');

@@ -18,13 +18,14 @@ function validateCourseCode(courseCode) {
     return true;
 }
 
-module.exports.tryCreateCourse = async function(courseCode, title) { // returns {id:string} if success, returns {error:string} if failed
+module.exports.tryCreateCourse = async function(courseCode, title, prereqs, precludes) { // returns {id:string} if success, returns {error:string} if failed
     if(!courseCode) return { error: "Course code empty" };
     if(!title) return { error: "Title empty" };
     if(!validateCourseCode(courseCode)) return { error: "Invalid course code, should be 4 capital letters and 4 digits" };
     if((await Course.find({ courseCode })).length) return { error: "Course exists" };
 
-    const course = await new Course({courseCode, title}).save();
+    const course = await new Course({courseCode, title, prereqs, precludes}).save();
+    
     return {id: course._id};
 }
 

@@ -9,7 +9,7 @@ function validateClassCapacity(cap) {
     return (cap >= 1);
 }
 
-module.exports.tryCreateClass = async function (course, professor, totalCapacity, prereqs, precludes) { // returns {id:string} if success, returns {error:string} if failed
+module.exports.tryCreateClass = async function (course, professor, totalCapacity) { // returns {id:string} if success, returns {error:string} if failed
     if (!course) return { error: "Course empty" };
     if (!professor) return { error: "Professor empty" };
     if (!validateClassCapacity(totalCapacity)) return { error: "The total capacity of the class must be at least 1" };
@@ -45,7 +45,7 @@ module.exports.tryCreateClass = async function (course, professor, totalCapacity
     if (courseDeleted) return { error: "Sorry, that course was deleted, choose another" };
 
     //save the class to the database and return its _id
-    const someClass = await new Class({ course, professor, totalCapacity, prereqs, precludes }).save();
+    const someClass = await new Class({ course, professor, totalCapacity}).save();
     return { id: someClass._id };
 }
 

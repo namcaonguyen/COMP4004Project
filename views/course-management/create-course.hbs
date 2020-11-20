@@ -24,6 +24,23 @@
                             <br>
                             <label for="title">Title:</label>
                             <input id="title" name="title" class="form-control {{response}}" placeholder="Software Quality Assurance" required autofocus>
+                            <br>
+                            <label for="prereqs">Prerequisites for the class:</label>
+                            <select class="browser-default custom-select" name="prereqs" id="prereqs" multiple>
+                              {{#each courses}}
+                                <option value={{this.courseCode}}>{{this.courseCode}}</option>
+                              {{/each}}
+                            </select>
+
+                            <br>
+                            <br>
+
+                            <label for="precludes">Precluded classes:</label>
+                            <select class="browser-default custom-select" name="precludes" id="precludes" multiple>
+                              {{#each courses}}
+                                <option value={{this.courseCode}}>{{this.courseCode}}</option>
+                              {{/each}}
+                            </select>
                             <hr class="my-4">
                             <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Create Course</button>
                         </div>

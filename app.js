@@ -149,11 +149,11 @@ process.on("SIGINT", () => {
 }
 
 //{
-//    const createdadmin = new user({
+//    const createdadmin = new User({
 //        email: "admin@admin.com",
 //        password: "password",
 //        fullname: "admin guy",
-//        accounttype: "administrator",
+//        accountType: "administrator",
 //        approved: true
 //	});
 //    createdadmin.save(function(err, createdadmin) {

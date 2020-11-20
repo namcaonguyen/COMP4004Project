@@ -33,11 +33,19 @@ Given("there are no courses in the database", async function () {
     assert.strictEqual(allCourses.length, 0);
 });
 
-Given("There is a course in the database with code {string} and title {string}", async function (cCode, cTitle) {
+Given("There is a course in the database with code {string} and title {string} and prereqs {string} and precludes {string}", async function (cCode, cTitle, cPrereqs, cPrecludes) {
+    // Split the prereqs and precludes by ',' into an array and remove the empty strings if any.
+    setOfPrereqs = cPrereqs.split(",");
+    setOfPrecludes = cPrecludes.split(",");
+    setOfPrereqs = setOfPrereqs.filter(item => item);
+    setOfPrecludes = setOfPrecludes.filter(item => item);
+    
     // Create the Course object to save to the database.
     const createdCourse = new Course({
         courseCode: cCode,
         title: cTitle,
+        prereqs: setOfPrereqs,
+        precludes: setOfPrecludes
     });
 
     // Save the course to the database.
@@ -98,27 +106,14 @@ Given("there exists an approved professor in the database named {string} with em
 });
 
 
-When("An admin tries to create a class for course code {string} with {string} {int} {string} {string}", async function (classCode, classProfessor, classCapacity, classPrereqs, classPrecluded) {
-    // split the prereqs and precluded by ',' into an array and remove the empty strings if any
-    setOfPrereqs = classPrereqs.split(",");
-    setOfPrecluded = classPrecluded.split(",");
-
-    setOfPrereqs = setOfPrereqs.filter(item => item);
-    setOfPrecluded = setOfPrecluded.filter(item => item);
-
+When("An admin tries to create a class for course code {string} with {string} and capacity {int}", async function (classCode, classProfessor, classCapacity) {
     // Create class object and save it to the database.
-    result = await tryCreateClass( this.createdCourseObjectId, this.createdProfessorObjectId, classCapacity, setOfPrereqs, setOfPrecluded );
+    result = await tryCreateClass( this.createdCourseObjectId, this.createdProfessorObjectId, classCapacity );
 });
 
-Then("There exists a class for the {string} with {string} {int} {string} {string}", async function (classCodeString, classProfessorString, classCapacity, classPrereqs, classPrecluded) {
-    // split the prereqs and precluded by ',' into an array and remove the empty strings if any
-    setOfPrereqs = classPrereqs.split(",");
-    setOfPrecluded = classPrecluded.split(",");
-
-    setOfPrereqs = setOfPrereqs.filter(item => item);
-    setOfPrecluded = setOfPrecluded.filter(item => item);
-
-    const allClasses = await Class.find({ _id: result.id, course: this.createdCourseObjectId, professor: this.createdProfessorObjectId, totalCapacity: classCapacity, prereqs: setOfPrereqs, precludes: setOfPrecluded });
+Then("There exists a class for the {string} with {string} and capacity {int}", async function (classCodeString, classProfessorString, classCapacity) {
+    // Find all the Classes with the given attributes.
+    const allClasses = await Class.find({ _id: result.id, course: this.createdCourseObjectId, professor: this.createdProfessorObjectId, totalCapacity: classCapacity });
 
     // Assert that a class was found, meaning it was saved.
     assert.equal(allClasses.length, 1);

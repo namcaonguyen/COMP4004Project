@@ -19,8 +19,14 @@ Given("There are no courses in the database", async function () {
     assert.strictEqual(allCourses.length, 0);
 });
 
-When("An admin tries to create a course with code {string} and title {string}", async function (courseCode, title) {
-    result = await tryCreateCourse(courseCode, title);
+When("An admin tries to create a course with code {string} and title {string} and prereqs {string} and precludes {string}", async function (courseCode, title, prereqs, precludes) {
+    // Split the prereqs and precludes by ',' into an array and remove the empty strings if any
+    setOfPrereqs = prereqs.split(",");
+    setOfPrecludes = precludes.split(",");
+    setOfPrereqs = setOfPrereqs.filter(item => item);
+    setOfPrecludes = setOfPrecludes.filter(item => item);
+    
+    result = await tryCreateCourse(courseCode, title, setOfPrereqs, setOfPrecludes);
 });
 
 Then("A new course is successfully created", () => {
@@ -32,8 +38,14 @@ Then("No new course is created and an error is returned", () => {
     assert(!!result.error);
 });
 
-Then("There exists a course with code {string} and title {string}", async function (courseCode, title) {
-    const courses = await Course.find({courseCode, title});
+Then("There exists a course with code {string} and title {string} and prereqs {string} and precludes {string}", async function (courseCode, title, prereqs, precludes) {
+    // Split the prereqs and precludes by ',' into an array and remove the empty strings if any
+    setOfPrereqs = prereqs.split(",");
+    setOfPrecludes = precludes.split(",");
+    setOfPrereqs = setOfPrereqs.filter(item => item);
+    setOfPrecludes = setOfPrecludes.filter(item => item);
+    
+    const courses = await Course.find({ courseCode: courseCode, title: title, prereqs: setOfPrereqs, precludes: setOfPrecludes });
     assert(!!courses.length);
 });
 
