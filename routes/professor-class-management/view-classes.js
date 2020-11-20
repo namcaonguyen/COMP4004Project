@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Class = require("../../db/class.js");
-const { getProfessorClassList, getStudentClassList, isEnrolled } = require("../../js/classEnrollmentManagement.js");
+const { getProfessorClassList, getStudentClassList, isEnrolled, getCourseCodeOfClass } = require("../../js/classEnrollmentManagement.js");
 
 // display classes
 router.get("/", async (req, res) => {
@@ -14,12 +14,15 @@ router.get("/", async (req, res) => {
 
 // get specific course
 router.get("/:id", async(req, res) => {
-    Class.findById(req.params.id, function(err) {
+    Class.findById(req.params.id, async function(err) {
         if (err) {
             res.send("This class does not exist. If this is a mistake please contact an administrator.");
         } else {
             if (isEnrolled(res.locals.user._id, req.params.id)) {
-                res.render("view-class", { title: "Welcome" });
+                const theCourseCode = await getCourseCodeOfClass(req.params.id);
+                var data = { title: "Welcome", cCode: theCourseCode };
+                data[res.locals.user.accountType] = true;
+                res.render("view-class", data);
             } else {
                 res.send("You are not enrolled in this class.");
             }
