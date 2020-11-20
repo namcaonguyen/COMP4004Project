@@ -25,14 +25,14 @@ async function getClassInfo(class_) {
 	let tempClass = {};
 	tempClass._id = class_._id;
 	tempClass.totalCapacity = class_.totalCapacity;
-	tempClass.prereqs = class_.prereqs;
-	tempClass.precludes = class_.precludes;
 
 	// Find the Course associated with the Class.
 	var associatedCourse = await Course.find({ _id: class_.course });
 
 	tempClass.courseCode = associatedCourse[0].courseCode;
 	tempClass.title = associatedCourse[0].title;
+	tempClass.prereqs = associatedCourse[0].prereqs;
+	tempClass.precludes = associatedCourse[0].precludes;
 
 	// Find the Professor associated with the Class.
 	var associatedProfessor = await User.find({ _id: class_.professor });

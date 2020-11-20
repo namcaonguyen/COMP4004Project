@@ -43,24 +43,6 @@
                     </div>
 
                     <br>
-
-                    <label for="prereqs">Prerequisites for the class:</label>
-                    <select class="browser-default custom-select" name="prereqs" id="prereqs" multiple>
-                        {{#each courses}}
-                        <option value={{this.courseCode}}>{{this.courseCode}}</option>
-                        {{/each}}
-                    </select>
-
-                    <br><br>
-
-                    <label for="precludes">Precluded classes:</label>
-                    <select class="browser-default custom-select" name="precludes" id="precludes" multiple>
-                        {{#each courses}}
-                        <option value={{this.courseCode}}>{{this.courseCode}}</option>
-                        {{/each}}
-                    </select>
-
-                    <br>
                     <hr class="my-4">
                     <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Submit</button>
                 </form>

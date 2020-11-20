@@ -31,6 +31,9 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{this.courseCode}}</h5>
                                 <h6 class="card-subtitle mb-2 text-muted">{{this.title}}</h6>
+                                <h7 class="card-subtitle mb-2 text-muted">Prerequisites: {{this.prereqs}}</h7>
+                                <br>
+                                <h7 class="card-subtitle mb-2 text-muted">Precludes: {{this.precludes}}</h7>
                                 <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete"
                                     type="submit" value="{{this._id}}" onclick="onSubmit('{{this.courseCode}}')">Delete</button>
                             </div>
