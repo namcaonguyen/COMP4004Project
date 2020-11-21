@@ -1,0 +1,38 @@
+<style>
+    .card {
+        margin: 0 auto;
+        float: none;
+        margin-bottom: 10px;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-8 mx-auto">
+            <div class="card card-signin my-5">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Course Management System</h3>
+                    <h5 class="card-title text-center">Manage Classes</h5>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item"><a href="/classes">View Classes</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">{{this.cCode}}</li>
+                        </ol>
+                    </nav>
+
+                    {{#if error}}
+                    <div class="alert alert-danger">Error: {{error}}</div>
+                    {{/if}}
+
+                    {{#if professor}}
+                    <a href="/create-deliverable" class="list-group-item list-group-item-action">Create Deliverable</a>
+                    {{/if}}
+
+                    <hr class="my-4">
+                    <div id="message" style="text-align: center;"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
