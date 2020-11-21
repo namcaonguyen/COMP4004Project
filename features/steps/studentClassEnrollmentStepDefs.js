@@ -58,7 +58,14 @@ Given("There exists a {string} {string} with email {string} and password {string
 	// Assert that the newly created User was found in the database.
 	assert.equal(true, newCreatedUser.length);
 
-	this.createdUserObjectID = createdUser._id;
+	// Store the most recently created User Object ID in a variable for use later.
+	if ( accountTypeParam == "student" ) {
+		this.createdStudentUserObjectID = createdUser._id;
+	} else if ( accountTypeParam == "professor" ) {
+		this.createdProfessorUserObjectID = createdUser._id;
+	} else {
+		this.createdAdministratorUserObjectID = createdUser._id;
+	}
 });
 
 When("Student User tries to view list of available Classes", async function() {
@@ -109,6 +116,7 @@ Given("There exists a Course {string} with title {string}", async function(cours
 	// Assert that the newly created Course was found in the database.
 	assert.equal(true, newCreatedCourse.length);
 
+	// Store the most recently created Course Object ID in a variable for use later.
 	this.createdCourseObjectID = createdCourse._id;
 });
 
@@ -147,6 +155,7 @@ Given("There exists a Class for {string} with capacity {int}, prerequisites {str
 	// Assert that the newly created Class was found in the database.
 	assert.equal(true, newCreatedClass.length);
 
+	// Store the most recently created Class Object ID in a variable for use later.
 	this.createdClassObjectID = createdClass._id;
 });
 

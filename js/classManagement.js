@@ -59,3 +59,68 @@ module.exports.deleteClass = async function (id) {
     await ClassEnrollment.deleteMany({ class: class_ });
     await Class.deleteMany({_id: id});
 }
+
+// Function to validate the inputs for when Class information is being updated.
+// Param:   classIDParam        Object ID of the Class Object being updated
+// Param:   professorIDParam    Object ID of the professor User being assigned
+// Param:   capacityParam       New capacity
+// Return an error array full of error messages.
+async function validateUpdateClassInputs( classIDParam, professorIDParam, capacityParam ) {
+	// Declaration of array varible to hold error messages.
+    var errorArray = [];
+
+    // Check if a professor was selected.
+    if ( !professorIDParam ) {
+        errorArray.push("Professor empty.");
+	}
+    // Check if the Class Capacity is greater or equal than 1.
+    if ( !validateClassCapacity(capacityParam) ) {
+        errorArray.push("The total capacity of the class must be at least 1.");
+	}
+    // Check if the Class Capacity is too low.
+    const foundEnrollments = await ClassEnrollment.find( { class: classIDParam } );
+    if ( capacityParam < foundEnrollments.length && foundEnrollments.length > 0 ) {
+        var errorString = "There are already " + foundEnrollments.length + " student(s) enrolled in this Class. You cannot lower the capacity any further than " + foundEnrollments.length + ".";
+        errorArray.push(errorString);
+	}
+
+    // Get a list of professors
+    const professorList = (await User.find({ approved: true, accountType: "professor" })).map(result => {
+        const { _id, email, fullname, accountType } = result;
+        return { _id, email, fullname, accountType };
+    });
+    // Before updating the Class information, make sure that the professor selected still exists in the database. This is to ensure ACID properties remain effective.
+    var professorInDatabase = true;
+    for ( var i = 0; i < professorList.length; i++ ) {
+        if ( (professorList[i]._id).equals(professorIDParam) ) {
+            professorInDatabase = false;
+        }
+    }
+    // Check if the professor is still in the database.
+    if ( professorInDatabase ) {
+        errorArray.push("Sorry, that professor was deleted. Choose another one.");
+	}
+
+    return errorArray;
+}
+
+// Function to try and update Class information.
+// Param:   classIDParam        Object ID of the Class Object being updated
+// Param:   professorIDParam    Object ID of the professor User being assigned
+// Param:   capacityParam       New capacity
+// Return success or an error array.
+module.exports.tryToUpdateClassInformation = async function( classIDParam, professorIDParam, capacityParam ) {
+    // Check the inputs for errors.
+    var errorArray = await validateUpdateClassInputs( classIDParam, professorIDParam, capacityParam );
+
+    // If there are errors in the date inputs...
+    if ( errorArray.length > 0 ) {
+		return { errorArray: errorArray };
+	} else {
+        // Update the Class information.
+        var updateValues = { $set: { professor: professorIDParam, totalCapacity: capacityParam }};
+        await Class.updateOne({ _id: classIDParam }, updateValues);
+
+        return { success: true };
+    }
+}

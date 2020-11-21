@@ -20,6 +20,9 @@ module.exports.getClassList = async function() {
 	return classList;
 }
 
+// Function to get the info of an individual Class object.
+// Param:	class_	Class object
+// Return info about the Class object.
 async function getClassInfo(class_) {
 	// Declare temporary Class variable.
 	let tempClass = {};
