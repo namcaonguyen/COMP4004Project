@@ -1,0 +1,64 @@
+<style>
+    .card {
+        margin: 0 auto;
+        float: none;
+        margin-bottom: 10px;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+            <div class="card card-signin my-5">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Course Management System</h3>
+                    <h5 class="card-title text-center">Edit Class</h5>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item"><a href="/view-classes">Manage Classes</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Edit Class</li>
+                        </ol>
+                    </nav>
+                    <hr class="my-4">
+
+                    {{#if error}}
+                        <div class="alert alert-danger">{{error}}</div>
+                    {{/if}}
+
+                    <form name="edit_class_form" method="POST" >
+                        <input type="hidden" value="{{this.classID}}" name="classID">
+                        <label for="course">Course ID:</label>
+                        <br>
+                        <label for="course">{{this.courseCode}}</label>
+
+                        <br><br>
+
+                        <label for="professor">Professor for the Class:</label>
+                        <select class="browser-default custom-select" name="professor" id="professsor">
+                            {{#each professors}}
+                                <option value={{this._id}}>{{this.fullname}}</option>
+                            {{/each}}
+                        </select>
+                        <br><br>
+
+                        <label for="capacity">Class Capacity:</label>
+                        <input type="number" id="capacity" name="capacity" class="form-control {{response}}" value={{this.classCapacity}} required autofocus>
+
+                        <br>
+
+                        <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Update Class Information</button>
+                    </form>
+
+                    <hr class=" my-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item"><a href="/view-classes">Manage Classes</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Edit Class</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

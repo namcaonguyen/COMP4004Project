@@ -16,12 +16,16 @@
                 Class</button>
             {{/if}}
         </form>
-        <form method="POST" action="delete-class">
-            {{#if ../administrator}}
-            <input type="hidden" value="{{this._id}}" name="classID">
-            <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" type="submit" onclick="onSubmit('{{this.courseCode}}')">Delete</button>
-            {{/if}}
-        </form>
+        {{#if ../administrator}}
+            <form method="GET" action="edit-class">
+                <input type="hidden" value="{{this._id}}" name="classID">
+                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Edit Class</button>
+            </form>
+            <form method="POST" action="delete-class">
+                <input type="hidden" value="{{this._id}}" name="classID">
+                <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" type="submit" onclick="onSubmit('{{this.courseCode}}')">Delete</button>
+            </form>
+        {{/if}}
     </div>
 </div>
 {{/each}}

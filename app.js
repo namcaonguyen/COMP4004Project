@@ -84,6 +84,7 @@ app.use("/create-course", require("./routes/course-management/create-course"));
 app.use("/classes", require("./routes/professor-class-management/view-classes"));
 
 app.use("/create-class", require("./routes/class-management/create-class"));
+app.use("/edit-class", require("./routes/class-management/edit-class"));
 
 app.use("/student", require("./routes/student-account/view-available-classes"));
 
