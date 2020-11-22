@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Class = require("../../db/class.js");
-const { getProfessorClassList, getStudentClassList, isEnrolled, getCourseCodeOfClass } = require("../../js/classEnrollmentManagement.js");
+const { getProfessorClassList, getStudentClassList, isEnrolled, getCourseCodeOfClass, getDeliverablesOfClass } = require("../../js/classEnrollmentManagement.js");
 
 // display classes
 router.get("/", async (req, res) => {
@@ -20,7 +20,9 @@ router.get("/:id", async(req, res) => {
         } else {
             if (isEnrolled(res.locals.user._id, req.params.id)) {
                 const theCourseCode = await getCourseCodeOfClass(req.params.id);
-                var data = { title: "Welcome", cCode: theCourseCode };
+                const foundDeliverables = await getDeliverablesOfClass(req.params.id);
+                //console.log(foundDeliverables);
+                var data = { title: "Welcome", cCode: theCourseCode, deliverables: foundDeliverables };
                 data[res.locals.user.accountType] = true;
                 res.render("view-class", data);
             } else {

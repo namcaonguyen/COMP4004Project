@@ -1,6 +1,7 @@
 const Class = require("../db/class.js");
 const User = require("../db/user.js");
 const Course = require("../db/course.js");
+const Deliverable = require("../db/deliverable.js");
 const ClassEnrollment = require("../db/classEnrollment.js");
 const AcademicDeadline = require("../db/academicDeadline.js");
 
@@ -186,12 +187,26 @@ module.exports.isEnrolled = async function (id, classId) {
 
 
 /**
- * @description Checks whether or not the user with the ID is enrolled in a specific class.
- * @param {string} id - The id of the user to check.
+ * @description returns the course code of a given class.
  * @param {string} classId - The id of the class.
  */
 module.exports.getCourseCodeOfClass = async function (classId) {
 	const foundClasses = await Class.find({ _id: classId });
 	const foundCourses = await Course.find({ _id: foundClasses[0].course });
 	return foundCourses[0].courseCode;
+}
+
+/**
+ * @description returns a list of deliverables for a class.
+ * @param {string} classId - The id of the class.
+ */
+module.exports.getDeliverablesOfClass = async function (classId) {
+
+	//get list of deliverables for a class
+	const foundDeliverables = (await Deliverable.find({ class_id: classId })).map(result => {
+		const { _id, title, weight } = result;
+		return { _id, title, weight };
+	});
+
+	return foundDeliverables;
 }
