@@ -148,6 +148,10 @@ process.on("SIGINT", () => {
     });
 }
 
+//Handy dev tool to create an admin, a prof, a class, a course and a deliverable.
+//Use [ CTRL + K + U ] to uncomment a block of code
+//Use [ CTRL + K + C ] to comment a block of code
+
 //{
 //    const createdadmin = new User({
 //        email: "admin@admin.com",
@@ -155,52 +159,74 @@ process.on("SIGINT", () => {
 //        fullname: "admin guy",
 //        accountType: "administrator",
 //        approved: true
+//    });
+//    createdadmin.save(function (err, createdadmin) {
+//        if (err) {
+//            return console.error(err);
+//        }
+//    });
+
+//    const createdstudent = new User({
+//        email: "tj@tj",
+//        password: "password",
+//        fullname: "TJ Mendicino",
+//        accountType: "student",
+//        approved: true
+//    });
+//    createdstudent.save(function (err, createdadmin) {
+//        if (err) {
+//            return console.error(err);
+//        }
+//    });
+
+//    const Course = require("./db/course.js");
+//    const newCourse = new Course({
+//        courseCode: "COMP4004",
+//        title: "Software Quality Assurance",
+//        prereqs: [""],
+//        precludes: [""]
+//    });
+//    newCourse.save(function (err, newCourse) {
+//        if (err) {
+//            return console.error(err);
+//        }
+//    });
+    
+//    const newProfessor = new User({
+//        email: "prof@prof",
+//        password: "password",
+//        fullname: "prof",
+//        accountType: "professor",
+//        approved: true
+//    });
+//    newProfessor.save(function (err, newProfessor) {
+//        if (err) {
+//            return console.error(err);
+//        }
+//    });
+
+//    const Class = require("./db/class.js");
+//    const newClass = new Class({
+//        course: newCourse._id,
+//        professor: newProfessor._id,
+//        totalCapacity: 20
+//    });
+//    newClass.save(function (err, newClass) {
+//        if (err) {
+//            return console.error(err);
+//        }
+//    });
+
+//    const Deliverable = require("./db/deliverable.js");
+//    const newDeliverable = new Deliverable({
+//        class_id: newClass._id,
+//        title: "COMP4004 Deliverable 3 CMS",
+//        description: "The description for D3 CMS project",
+//        weight: 10
 //	});
-//    createdadmin.save(function(err, createdadmin) {
+//    newDeliverable.save(function(err, newDeliverable) {
 //        if (err) {
 //      return console.error(err);  
 //		}
-//	});
+//    });
 //}
-
-// Handy dev example, creates a user, course, and class (course instance)
-// {
-//     const createduser = new user({
-//         email: "dan@gmail.com",
-//         password: "password",
-//         fullname: "dr dan",
-//         accounttype: "professor",
-//         approved: true
-//     });
-
-//     createduser.save(function (err, createduser) {
-//         if ( err ) {
-//             return console.error(err);
-//         }
-
-//         const course = require("./db/course.js");
-//         const createdcourse = new course({
-//             coursecode: "comp4004",
-//             title: "software qa",
-//         });
-
-//         createdcourse.save(function (err, createdcourse) {
-//             if ( err ) {
-//                 return console.error(err);
-//             }
-            
-//             const class = require("./db/class.js");
-//             const createdclass = new class({
-//                 course: createdcourse,
-//                 professor: createduser,
-//                 totalcapacity: 69
-//             });
-
-//             createdclass.save(function (err, createdclass) {
-//                 if ( err ) {
-//                     return console.error(err);
-//                 }
-//             });
-//         });
-//     });
-// }

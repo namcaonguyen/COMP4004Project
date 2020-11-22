@@ -11,7 +11,7 @@
             <div class="card card-signin my-5">
                 <div class="card-body">
                     <h3 class="card-title text-center">Course Management System</h3>
-                    <h5 class="card-title text-center">Manage Classes</h5>
+                    <h5 class="card-title text-center">Class: {{this.cCode}}</h5>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -23,10 +23,22 @@
                     {{#if error}}
                     <div class="alert alert-danger">Error: {{error}}</div>
                     {{/if}}
-
                     {{#if professor}}
                     <a href="/create-deliverable" class="list-group-item list-group-item-action">Create Deliverable</a>
                     {{/if}}
+                    <br>
+                    <div id="deliverablePageTitle"></div>
+
+                    {{#each deliverables}}
+                    <br>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{this.title}}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">Weight: {{this.weight}}%</h6>
+
+                        </div>
+                    </div>
+                    {{/each}}
 
                     <hr class="my-4">
                     <div id="message" style="text-align: center;"></div>
@@ -36,3 +48,17 @@
         </div>
     </div>
 </div>
+
+<script>
+    var data = "{{deliverables}}";
+    if (data.length === 0) {
+        $("#deliverablePageTitle").html("There are currently no deliverables for this class.");
+    } else {
+        $("#deliverablePageTitle").html("Deliverables:");
+    }
+
+    function onSubmit(name, elem) {
+        if (!confirm("Are you sure you want to " + elem.name + " " + name + "?"))
+            event.preventDefault();
+    }
+</script>
