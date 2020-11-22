@@ -25,21 +25,26 @@
                         <input class="form-control" type="text" placeholder="Search" aria-label="Search">
                     </div>
                     <br>
-                    <form method="POST" action="delete-course">
-                        {{#each courses}}
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">{{this.courseCode}}</h5>
-                                <h6 class="card-subtitle mb-2 text-muted">{{this.title}}</h6>
-                                <h7 class="card-subtitle mb-2 text-muted">Prerequisites: {{this.prereqs}}</h7>
-                                <br>
-                                <h7 class="card-subtitle mb-2 text-muted">Precludes: {{this.precludes}}</h7>
-                                <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete"
-                                    type="submit" value="{{this._id}}" onclick="onSubmit('{{this.courseCode}}')">Delete</button>
-                            </div>
-                        </div>
-                        {{/each}}
-                    </form>
+                    {{#each courses}}
+                      <div class="card">
+                        <div class="card-body">
+                          <h5 class="card-title">{{this.courseCode}}</h5>
+                          <h6 class="card-subtitle mb-2 text-muted">{{this.title}}</h6>
+                          <h7 class="card-subtitle mb-2 text-muted">Prerequisites: {{this.prereqs}}</h7>
+                          <br>
+                          <h7 class="card-subtitle mb-2 text-muted">Precludes: {{this.precludes}}</h7>
+                          <br>
+                          <form method="GET" action="edit-course">
+                            <input type="hidden" value="{{this._id}}" name="courseID">
+                            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Edit Course</button>
+                          </form>
+                          <form method="POST" action="delete-course">
+                            <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete"
+                              type="submit" value="{{this._id}}" onclick="onSubmit('{{this.courseCode}}')">Delete</button>
+                          </form>
+                      </div>
+                    </div>
+                  {{/each}}
                 </div>
             </div>
         </div>

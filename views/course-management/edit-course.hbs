@@ -1,0 +1,110 @@
+<style>
+    .card {
+        margin: 0 auto;
+        float: none;
+        margin-bottom: 10px;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+            <div class="card card-signin my-5">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Course Management System</h3>
+                    <h5 class="card-title text-center">Edit Course</h5>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item"><a href="/view-courses">View Courses</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Edit Course</li>
+                        </ol>
+                    </nav>
+                    <hr class="my-4">
+
+                    {{#if error}}
+                        <div class="alert alert-danger">{{error}}</div>
+                    {{/if}}
+
+                    <form name="edit_course_form" method="POST" >
+                        <input type="hidden" value="{{this.courseID}}" name="courseID">
+                        <label for="courseCode">Course Code:</label>
+                        <br>
+                        <label id="courseCode">{{this.courseCode}}</label>
+
+                        <br><br>
+
+                        <label for="title">Title:</label>
+                        <input id="title" name="title" class="form-control {{response}}" value="{{this.title}}" autofocus>
+
+                        <br><br>
+                        
+                        <label for="prereqsToRemove">Prerequisites:</label>
+                        <br>
+                        <table>
+                            <tr>
+                                <td><label>Select a prerequisite to remove it.</label></td>
+                                <td><label>Select a prerequisite to add it.</label></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <select class="browser-default custom-select" name="prereqsToRemove" id="prereqsToRemove" multiple>
+                                        {{#each currentPrereqs}}
+                                            <option value={{this}}>{{this}}</option>
+                                        {{/each}}
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="browser-default custom-select" name="prereqsToAdd" id="prereqsToAdd" multiple>
+                                        {{#each otherPrereqs}}
+                                            <option value={{this}}>{{this}}</option>
+                                        {{/each}}
+                                    </select>
+                                </td>
+                            </tr>
+                        </table>
+                        
+
+                        <br><br>
+
+                        <label for="precludesToRemove">Precludes:</label>
+                        <table>
+                            <tr>
+                                <td><label>Select a preclude to remove it.</label></td>
+                                <td><label>Select a preclude to add it.</label></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <select class="browser-default custom-select" name="precludesToRemove" id="precludesToRemove" multiple>
+                                        {{#each currentPrecludes}}
+                                            <option value={{this}}>{{this}}</option>
+                                        {{/each}}
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="browser-default custom-select" name="precludesToAdd" id="precludesToAdd" multiple>
+                                        {{#each otherPrecludes}}
+                                            <option value={{this}}>{{this}}</option>
+                                        {{/each}}
+                                    </select>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <br>
+
+                        <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Update Course Information</button>
+                    </form>
+
+                    <hr class=" my-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item"><a href="/view-courses">View Courses</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Edit Course</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
