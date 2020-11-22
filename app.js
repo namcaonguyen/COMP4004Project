@@ -80,6 +80,7 @@ app.use("/view-classes", require("./routes/course-management/view-classes"));
 app.use("/delete-course", require("./routes/course-management/delete-course"));
 app.use("/delete-class", require("./routes/course-management/delete-class"));
 app.use("/create-course", require("./routes/course-management/create-course"));
+app.use("/edit-course", require("./routes/course-management/edit-course"));
 
 app.use("/classes", require("./routes/professor-class-management/view-classes"));
 
