@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Class = require("../../db/class.js");
 const { getProfessorClassList, getStudentClassList, isEnrolled, getCourseCodeOfClass, getDeliverablesOfClass } = require("../../js/classEnrollmentManagement.js");
+const { tryCreateDeliverable } = require("../../js/classManagement.js");
 
 // display classes
 router.get("/", async (req, res) => {
@@ -10,6 +11,44 @@ router.get("/", async (req, res) => {
     data[res.locals.user.accountType] = true;
     
     res.render("professor-class-management/view-classes", data);
+});
+
+// get create deliverable
+router.get("/create-deliverable", async (req, res) => {
+    if (res.locals.user.accountType === "professor") {
+        var data = { title: "Create Deliverable", classId: req.query.classId, classCourseCode: req.query.cCode };
+        data[res.locals.user.accountType] = true;
+        res.render("professor-class-management/create-deliverable", data);
+    } else {
+        res.render("forbidden", { title: "Access Denied" });
+    }
+});
+
+// POST create deliverable
+router.post("/create-deliverable", async (req, res) => {
+    if (res.locals.user.accountType === "professor") {
+        //tryCreateDeliverable(req.body.classId, req.body.title, req.body.description, req.body.weight);
+
+        //create deliverable in database
+        var { id, errorArray } = await tryCreateDeliverable(req.body.classId, req.body.title, req.body.description, req.body.weight);
+
+        if (!id) {
+            // Declaration of variable for an Error Message.
+            var errorMessage = "ERROR" + ((errorArray.length > 1) ? "S:\n" : "");
+            // Go through all the errors in the Error Array.
+            for (i = 0; i < errorArray.length; ++i) {
+                errorMessage += "- " + errorArray[i] + "\n";
+            }
+
+            var data = { title: "Create Deliverable", classId: req.query.classId, classCourseCode: req.query.cCode, error: errorMessage };
+            data[res.locals.user.accountType] = true;
+            res.render("professor-class-management/create-deliverable", data);
+        }
+        else res.redirect(req.query.classId);
+
+    } else {
+        res.render("forbidden", { title: "Access Denied" });
+    }
 });
 
 // get specific course
@@ -21,8 +60,7 @@ router.get("/:id", async(req, res) => {
             if (isEnrolled(res.locals.user._id, req.params.id)) {
                 const theCourseCode = await getCourseCodeOfClass(req.params.id);
                 const foundDeliverables = await getDeliverablesOfClass(req.params.id);
-                //console.log(foundDeliverables);
-                var data = { title: "Welcome", cCode: theCourseCode, deliverables: foundDeliverables };
+                var data = { title: "Welcome", cCode: theCourseCode, deliverables: foundDeliverables, classId: req.params.id };
                 data[res.locals.user.accountType] = true;
                 res.render("view-class", data);
             } else {
