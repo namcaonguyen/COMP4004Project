@@ -1,6 +1,7 @@
 const Class = require("../db/class.js");
 const User = require("../db/user.js");
 const Course = require("../db/course.js");
+const Deliverable = require("../db/deliverable.js");
 const ClassEnrollment = require("../db/classEnrollment.js");
 
 //ensure that the class capacity > 1
@@ -123,4 +124,68 @@ module.exports.tryToUpdateClassInformation = async function( classIDParam, profe
 
         return { success: true };
     }
+}
+
+// Function to create a deliverable.
+// Param:   classIDParam            Object ID of the Class Object being updated
+// Param:   titleParam              Title of the deliverable
+// Param:   descriptionParam        Description of the deliverable
+// Param:   weightParam             Weight of the deliverable
+// Return success or an error array.
+module.exports.tryCreateDeliverable = async function (classIDParam, titleParam, descriptionParam, weightParam) {
+    // Check the inputs for errors.
+    var errorArray = await validateCreateDeliverableInputs(classIDParam, titleParam, descriptionParam, weightParam);
+
+    // If there are errors in the deliverable inputs...
+    if (errorArray.length > 0) {
+        return { errorArray: errorArray };
+    } else {
+        // Create deliverable object and save it to the database.
+        const createdDeliverable = new Deliverable({
+            class_id: classIDParam,
+            title: titleParam,
+            description: descriptionParam,
+            weight: weightParam
+        });
+
+        // Save the deliverable to the database.
+        await createdDeliverable.save();
+
+        return { id: createdDeliverable._id };
+    }
+}
+
+// Ensure that the weight >= 0 and <= 100
+function validateDeliverableWeight(weightOfDeliverable) {
+    if ((weightOfDeliverable >= 0) && (weightOfDeliverable <= 100)) return true;
+    return false;
+}
+
+// Function to validate the inputs for when Class information is being updated.
+// Param:   classIDParam        Object ID of the Class Object being updated
+// Param:   professorIDParam    Object ID of the professor User being assigned
+// Param:   capacityParam       New capacity
+// Return an error array full of error messages.
+async function validateCreateDeliverableInputs(classIDParam, titleParam, descriptionParam, weightParam) {
+    // Declaration of array varible to hold error messages.
+    var errorArray = [];
+
+    // Check if the weight is greater or equal than 1 and less than or equal to 100.
+    if (!validateDeliverableWeight(weightParam)) {
+        errorArray.push("The weight of the deliverable must be >= 0 and <= 100 %.");
+    }
+
+    // Before creating the deliverable, make sure that the class selected still exists in the database. This is to ensure ACID properties remain in effect.
+    const foundClass = await Class.find({ _id: classIDParam });
+    var classInDatabase = true;
+    if (foundClass.length == 0) {
+        classInDatabase = false;
+    }
+
+    // Check if the class is still in the database.
+    if (!classInDatabase) {
+        errorArray.push("Sorry, that class was deleted.");
+    }
+
+    return errorArray;
 }

@@ -150,7 +150,7 @@ process.on("SIGINT", () => {
     });
 }
 
-//Handy dev tool to create an admin, a prof, a class, a course and a deliverable.
+//Handy dev tool to create a student, an admin, a prof, a class, a course and a deliverable.
 //Use [ CTRL + K + U ] to uncomment a block of code
 //Use [ CTRL + K + C ] to comment a block of code
 
