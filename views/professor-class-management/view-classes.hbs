@@ -20,17 +20,22 @@
                     </nav>
 
                     {{#each classes}}
-                    <div class="card" style="width: 30rem;">
-                        <a class="card-body" href="/classes/{{this._id}}">
+                    <div class="card card-body" style="width: 30rem;">
+                        <a href="/classes/{{this._id}}">
                             <h5 class="card-title">{{this.courseCode}}</h5>
-                            <h5 class="card-title">{{this.title}}</h5>
-                            {{#if ../student}}
-                            <h6 class="card-subtitle mb-2 text-muted">Taught by: {{this.professor}}</h6>
-                            {{/if}}
-                            {{#if ../professor}}
-                            <h6 class="card-subtitle mb-2 text-muted">Students Enrolled: {{this.numOfEnrolled}}</h6>
-                            {{/if}}
                         </a>
+                        <h5 class=" card-title">{{this.title}}</h5>
+                        {{#if ../student}}
+                        <h6 class="card-subtitle mb-2 text-muted">Taught by: {{this.professor}}</h6>
+                        <form method="POST" action="/student/drop-class">
+                            <input type="hidden" value="{{this._id}}" name="classID">
+                            <button class="btn btn-lg btn-danger btn-block text-uppercase" type="submit">Drop
+                                Class</button>
+                        </form>
+                        {{/if}}
+                        {{#if ../professor}}
+                        <h6 class="card-subtitle mb-2 text-muted">Students Enrolled: {{this.numOfEnrolled}}</h6>
+                        {{/if}}
                     </div>
                     {{/each}}
 
