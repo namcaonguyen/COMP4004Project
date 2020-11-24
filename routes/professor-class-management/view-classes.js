@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Class = require("../../db/class.js");
-const { getProfessorClassList, getStudentClassList, isEnrolled, getCourseCodeOfClass, getDeliverablesOfClass } = require("../../js/classEnrollmentManagement.js");
+const { getProfessorClassList, getStudentClassList, isEnrolled, isTeaching, getCourseCodeOfClass, getDeliverablesOfClass } = require("../../js/classEnrollmentManagement.js");
 const { tryCreateDeliverable } = require("../../js/classManagement.js");
 
 // display classes
@@ -57,7 +57,7 @@ router.get("/:id", async(req, res) => {
         if (err) {
             res.send("This class does not exist. If this is a mistake please contact an administrator.");
         } else {
-            if (await isEnrolled(res.locals.user._id, req.params.id)) {
+            if (await isEnrolled(res.locals.user._id, req.params.id) || await isTeaching(res.locals.user._id, req.params.id)) {
                 const theCourseCode = await getCourseCodeOfClass(req.params.id);
                 const foundDeliverables = await getDeliverablesOfClass(req.params.id);
                 var data = { title: "Welcome", cCode: theCourseCode, deliverables: foundDeliverables, classId: req.params.id };

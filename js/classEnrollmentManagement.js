@@ -205,6 +205,14 @@ module.exports.isEnrolled = async function (id, classId) {
 	return ((await ClassEnrollment.find({ student: id, class: classId })).length !== 0);
 }
 
+/**
+ * @description Checks whether or not the professor is teaching the class.
+ * @param {string} id - The id of the user to check.
+ * @param {string} classId - The id of the class.
+ */
+module.exports.isTeaching = async function (id, classId) {
+	return ((await Class.find({ _id: classId, professor: id })).length !== 0);
+}
 
 /**
  * @description returns the course code of a given class.
