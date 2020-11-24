@@ -57,7 +57,7 @@ router.get("/:id", async(req, res) => {
         if (err) {
             res.send("This class does not exist. If this is a mistake please contact an administrator.");
         } else {
-            if (isEnrolled(res.locals.user._id, req.params.id)) {
+            if (await isEnrolled(res.locals.user._id, req.params.id)) {
                 const theCourseCode = await getCourseCodeOfClass(req.params.id);
                 const foundDeliverables = await getDeliverablesOfClass(req.params.id);
                 var data = { title: "Welcome", cCode: theCourseCode, deliverables: foundDeliverables, classId: req.params.id };

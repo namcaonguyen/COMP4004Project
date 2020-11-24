@@ -202,7 +202,7 @@ module.exports.getStudentClassList = async function (id) {
  * @param {string} classId - The id of the class.
  */
 module.exports.isEnrolled = async function (id, classId) {
-	return (await ClassEnrollment.find({ student: id, class: classId })).length !== 0;
+	return ((await ClassEnrollment.find({ student: id, class: classId })).length !== 0);
 }
 
 
