@@ -155,12 +155,6 @@ module.exports.tryCreateDeliverable = async function (classIDParam, titleParam, 
     }
 }
 
-// Ensure that the weight >= 0 and <= 100
-function validateDeliverableWeight(weightOfDeliverable) {
-    if ((weightOfDeliverable >= 0) && (weightOfDeliverable <= 100)) return true;
-    return false;
-}
-
 // Function to validate the inputs for when Class information is being updated.
 // Param:   classIDParam        Object ID of the Class Object being updated
 // Param:   professorIDParam    Object ID of the professor User being assigned
@@ -170,8 +164,12 @@ async function validateCreateDeliverableInputs(classIDParam, titleParam, descrip
     // Declaration of array varible to hold error messages.
     var errorArray = [];
 
+    // Check if another deliverable has the same title in this class.
+    if ((await Deliverable.find({ class_id: classIDParam, title: titleParam})).length !== 0) {
+        errorArray.push("A deliverable with that title already exists in this class.");
+    }
     // Check if the weight is greater or equal than 1 and less than or equal to 100.
-    if (!validateDeliverableWeight(weightParam)) {
+    if ((weightParam < 0) || (weightParam > 100)) {
         errorArray.push("The weight of the deliverable must be >= 0 and <= 100 %.");
     }
 

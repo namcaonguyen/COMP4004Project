@@ -35,13 +35,13 @@
 
                     {{#each deliverables}}
                     <br>
-                    <div class="card">
+                    <a class="card" href="/classes/{{../classId}}/{{this.title}}">
                         <div class="card-body">
                             <h5 class="card-title">{{this.title}}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">Weight: {{this.weight}}%</h6>
 
                         </div>
-                    </div>
+                    </a>
                     {{/each}}
 
                     <hr class="my-4">
