@@ -62,6 +62,7 @@ async function isPastAcademicDeadline() {
 	// If the Academic Deadline has already past...
 	return findAcademicDeadline[0].date.getTime() < currentDate.getTime();
 }
+module.exports.isPastAcademicDeadline = isPastAcademicDeadline;
 
 // Function to check if the Class is full.
 // Param:	classObjectID	ID of the Class to check
@@ -131,14 +132,13 @@ module.exports.tryEnrollStudentInClass = async function(studentUserObjectID, cla
 }
 
 // before deadline
-module.exports.tryDropClassNoDR = async function(studentUserObjectID, classObjectID) {
+module.exports.tryDropClassNoDR = async function(studentID, classID) {
 	const query = {
-		student: studentUserObjectID,
-		class: classObjectID
+		student: studentID,
+		class: classID
 	};
 
-	// uncomment this out when class dropping with DR is implemented
-	// if(isPastAcademicDeadline()) return { success: false, error: "Past deadline. Class can't be dropped without DR" }
+	if(await isPastAcademicDeadline()) return { success: false, error: "Deadline has already passed, drop with DR instead :(" };
 
 	const { deletedCount } = await ClassEnrollment.deleteMany(query);
 
@@ -150,8 +150,25 @@ module.exports.tryDropClassNoDR = async function(studentUserObjectID, classObjec
 // this is a seperate function because: the page presented to the user should state "Drop DR",
 // and THAT version of the page should be rendered if we're past the deadline
 // that way the user doesn't select "Drop" (no DR) as the deadline passes, and then accidentally drops the class with DR
-module.exports.tryDropClassWithDR = async function(studentUserObjectID, classObjectID) {
-	throw new Error("Not implemented")
+module.exports.tryDropClassWithDR = async function(studentID, classID) {
+	const query = {
+		student: studentID,
+		class: classID
+	};
+
+	if(!(await isPastAcademicDeadline())) return { success: false, error: "Deadline hasn't passed yet, drop without DR instead :)" };
+
+	const classEnrollments = await ClassEnrollment.find(query);
+	if(!classEnrollments.length) return { success: false, error: "Not already enrolled." };
+	if(classEnrollments.length !== 1) console.warn("WARNING: Student is enrolled in the same class multiple times!");
+
+	await ClassEnrollment.updateMany(query, {
+		$set: {
+			finalGrade: "WDN"
+		}
+	});
+	
+	return { success: true }; // no error
 }
 
 // Function to get all classes where the specified professor is the prof of the class. It includes data that is used to display information to the user.
@@ -183,13 +200,16 @@ module.exports.getStudentClassList = async function (id) {
 	var classes = await ClassEnrollment.find({ student: id });
 
 	for (let i = 0; i < classes.length; ++i) {
+		const finalGrade = classes[i].finalGrade;
 		var currentClass = await Class.findById(classes[i].class);
 		var currentClassInfo = await getClassInfo(currentClass);
 		classList.push({
 			_id: currentClassInfo._id,
 			title: currentClassInfo.title,
 			courseCode: currentClassInfo.courseCode,
-			professor: currentClassInfo.professor
+			professor: currentClassInfo.professor,
+			finalGrade,
+			withdrawn: finalGrade == "WDN" 
 		});
 	}
 
