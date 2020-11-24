@@ -60,11 +60,7 @@ async function isPastAcademicDeadline() {
 	}
 
 	// If the Academic Deadline has already past...
-	if ( findAcademicDeadline[0].date.getTime() < currentDate.getTime() ) {
-		return true;
-	} else {
-		return false;
-	}
+	return findAcademicDeadline[0].date.getTime() < currentDate.getTime();
 }
 
 // Function to check if the Class is full.
@@ -132,6 +128,30 @@ module.exports.tryEnrollStudentInClass = async function(studentUserObjectID, cla
 	// Save the Enrollment record to the database.
 	const enrollment = await new ClassEnrollment({ student: studentUserObjectID, class: classObjectID, finalGrade: "IN PROGRESS" }).save();
 	return { id: enrollment._id };
+}
+
+// before deadline
+module.exports.tryDropClassNoDR = async function(studentUserObjectID, classObjectID) {
+	const query = {
+		student: studentUserObjectID,
+		class: classObjectID
+	};
+
+	// uncomment this out when class dropping with DR is implemented
+	// if(isPastAcademicDeadline()) return { success: false, error: "Past deadline. Class can't be dropped without DR" }
+
+	const { deletedCount } = await ClassEnrollment.deleteMany(query);
+
+	if(!deletedCount) return { success: false, error: "Not already enrolled." };
+	
+	return { success: true }; // no error
+}
+
+// this is a seperate function because: the page presented to the user should state "Drop DR",
+// and THAT version of the page should be rendered if we're past the deadline
+// that way the user doesn't select "Drop" (no DR) as the deadline passes, and then accidentally drops the class with DR
+module.exports.tryDropClassWithDR = async function(studentUserObjectID, classObjectID) {
+	throw new Error("Not implemented")
 }
 
 // Function to get all classes where the specified professor is the prof of the class. It includes data that is used to display information to the user.
