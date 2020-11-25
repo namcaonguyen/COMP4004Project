@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Busboy = require("busboy");
 const Class = require("../../db/class.js");
+const Deliverable = require("../../db/deliverable.js");
 const { getProfessorClassList, getStudentClassList, isEnrolled, isTeaching, getCourseCodeOfClass, getDeliverablesOfClass, isPastAcademicDeadline } = require("../../js/classEnrollmentManagement.js");
 const { tryCreateDeliverable } = require("../../js/classManagement.js");
 const { tryDropClassNoDR, tryDropClassWithDR } = require("../../js/classEnrollmentManagement.js");
