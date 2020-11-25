@@ -2,21 +2,52 @@ const express = require("express");
 const router = express.Router();
 const Busboy = require("busboy");
 const Class = require("../../db/class.js");
-const Deliverable = require("../../db/deliverable.js");
-const { getProfessorClassList, getStudentClassList, isEnrolled, isTeaching, getCourseCodeOfClass, getDeliverablesOfClass } = require("../../js/classEnrollmentManagement.js");
+const { getProfessorClassList, getStudentClassList, isEnrolled, isTeaching, getCourseCodeOfClass, getDeliverablesOfClass, isPastAcademicDeadline } = require("../../js/classEnrollmentManagement.js");
 const { tryCreateDeliverable } = require("../../js/classManagement.js");
+const { tryDropClassNoDR, tryDropClassWithDR } = require("../../js/classEnrollmentManagement.js");
 
 // Middleware to parse the body of the request.
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
 // display classes
-router.get("/", async (req, res) => {
-    const classes = (res.locals.user.accountType === "professor") ? await getProfessorClassList(res.locals.user._id) : await getStudentClassList(res.locals.user._id);
-    var data = { title: "Class List", classes };
+
+async function renderClasses(req, res, data={}) {
+    data.title = "Class List";
+    data.classes = (res.locals.user.accountType === "professor") ? await getProfessorClassList(res.locals.user._id) : await getStudentClassList(res.locals.user._id);
     data[res.locals.user.accountType] = true;
-    
+    data.deadlinePassed = await isPastAcademicDeadline();
     res.render("professor-class-management/view-classes", data);
+}
+
+router.get("/", async (req, res) => {
+    await renderClasses(req, res);
+});
+
+router.post("/", async (req, res) => {
+    const data = {};
+
+    let dropNoDR, dropWithDR;
+    {
+        const action = req.body.action;
+        dropNoDR = action == "drop-no-dr";
+        dropWithDR = action == "drop-with-dr";
+    }
+    if(dropNoDR || dropWithDR) {
+        if (res.locals.user.accountType === "student") {
+            const studentID = res.locals.user._id;
+            const classID = req.body.classID;
+
+            const { success, error } = await (
+                (dropNoDR ? tryDropClassNoDR : tryDropClassWithDR)(studentID, classID)
+            );
+            if(!success) data.error = error;
+        } else {
+            res.render("forbidden", { title: "Access Denied" });
+        }
+    }
+
+    await renderClasses(req, res, data);
 });
 
 // get create deliverable

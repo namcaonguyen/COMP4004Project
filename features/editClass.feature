@@ -1,7 +1,10 @@
 Feature: An administrator User can edit the information of a Class.
 
 	Scenario Outline: An administrator User tries editing the professor and total capacity of a particular Class. The Class information should be updated.
-		Given There are no existing Users in the database
+		Given There is an Academic Deadline set in the database
+		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
+
+		And There are no existing Users in the database
 		And There are no existing Courses in the database
 		And There are no existing Classes in the database
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password"
@@ -15,7 +18,10 @@ Feature: An administrator User can edit the information of a Class.
 		| 300			|
 
 	Scenario: An administrator User tries editing the professor of a particular Class, but the professor was deleted. The Class information will not be updated.
-		Given There are no existing Users in the database
+		Given There is an Academic Deadline set in the database
+		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
+
+		And There are no existing Users in the database
 		And There are no existing Courses in the database
 		And There are no existing Classes in the database
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password"
@@ -27,7 +33,10 @@ Feature: An administrator User can edit the information of a Class.
 		Then The Class information is not updated
 
 	Scenario Outline: An administrator User tries editing the total capacity of a particular Class, but enters an invalid value. The Class information will not be updated.
-		Given There are no existing Users in the database
+		Given There is an Academic Deadline set in the database
+		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
+
+		And There are no existing Users in the database
 		And There are no existing Courses in the database
 		And There are no existing Classes in the database
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password"
@@ -41,7 +50,10 @@ Feature: An administrator User can edit the information of a Class.
 		| -1			|
 
 	Scenario: An administrator User tries editing the total capacity of a particular Class to be lower than the current number of enrolled students. The Class information will not be updated.
-		Given There are no existing Users in the database
+		Given There is an Academic Deadline set in the database
+		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
+
+		And There are no existing Users in the database
 		And There are no existing Courses in the database
 		And There are no existing Classes in the database
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password"
