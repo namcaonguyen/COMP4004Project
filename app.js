@@ -88,7 +88,6 @@ app.use("/create-class", require("./routes/class-management/create-class"));
 app.use("/edit-class", require("./routes/class-management/edit-class"));
 
 app.use("/student", require("./routes/student-account/view-available-classes"));
-app.use("/student/drop-class", require("./routes/student-account/drop-class"));
 
 app.use("/view-academic-deadline", require("./routes/view-academic-deadline.js"));
 
