@@ -1,9 +1,14 @@
 const express = require("express");
 const router = express.Router();
+const Busboy = require("busboy");
 const Class = require("../../db/class.js");
 const { getProfessorClassList, getStudentClassList, isEnrolled, isTeaching, getCourseCodeOfClass, getDeliverablesOfClass, isPastAcademicDeadline } = require("../../js/classEnrollmentManagement.js");
 const { tryCreateDeliverable } = require("../../js/classManagement.js");
 const { tryDropClassNoDR, tryDropClassWithDR } = require("../../js/classEnrollmentManagement.js");
+
+// Middleware to parse the body of the request.
+router.use(express.json());
+router.use(express.urlencoded({ extended: true }));
 
 // display classes
 
@@ -83,18 +88,14 @@ router.post("/create-deliverable", async (req, res) => {
     }
 });
 
-// get specific course
-router.get("/:id", async(req, res) => {
+// middleware to check wether the class a user requested is valid or if the user is authorized to interact with it.
+router.use("/:id", (req, res, next) => {
     Class.findById(req.params.id, async function(err) {
         if (err) {
             res.send("This class does not exist. If this is a mistake please contact an administrator.");
         } else {
             if (await isEnrolled(res.locals.user._id, req.params.id) || await isTeaching(res.locals.user._id, req.params.id)) {
-                const theCourseCode = await getCourseCodeOfClass(req.params.id);
-                const foundDeliverables = await getDeliverablesOfClass(req.params.id);
-                var data = { title: "Welcome", cCode: theCourseCode, deliverables: foundDeliverables, classId: req.params.id };
-                data[res.locals.user.accountType] = true;
-                res.render("view-class", data);
+                next();
             } else {
                 res.send("You are not enrolled in this class.");
             }
@@ -102,8 +103,42 @@ router.get("/:id", async(req, res) => {
     });
 });
 
-// Middleware to parse the body of the request.
-router.use(express.json());
-router.use(express.urlencoded({ extended: true }));
+// GET specific course
+router.get("/:id", async(req, res) => {
+    const theCourseCode = await getCourseCodeOfClass(req.params.id);
+    const foundDeliverables = await getDeliverablesOfClass(req.params.id);
+    var data = { title: "Welcome", cCode: theCourseCode, deliverables: foundDeliverables, classId: req.params.id };
+    data[res.locals.user.accountType] = true;
+    res.render("view-class", data);
+});
+
+// GET view deliverable
+router.get("/:id/:deliverable", async (req, res) => {
+    if ((await Deliverable.find({ class_id: req.params.id, title: req.params.deliverable })).length === 0) {
+        res.send("The deliverable you are requesting does not exist for this class.");
+    } else {
+        const theCourseCode = await getCourseCodeOfClass(req.params.id);
+        var data = { title: "Submit Deliverable", courseCode: theCourseCode, deliverableName: req.params.deliverable, classId: req.params.id };
+        data[res.locals.user.accountType] = true;
+        res.render("professor-class-management/view-deliverable", data);
+    }
+});
+
+// POST submit deliverable
+router.post("/:id/:deliverable", async (req, res) => {
+    // ***** WIP ***** //
+    var busboy = new Busboy({ headers: req.headers });
+    busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+        console.log(file);
+        console.log(filename);
+        console.log(encoding);
+        console.log(mimetype);
+    });
+    const theCourseCode = await getCourseCodeOfClass(req.params.id);
+    var data = { title: "Submitted!", courseCode: theCourseCode, deliverableName: req.params.deliverable, classId: req.params.id, success: "Successfully submitted deliverable!" };
+    data[res.locals.user.accountType] = true;
+    res.render("professor-class-management/view-deliverable", data);
+    // ***** WIP ***** //
+});
 
 module.exports = router;
