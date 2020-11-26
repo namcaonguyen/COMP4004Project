@@ -1,0 +1,70 @@
+<style>
+    .card {
+        margin: 0 auto;
+        float: none;
+        margin-bottom: 10px;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+            <div class="card card-signin my-5">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Course Management System</h3>
+                    <h5 class="card-title text-center">Edit Past Courses</h5>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Edit Past Courses</li>
+                        </ol>
+                    </nav>
+                    <hr class="my-4">
+
+                    {{#if error}}
+                        <div class="alert alert-danger">{{error}}</div>
+                    {{/if}}
+
+                    <form name="edit_course_form" method="POST" >
+                        <input type="hidden" value="{{this.studentID}}" name="studentID">
+                        <label for="informationLabel">Edit which Courses you've taken in the past:</label>
+                        <br>
+                        <table>
+                            <tr>
+                                <td><label>Here are the Courses you have taken in the past. Select a Course to remove it.</label></td>
+                                <td><label>Here are the Courses that are not on your account. Select a Course to add it.</label></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <select class="browser-default custom-select" name="coursesToRemove" id="coursesToRemove" multiple>
+                                        {{#each currentCourses}}
+                                            <option value={{this}}>{{this}}</option>
+                                        {{/each}}
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="browser-default custom-select" name="coursesToAdd" id="coursesToAdd" multiple>
+                                        {{#each otherCourses}}
+                                            <option value={{this}}>{{this}}</option>
+                                        {{/each}}
+                                    </select>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <br>
+
+                        <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Update Past Courses</button>
+                    </form>
+
+                    <hr class=" my-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Edit Past Courses</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,6 @@
 const Course = require("../db/course.js");
 const Class = require("../db/class.js");
+const User = require("../db/user.js");
 const { deleteClass } = require("./classManagement.js");
 
 function validateCourseCode(courseCode) {
@@ -143,4 +144,28 @@ module.exports.tryToUpdateCourseInformation = async function( courseIDParam, tit
 
         return { success: true };
     }
+}
+
+// Function to try and update the student Users's past Courses.
+module.exports.tryToUpdateStudentPastCourses = async function( studentIDParam, coursesToRemoveParam, coursesToAddParam ) {
+    // Get the student User.
+    var findUser = await User.find( { _id: studentIDParam } );
+
+    if ( findUser.length === 1 ) {
+        // Declare a variable for the updated Courses array, and populate it.
+        var updatedCourses = [];
+        updatedCourses = addToList(updatedCourses, findUser[0].coursesTaken);
+
+        // Get the updated Courses list.
+        updatedCourses = getUpdatedList(updatedCourses, coursesToRemoveParam, coursesToAddParam);
+
+        // Update the student User's Courses Taken attribute.
+        var updateValues = { $set: { coursesTaken: updatedCourses } };
+        await User.updateOne({ _id: studentIDParam }, updateValues);
+
+        return { success: true };
+	} else {
+        return { error: "Something went wrong with your account. Please contact an administrator." };
+	}
+
 }
