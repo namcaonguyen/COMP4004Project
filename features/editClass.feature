@@ -8,8 +8,8 @@ Feature: An administrator User can edit the information of a Class.
 		And There are no existing Courses in the database
 		And There are no existing Classes in the database
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
-		And There exists a Course "NAMO1001" with title "How to be Rad"
-		And There exists a Class for "NAMO1001" with capacity 50, prerequisites "", and precludes ""
+		And There is a course in the database with code "NAMO1001" and title "How to be Rad" and prereqs "" and precludes ""
+		And There exists a Class for "NAMO1001" taught by professor with email "namo@namo.com" with capacity 50
 		When An administrator tries to switch professors and change the capacity of the Class to <newCapacity>
 		Then The Class had its information successfully changed
 	Examples:
@@ -25,8 +25,8 @@ Feature: An administrator User can edit the information of a Class.
 		And There are no existing Courses in the database
 		And There are no existing Classes in the database
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
-		And There exists a Course "NAMO1001" with title "How to be Rad"
-		And There exists a Class for "NAMO1001" with capacity 50, prerequisites "", and precludes ""
+		And There is a course in the database with code "NAMO1001" and title "How to be Rad" and prereqs "" and precludes ""
+		And There exists a Class for "NAMO1001" taught by professor with email "namo@namo.com" with capacity 50
 		And There exists a "professor" "Soontobe Fired" with email "currently@unemployed.com" and password "jobsearching" and courses taken ""
 		And The professor was deleted
 		When An administrator tries to switch professors and change the capacity of the Class to 45
@@ -40,8 +40,8 @@ Feature: An administrator User can edit the information of a Class.
 		And There are no existing Courses in the database
 		And There are no existing Classes in the database
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
-		And There exists a Course "NAMO1001" with title "How to be Rad"
-		And There exists a Class for "NAMO1001" with capacity 50, prerequisites "", and precludes ""
+		And There is a course in the database with code "NAMO1001" and title "How to be Rad" and prereqs "" and precludes ""
+		And There exists a Class for "NAMO1001" taught by professor with email "namo@namo.com" with capacity 50
 		When An administrator tries to switch professors and change the capacity of the Class to <newCapacity>
 		Then The Class information is not updated
 	Examples:
@@ -57,8 +57,8 @@ Feature: An administrator User can edit the information of a Class.
 		And There are no existing Courses in the database
 		And There are no existing Classes in the database
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
-		And There exists a Course "NAMO1001" with title "How to be Rad"
-		And There exists a Class for "NAMO1001" with capacity 50, prerequisites "", and precludes ""
+		And There is a course in the database with code "NAMO1001" and title "How to be Rad" and prereqs "" and precludes ""
+		And There exists a Class for "NAMO1001" taught by professor with email "namo@namo.com" with capacity 50
 		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
 		And There exists a "student" "Johnson Joe" with email "hotmail@hotmail.com" and password "TheRaddestInTown" and courses taken ""
 		And Student with email "gmail@gmail.com" wants to enroll in the Class

@@ -16,8 +16,8 @@ Feature: A student User can enroll in a Class.
 		And There are no existing ClassEnrollments in the database
 		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
-		And There exists a Course "NAMO1001" with title "How to be Rad"
-		And There exists a Class for "NAMO1001" with capacity <totalCapacity>, prerequisites "", and precludes ""
+		And There is a course in the database with code "NAMO1001" and title "How to be Rad" and prereqs "" and precludes ""
+		And There exists a Class for "NAMO1001" taught by professor with email "namo@namo.com" with capacity <totalCapacity>
 		When Student User tries to view list of available Classes
 		Then There are available Classes
 		And Student with email "gmail@gmail.com" wants to enroll in the Class
@@ -37,8 +37,8 @@ Feature: A student User can enroll in a Class.
 		And There are no existing ClassEnrollments in the database
 		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
-		And There exists a Course "NAMO1001" with title "How to be Rad"
-		And There exists a Class for "NAMO1001" with capacity 150, prerequisites "", and precludes ""
+		And There is a course in the database with code "NAMO1001" and title "How to be Rad" and prereqs "" and precludes ""
+		And There exists a Class for "NAMO1001" taught by professor with email "namo@namo.com" with capacity 150
 		When Student User tries to view list of available Classes
 		Then There are available Classes
 		And Student with email "gmail@gmail.com" wants to enroll in the Class
@@ -53,8 +53,8 @@ Feature: A student User can enroll in a Class.
 		And There are no existing ClassEnrollments in the database
 		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
-		And There exists a Course "NAMO1001" with title "How to be Rad"
-		And There exists a Class for "NAMO1001" with capacity 150, prerequisites "", and precludes ""
+		And There is a course in the database with code "NAMO1001" and title "How to be Rad" and prereqs "" and precludes ""
+		And There exists a Class for "NAMO1001" taught by professor with email "namo@namo.com" with capacity 150
 		When Student User tries to view list of available Classes
 		Then There are available Classes
 		And Student with email "gmail@gmail.com" wants to enroll in the Class
@@ -72,8 +72,8 @@ Feature: A student User can enroll in a Class.
 		And There exists a "student" "Fast McGee" with email "fast@guy.com" and password "TheSpeedySpeedster99" and courses taken ""
 		And There exists a "student" "Slowy Slowerson" with email "slow@guy.com" and password "password" and courses taken ""
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
-		And There exists a Course "NAMO1001" with title "How to be Rad"
-		And There exists a Class for "NAMO1001" with capacity 1, prerequisites "", and precludes ""
+		And There is a course in the database with code "NAMO1001" and title "How to be Rad" and prereqs "" and precludes ""
+		And There exists a Class for "NAMO1001" taught by professor with email "namo@namo.com" with capacity 1
 		When Student User tries to view list of available Classes
 		Then There are available Classes
 		And Student with email "fast@guy.com" wants to enroll in the Class
@@ -90,8 +90,8 @@ Feature: A student User can enroll in a Class.
 		And There are no existing ClassEnrollments in the database
 		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
-		And There exists a Course "NAMO1001" with title "How to be Rad"
-		And There exists a Class for "NAMO1001" with capacity 150, prerequisites "", and precludes ""
+		And There is a course in the database with code "NAMO1001" and title "How to be Rad" and prereqs "" and precludes ""
+		And There exists a Class for "NAMO1001" taught by professor with email "namo@namo.com" with capacity 150
 		When Student User tries to view list of available Classes
 		Then There are available Classes
 		# Delete all the Classes right before the student User decides to enroll.
