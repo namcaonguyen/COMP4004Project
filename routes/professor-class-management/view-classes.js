@@ -1,18 +1,13 @@
 const express = require("express");
+const multer = require("multer");
 const router = express.Router();
-const Busboy = require("busboy");
 const Class = require("../../db/class.js");
 const Deliverable = require("../../db/deliverable.js");
 const { getProfessorClassList, getStudentClassList, isEnrolled, isTeaching, getCourseCodeOfClass, getDeliverablesOfClass, isPastAcademicDeadline } = require("../../js/classEnrollmentManagement.js");
-const { tryCreateDeliverable } = require("../../js/classManagement.js");
+const { tryCreateDeliverable, tryUpdateSubmissionDeliverable } = require("../../js/classManagement.js");
 const { tryDropClassNoDR, tryDropClassWithDR } = require("../../js/classEnrollmentManagement.js");
 
-// Middleware to parse the body of the request.
-router.use(express.json());
-router.use(express.urlencoded({ extended: true }));
-
 // display classes
-
 async function renderClasses(req, res, data={}) {
     data.title = "Class List";
     data.classes = (res.locals.user.accountType === "professor") ? await getProfessorClassList(res.locals.user._id) : await getStudentClassList(res.locals.user._id);
@@ -51,44 +46,6 @@ router.post("/", async (req, res) => {
     await renderClasses(req, res, data);
 });
 
-// get create deliverable
-router.get("/create-deliverable", async (req, res) => {
-    if (res.locals.user.accountType === "professor") {
-        var data = { title: "Create Deliverable", classId: req.query.classId, classCourseCode: req.query.cCode };
-        data[res.locals.user.accountType] = true;
-        res.render("professor-class-management/create-deliverable", data);
-    } else {
-        res.render("forbidden", { title: "Access Denied" });
-    }
-});
-
-// POST create deliverable
-router.post("/create-deliverable", async (req, res) => {
-    if (res.locals.user.accountType === "professor") {
-        //tryCreateDeliverable(req.body.classId, req.body.title, req.body.description, req.body.weight);
-
-        //create deliverable in database
-        var { id, errorArray } = await tryCreateDeliverable(req.body.classId, req.body.title, req.body.description, req.body.weight);
-
-        if (!id) {
-            // Declaration of variable for an Error Message.
-            var errorMessage = "ERROR" + ((errorArray.length > 1) ? "S:\n" : "");
-            // Go through all the errors in the Error Array.
-            for (i = 0; i < errorArray.length; ++i) {
-                errorMessage += "- " + errorArray[i] + "\n";
-            }
-
-            var data = { title: "Create Deliverable", classId: req.query.classId, classCourseCode: req.query.cCode, error: errorMessage };
-            data[res.locals.user.accountType] = true;
-            res.render("professor-class-management/create-deliverable", data);
-        }
-        else res.redirect(req.query.classId);
-
-    } else {
-        res.render("forbidden", { title: "Access Denied" });
-    }
-});
-
 // middleware to check wether the class a user requested is valid or if the user is authorized to interact with it.
 router.use("/:id", (req, res, next) => {
     Class.findById(req.params.id, async function(err) {
@@ -113,33 +70,103 @@ router.get("/:id", async(req, res) => {
     res.render("view-class", data);
 });
 
-// GET view deliverable
-router.get("/:id/:deliverable", async (req, res) => {
+// get create deliverable
+router.get("/:id/create-deliverable", async (req, res) => {
+    if (res.locals.user.accountType === "professor") {
+        const theCourseCode = await getCourseCodeOfClass(req.params.id);
+        var data = { title: "Create Deliverable", classId: req.params.id, courseCode: theCourseCode, classId: req.params.id, create: true, deliverableName: "Create Deliverable" };
+        data[res.locals.user.accountType] = true;
+        res.render("professor-class-management/view-deliverable", data);
+    } else {
+        res.render("forbidden", { title: "Access Denied" });
+    }
+});
+
+// POST create deliverable
+router.post("/:id/create-deliverable", async (req, res) => {
+    if (res.locals.user.accountType === "professor") {
+        //create deliverable in databas
+        // TO-DO: Use multer parser later when file submission for deliverable specification is being implemented.
+        var { id, errorArray } = await tryCreateDeliverable(req.body.classId, req.body.title, req.body.description, req.body.weight);
+
+        if (!id) {
+            // Declaration of variable for an Error Message.
+            var errorMessage = "ERROR" + ((errorArray.length > 1) ? "S:\n" : "");
+            // Go through all the errors in the Error Array.
+            for (i = 0; i < errorArray.length; ++i) {
+                errorMessage += "- " + errorArray[i] + "\n";
+            }
+
+            const theCourseCode = await getCourseCodeOfClass(req.params.id);
+            var data = { title: "Create Deliverable", classId: req.params.id, courseCode: theCourseCode, error: errorMessage, create: true, deliverableName: "Create Deliverable" };
+            data[res.locals.user.accountType] = true;
+            res.render("professor-class-management/view-deliverable", data);
+        } else {
+            res.redirect("/classes/" + req.params.id);
+        }
+    } else {
+        res.render("forbidden", { title: "Access Denied" });
+    }
+});
+
+// middleware to ensure the deliverable exists before moving on.
+router.use("/:id/:deliverable", async (req, res, next) => {
     if ((await Deliverable.find({ class_id: req.params.id, title: req.params.deliverable })).length === 0) {
         res.send("The deliverable you are requesting does not exist for this class.");
     } else {
-        const theCourseCode = await getCourseCodeOfClass(req.params.id);
-        var data = { title: "Submit Deliverable", courseCode: theCourseCode, deliverableName: req.params.deliverable, classId: req.params.id };
-        data[res.locals.user.accountType] = true;
-        res.render("professor-class-management/view-deliverable", data);
+        next();
     }
+})
+
+// GET view deliverable
+router.get("/:id/:deliverable", async (req, res) => {
+    const theCourseCode = await getCourseCodeOfClass(req.params.id);
+    var data = { title: "Submit Deliverable", courseCode: theCourseCode, deliverableName: req.params.deliverable, classId: req.params.id };
+    data[res.locals.user.accountType] = true;
+    res.render("professor-class-management/view-deliverable", data);
 });
 
 // POST submit deliverable
 router.post("/:id/:deliverable", async (req, res) => {
-    // ***** WIP ***** //
-    var busboy = new Busboy({ headers: req.headers });
-    busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-        console.log(file);
-        console.log(filename);
-        console.log(encoding);
-        console.log(mimetype);
-    });
     const theCourseCode = await getCourseCodeOfClass(req.params.id);
-    var data = { title: "Submitted!", courseCode: theCourseCode, deliverableName: req.params.deliverable, classId: req.params.id, success: "Successfully submitted deliverable!" };
+    var data = { courseCode: theCourseCode, deliverableName: req.params.deliverable, classId: req.params.id };
     data[res.locals.user.accountType] = true;
-    res.render("professor-class-management/view-deliverable", data);
-    // ***** WIP ***** //
+
+    if (res.locals.user.accountType === "student") {
+        // TO-DO: Deliverable Deadline
+
+        var fileName = res.locals.user._id + "-" + theCourseCode + "-" + req.params.deliverable + "-";
+        var storage = multer.diskStorage({
+            destination: "uploads/",
+            filename: function (req, file, cb) {
+                fileName += file.originalname;
+                cb(null, fileName);
+            }
+        });
+        var upload = multer({ storage : storage }).any();
+
+        upload(req, res, function(err) {
+            if(!err && tryUpdateSubmissionDeliverable(req.params.id, res.locals.user._id, req.params.deliverable, fileName)) {
+                data.title = "Submitted!";
+                data.success = "Successfully submitted deliverable!";
+                res.render("professor-class-management/view-deliverable", data);
+            } else {
+                data.title = "Failed!";
+                data.error = "Failed to update deliverable submission. Please try again.";
+                res.render("professor-class-management/view-deliverable", data);
+            }
+        });
+    } else {
+        if ("delete" in req.body) {
+            // TO-DO: remove deliverable
+            res.redirect("/classes/" + req.params.id + "/");
+        } else {
+            // TO-DO: update deliverable
+            data.title = "Updated!";
+            data.success = "Successfully updated deliverable!";
+            res.render("professor-class-management/view-deliverable", data);
+        }
+    }
 });
 
 module.exports = router;

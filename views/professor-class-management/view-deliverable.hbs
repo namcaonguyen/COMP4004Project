@@ -33,7 +33,7 @@
                         <br>
 
                         <label for="description">Description:</label>
-                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        <textarea class="form-control" maxlength="255" id="description" name="description" rows="3"></textarea>
 
                         <br>
 
@@ -43,9 +43,8 @@
                             <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
                         </div>
                         <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="inputGroupFile01"
-                            aria-describedby="inputGroupFileAddon01">
-                            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                            <input type="file" class="custom-file-input" name="deliverable_file" aria-describedby="inputGroupFileAddon01">
+                            <label class="custom-file-label" for="deliverable_file">Choose file</label>
                         </div>
                         </div>
 
@@ -56,10 +55,19 @@
                             <input type="number" id="weight" name="weight" class="form-control {{response}}" placeholder="10" required autofocus>
                         </div>
 
-                        <br>
                         <hr class="my-4">
-                        <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Update Deliverable</button>
+                        {{#if create}}
+                            <button class="btn btn-lg btn-primary btn-block text-uppercase" name="create" type="submit">Create Deliverable</button>
+                        {{else}}
+                            <button class="btn btn-lg btn-primary btn-block text-uppercase" name="update" type="submit">Update Deliverable</button>
+                        {{/if}}
                     </form>
+                    {{#unless create}}
+                        <br>
+                        <form name="deliverable_delete_form" method="POST">
+                            <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" type="submit">Delete Deliverable</button>
+                        </form>
+                    {{/unless}}
                     {{/if}}
                     {{#if student}}
                     <form name="submit_deliverable_form" method="POST" enctype="multipart/form-data">
@@ -77,8 +85,8 @@
                             <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
                         </div>
                         <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="inputFile" name = "inputFile" aria-describedby="inputGroupFileAddon01">
-                            <label class="custom-file-label" for="inputFile">Choose file</label>
+                            <input type="file" class="custom-file-input" id="deliverable_file" name="deliverable_file" aria-describedby="inputGroupFileAddon01">
+                            <label class="custom-file-label" for="deliverable_file">Choose file</label>
                         </div>
                         </div>
 
@@ -87,14 +95,14 @@
                         <hr class="my-4">
                         <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Submit Deliverable</button>
                     </form>
+                    {{/if}}
                     <script>
-                        $("#inputFile").on("change", function() {
+                        $("#deliverable_file").on("change", function() {
                             var fileName = $(this).val();
                             fileName = fileName.split("\\");
                             $(this).next(".custom-file-label").html(fileName[fileName.length-1]);
                         });
                     </script>
-                    {{/if}}
                 </div>
             </div>
         </div>

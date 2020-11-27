@@ -5,6 +5,7 @@ const hbs = require("express-handlebars");
 const path = require("path");
 const mongoose = require("mongoose");
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
 // connect to db
 mongoose.connect("mongodb://localhost/cmsApp");
@@ -24,8 +25,8 @@ app.set("view engine", "hbs");
 app.use(express.static(path.join(__dirname, "public"))); // set public folder
 
 // Middleware to parse the body of the request.
-app.use(express.json());
-app.use(express.urlencoded());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
 // POST login page.

@@ -24,11 +24,7 @@
                     <div class="alert alert-danger">Error: {{error}}</div>
                     {{/if}}
                     {{#if professor}}
-                    <form method="GET" action="create-deliverable">
-                        <input type="hidden" value="{{this.classId}}" name="classId">
-                        <input type="hidden" value="{{this.cCode}}" name="cCode">
-                        <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Create Deliverable</button>
-                    </form>
+                        <a class="btn btn-lg btn-primary btn-block text-uppercase" href="/classes/{{this.classId}}/create-deliverable">Create Deliverable</a>
                     {{/if}}
                     <br>
                     <div id="deliverablePageTitle"></div>
