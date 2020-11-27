@@ -2,7 +2,9 @@ const Class = require("../db/class.js");
 const User = require("../db/user.js");
 const Course = require("../db/course.js");
 const Deliverable = require("../db/deliverable.js");
+const DeliverableSubmission = require("../db/deliverableSubmission.js");
 const ClassEnrollment = require("../db/classEnrollment.js");
+const fs = require("fs");
 
 //ensure that the class capacity > 1
 function validateClassCapacity(cap) {
@@ -165,12 +167,16 @@ async function validateCreateDeliverableInputs(classIDParam, titleParam, descrip
     var errorArray = [];
 
     // Check if another deliverable has the same title in this class.
-    if ((await Deliverable.find({ class_id: classIDParam, title: titleParam})).length !== 0) {
+    if ((await Deliverable.find({ class_id: classIDParam, title: { $regex: new RegExp("^" + titleParam.toLowerCase(), "i") }})).length !== 0) {
         errorArray.push("A deliverable with that title already exists in this class.");
     }
     // Check if the weight is greater or equal than 1 and less than or equal to 100.
     if ((weightParam < 0) || (weightParam > 100)) {
         errorArray.push("The weight of the deliverable must be >= 0 and <= 100 %.");
+    }
+    // Check if the description is not greater than 255 characters.
+    if (descriptionParam.length > 255) {
+        errorArray.push("The description of the deliverable can be at most 255 characters.");
     }
 
     // Before creating the deliverable, make sure that the class selected still exists in the database. This is to ensure ACID properties remain in effect.
@@ -186,4 +192,35 @@ async function validateCreateDeliverableInputs(classIDParam, titleParam, descrip
     }
 
     return errorArray;
+}
+
+/**
+ * @description This function updates the deliverable submission info for a specific student in a class.
+ * @param {string} classId - The id of the class.
+ * @param {string} studentId - The id of the student submitting the file.
+ * @param {string} deliverableTitle - The name of the deliverable.
+ * @param {string} fileNameRef - The name of the file to reference later.
+ */
+module.exports.tryUpdateSubmissionDeliverable = async function (classId, studentId, deliverableTitle, fileNameRef) {
+    const deliverable = await Deliverable.find({ class_id: classId, title: deliverableTitle });
+    if (deliverable.length !== 0) { // check if deliverable exists in this class.
+        const query = { deliverable_id: deliverable[0]._id, student_id: studentId };
+        const deliverableSubmission = await DeliverableSubmission.find(query);
+        if (deliverableSubmission.length === 0) { // create submission deliverable if it doesn't exist.
+            const submission = new DeliverableSubmission({
+                deliverable_id: deliverable[0]._id,
+                student_id: studentId,
+                file_name: fileNameRef,
+                grade: -1
+            });
+        
+            await submission.save(); // save the submission to the database.
+        } else { // otherwise update existing submission deliverable.
+            console.log(deliverableSubmission[0].file_name);
+            fs.unlinkSync("uploads/" + deliverableSubmission[0].file_name); // delete old submission file
+            await DeliverableSubmission.updateOne(query, { $set: { file_name: fileNameRef } }); // update file name reference in db to new file
+        }
+        return true; // sucessfully updated submission deliverable
+    }
+    return false; // something went wrong
 }
