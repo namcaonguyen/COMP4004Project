@@ -5,7 +5,7 @@ Feature: Create a class for a course
 		And there are no courses in the database
 		And There is a course in the database with code "COMP4004" and title "Software Quality Assurance" and prereqs <prereqs> and precludes <precluded>
 		And there are no professors in the database
-		And there exists an approved professor in the database named "Jean-Pierre Corriveau" with email "jp@gmail.com" and password "password"
+		And There exists a "professor" "Jean-Pierre Corriveau" with email "jp@gmail.com" and password "password" and courses taken ""
 		When An admin tries to create a class for course code "COMP4004" with "Jean-Pierre Corriveau" and capacity <capacity>
 		Then There exists a class for the "COMP4004" with "Jean-Pierre Corriveau" and capacity <capacity>
     
@@ -19,7 +19,7 @@ Feature: Create a class for a course
 		And there are no courses in the database
 		And There is a course in the database with code "COMP4004" and title "Software Quality Assurance" and prereqs <prereqs> and precludes <precluded>
 		And there are no professors in the database
-		And there exists an approved professor in the database named "Jean-Pierre Corriveau" with email "jp@gmail.com" and password "password"
+		And There exists a "professor" "Jean-Pierre Corriveau" with email "jp@gmail.com" and password "password" and courses taken ""
 		When An admin tries to create a class for course code "COMP4004" with "Jean-Pierre Corriveau" and capacity <capacity>
 		Then class is not found in the database
 
@@ -32,7 +32,7 @@ Feature: Create a class for a course
 		And there are no courses in the database
 		And There is a course in the database with code "COMP4004" and title "Software Quality Assurance" and prereqs "" and precludes ""
 		And there are no professors in the database
-		And there exists an approved professor in the database named "Jean-Pierre Corriveau" with email "jp@gmail.com" and password "password"
+		And There exists a "professor" "Jean-Pierre Corriveau" with email "jp@gmail.com" and password "password" and courses taken ""
 		And the course was deleted
 		When An admin tries to create a class for course code "COMP4004" with "Jean-Pierre Corriveau" and capacity 99
 		Then class is not found in the database
@@ -42,7 +42,7 @@ Feature: Create a class for a course
 		And there are no courses in the database
 		And There is a course in the database with code "COMP4004" and title "Software Quality Assurance" and prereqs "" and precludes ""
 		And there are no professors in the database
-		And there exists an approved professor in the database named "Jean-Pierre Corriveau" with email "jp@gmail.com" and password "password"
+		And There exists a "professor" "Jean-Pierre Corriveau" with email "jp@gmail.com" and password "password" and courses taken ""
 		And the prof was deleted
 		When An admin tries to create a class for course code "COMP4004" with "Jean-Pierre Corriveau" and capacity 99
 		Then the prof is not found in the database

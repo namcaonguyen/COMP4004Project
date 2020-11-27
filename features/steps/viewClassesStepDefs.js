@@ -39,28 +39,6 @@ Given("There is a course in the database with code {string} and title {string} b
     assert.equal(true, newCreatedCourse._id.equals(createdCourse._id));
 });
 
-Given("There exists an approved {string} in the database named {string} with email {string} and password {string} before viewing all classes", async function (accountTypeParam, userName, userEmail, userPassword) {
-    // Create user object and save it to the database.
-    const createdUser = new User({
-        email: userEmail,
-        password: userPassword,
-        fullname: userName,
-        accountType: accountTypeParam,
-        approved: true
-    });
-
-    // Save the user to the database.
-    await createdUser.save();
-
-    // Find the new User in the database.
-    var newCreatedUser = await User.findById(createdUser._id);
-
-    assert.equal(newCreatedUser.fullname, createdUser.fullname);
-    assert.equal(newCreatedUser.accountType, createdUser.accountType);
-    assert.equal(true, newCreatedUser._id.equals(createdUser._id));
-});
-
-
 When("There exists a class for course code {string} with {string} {int} {string} {string} before viewing all classes", async function (code, classProfessor, classCapacity, classPrereqs, classPrecluded) {
     var course = await Course.find({ courseCode: code });
     var createdUser = await User.find({ fullname: classProfessor });

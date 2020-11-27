@@ -3,7 +3,7 @@ Feature: A student User can enroll in a Class.
 	Scenario: A student User wants to see the Classes to enroll, but there are no available Classes.
 		Given There are no existing Users in the database
 		And There are no existing Classes in the database
-		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password"
+		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
 		When Student User tries to view list of available Classes
 		Then There are no available Classes
 
@@ -14,8 +14,8 @@ Feature: A student User can enroll in a Class.
 		And There are no existing Courses in the database
 		And There are no existing Classes in the database
 		And There are no existing ClassEnrollments in the database
-		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password"
-		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password"
+		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
+		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
 		And There exists a Course "NAMO1001" with title "How to be Rad"
 		And There exists a Class for "NAMO1001" with capacity <totalCapacity>, prerequisites "", and precludes ""
 		When Student User tries to view list of available Classes
@@ -35,8 +35,8 @@ Feature: A student User can enroll in a Class.
 		And There are no existing Courses in the database
 		And There are no existing Classes in the database
 		And There are no existing ClassEnrollments in the database
-		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password"
-		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password"
+		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
+		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
 		And There exists a Course "NAMO1001" with title "How to be Rad"
 		And There exists a Class for "NAMO1001" with capacity 150, prerequisites "", and precludes ""
 		When Student User tries to view list of available Classes
@@ -51,8 +51,8 @@ Feature: A student User can enroll in a Class.
 		And There are no existing Courses in the database
 		And There are no existing Classes in the database
 		And There are no existing ClassEnrollments in the database
-		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password"
-		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password"
+		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
+		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
 		And There exists a Course "NAMO1001" with title "How to be Rad"
 		And There exists a Class for "NAMO1001" with capacity 150, prerequisites "", and precludes ""
 		When Student User tries to view list of available Classes
@@ -69,9 +69,9 @@ Feature: A student User can enroll in a Class.
 		And There are no existing Courses in the database
 		And There are no existing Classes in the database
 		And There are no existing ClassEnrollments in the database
-		And There exists a "student" "Fast McGee" with email "fast@guy.com" and password "TheSpeedySpeedster99"
-		And There exists a "student" "Slowy Slowerson" with email "slow@guy.com" and password "password"
-		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password"
+		And There exists a "student" "Fast McGee" with email "fast@guy.com" and password "TheSpeedySpeedster99" and courses taken ""
+		And There exists a "student" "Slowy Slowerson" with email "slow@guy.com" and password "password" and courses taken ""
+		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
 		And There exists a Course "NAMO1001" with title "How to be Rad"
 		And There exists a Class for "NAMO1001" with capacity 1, prerequisites "", and precludes ""
 		When Student User tries to view list of available Classes
@@ -88,8 +88,8 @@ Feature: A student User can enroll in a Class.
 		And There are no existing Courses in the database
 		And There are no existing Classes in the database
 		And There are no existing ClassEnrollments in the database
-		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password"
-		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password"
+		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
+		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
 		And There exists a Course "NAMO1001" with title "How to be Rad"
 		And There exists a Class for "NAMO1001" with capacity 150, prerequisites "", and precludes ""
 		When Student User tries to view list of available Classes

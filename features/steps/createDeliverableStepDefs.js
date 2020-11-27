@@ -20,35 +20,6 @@ Given("The database is empty before creating a deliverable", async function () {
     assert.strictEqual((await Deliverable.find({})).length, 0); // assert that no professors were found, meaning they were all deleted.
 });
 
-When("There exists an approved professor with name {string} email {string} and password {string}", async function (profName, profEmail, profPassword) {
-    // Create user object and save it to the database.
-    const createdProfessor = new User({
-        email: profEmail,
-        password: profPassword,
-        fullname: profName,
-        accountType: "professor",
-        approved: true
-    });
-
-    // Save the user to the database.
-    await createdProfessor.save();
-
-    // Find the new User in the database.
-    var newCreatedProfessor = await User.find({ _id: createdProfessor._id, accountType: "professor" }, function (err, foundProfessors) {
-        if (err) {
-            return console.error(err);
-        } else {
-            return foundProfessors;
-        }
-    });
-
-    assert.equal(newCreatedProfessor[0].fullname, createdProfessor.fullname);
-    assert.equal(newCreatedProfessor[0].accountType, createdProfessor.accountType);
-    assert.equal(true, newCreatedProfessor[0]._id.equals(createdProfessor._id));
-
-    this.createdProfessorObjectId = createdProfessor._id;
-});
-
 Given("There exists a course with course code {string} and title {string}", async function (cCode, courseTitle) {
     // Create user object and save it to the database.
     const createdCourse = new Course({
@@ -77,7 +48,7 @@ Given("There exists a class for COMP4004 with JP as the professor and class capa
     // Create class object and save it to the database.
     const createdClass = new Class({
         course: this.createdCourseObjectId,
-        professor: this.createdProfessorObjectId,
+        professor: this.createdProfessorUserObjectId,
         totalCapacity: classCapacity
     });
 

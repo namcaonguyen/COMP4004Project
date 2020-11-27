@@ -2,7 +2,7 @@ Feature: Create a deliverable for a class
 
 	Scenario Outline: A professor creates a deliverable for a class with valid input
 		Given The database is empty before creating a deliverable
-		When There exists an approved professor with name "JP Corriveau" email "jp@cms.com" and password "password"
+		When There exists a "professor" "JP Corriveau" with email "jp@cms.com" and password "password" and courses taken ""
 		And There exists a course with course code "COMP4004" and title "Quality Assurance"
 		And There exists a class for COMP4004 with JP as the professor and class capacity of <capacity>
 		When JP tries to create a deliverable for COMP4004 with <title> <description> and <weight>
@@ -16,7 +16,7 @@ Feature: Create a deliverable for a class
 
 	Scenario Outline: A professor tries to create a deliverable for a class with invalid input
         Given The database is empty before creating a deliverable
-		When There exists an approved professor with name "JP Corriveau" email "jp@cms.com" and password "password"
+		When There exists a "professor" "JP Corriveau" with email "jp@cms.com" and password "password" and courses taken ""
 		And There exists a course with course code "COMP4004" and title "Quality Assurance"
 		And There exists a class for COMP4004 with JP as the professor and class capacity of <capacity>
 		When JP tries to create a deliverable for COMP4004 with <title> <description> and <weight>
@@ -29,7 +29,7 @@ Feature: Create a deliverable for a class
 
 	Scenario Outline: A professor tries to create a deliverable for a class but the class was deleted before creating the deliverable
         Given The database is empty before creating a deliverable
-		When There exists an approved professor with name "JP Corriveau" email "jp@cms.com" and password "password"
+		When There exists a "professor" "JP Corriveau" with email "jp@cms.com" and password "password" and courses taken ""
 		And There exists a course with course code "COMP4004" and title "Quality Assurance"
 		And There exists a class for COMP4004 with JP as the professor and class capacity of <capacity>
 		And The class was deleted

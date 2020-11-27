@@ -9,8 +9,8 @@ Feature: Students can withdraw from classes after deadline with DR
 		And There are no existing Classes in the database
 		And There are no existing ClassEnrollments in the database
 
-		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password"
-		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password"
+		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
+		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
 
 		And There exists a Course "NAMO1001" with title "How to be Rad"
 		And There exists a Class for "NAMO1001" with capacity 300, prerequisites "", and precludes ""
@@ -37,8 +37,8 @@ Feature: Students can withdraw from classes after deadline with DR
 		And There are no existing Classes in the database
 		And There are no existing ClassEnrollments in the database
 
-		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password"
-		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password"
+		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
+		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
 
 		And There exists a Course "NAMO1001" with title "How to be Rad"
 		And There exists a Class for "NAMO1001" with capacity 300, prerequisites "", and precludes ""
