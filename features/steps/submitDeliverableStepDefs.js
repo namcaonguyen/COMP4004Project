@@ -40,7 +40,7 @@ When("There exists an approved student with name {string} email {string} and pas
 When("{string} submits a text file named {string} as submission to that deliverable with the contents being {string}", async function(student, fileName, text) {
     var deliverable = await Deliverable.findById(this.deliverable.id);
     this.fileName = this.student._id + "-" + (await Course.findById(this.course.id)).courseCode + "-" + deliverable.title + "-" + fileName;
-    fs.writeFileSync("uploads/" + this.fileName);
+    fs.writeFileSync("uploads/" + this.fileName, text);
     assert(true, await tryUpdateSubmissionDeliverable(this.class.id, this.student._id, deliverable.title, this.fileName));
 });
 
