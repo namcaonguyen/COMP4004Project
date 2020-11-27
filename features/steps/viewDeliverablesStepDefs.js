@@ -12,6 +12,9 @@ const {
 const {
     tryCreateCourse
 } = require("../../js/courseManagement.js");
+const {
+    tryEnrollStudentInClass
+} = require("../../js/classEnrollmentManagement.js");
 
 Given("The database is empty before viewing deliverables", async function () {
     await Class.deleteMany({}); // delete all classes
@@ -48,35 +51,6 @@ Given("There exists a course with code {string} and title {string} and prereqs {
     assert.strictEqual((await Course.find({})).length, 1);
 
     this.createdCourseObjectId = createdCourse._id;
-});
-
-Given("There exists an approved professor in the database named {string} with email {string} and password {string} before viewing deliverables", async function (userName, userEmail, userPassword) {
-    // Create user object and save it to the database.
-    const createdProfessor = new User({
-        email: userEmail,
-        password: userPassword,
-        fullname: userName,
-        accountType: "professor",
-        approved: true
-    });
-
-    // Save the user to the database.
-    await createdProfessor.save();
-
-    // Find the new User in the database.
-    var newCreatedProfessor = await User.find({ _id: createdProfessor._id, accountType: "professor" }, function (err, foundProfessors) {
-        if (err) {
-            return console.error(err);
-        } else {
-            return foundProfessors;
-        }
-    });
-
-    assert.equal(newCreatedProfessor[0].fullname, createdProfessor.fullname);
-    assert.equal(newCreatedProfessor[0].accountType, createdProfessor.accountType);
-    assert.equal(true, newCreatedProfessor[0]._id.equals(createdProfessor._id));
-
-    this.createdProfessorObjectId = createdProfessor._id;
 });
 
 Given("There exists a Class for {string} with capacity {int} before viewing deliverables", async function (courseCodeParam, totalCapacityParam) {
@@ -132,26 +106,9 @@ Then("The professor can't see any deliverables in the deliverables list for his 
     assert.equal(0, foundDeliverable.length);
 });
 
-Given("There exists an approved student in the database named {string} with email {string} and password {string} and is enrolled in the class", async function (nameParam, emailParam, passwordParam) {
-    // Create a User object to save to the database.
-    const createdStudent = new User({
-        email: emailParam,
-        password: passwordParam,
-        fullname: nameParam,
-        accountType: "student",
-        approved: true
-    });
-
-    // Save the User to the database.
-    await createdStudent.save();
-
-    // Find the new student in the database.
-    var newCreatedStudent = await User.find({ _id: createdStudent._id });
-
-    // Assert that the newly created student was found in the database.
-    assert.equal(true, newCreatedStudent.length);
-
-    this.createdStudentObjectID = createdStudent._id;
+When("The student is enrolled in the Class", async function() {
+    // Enroll the most recently created student User in the most recently created Class.
+    await tryEnrollStudentInClass(this.createdStudentObjectID, this.createdClassObjectID);
 });
 
 Then("The student can see the deliverable in the deliverables list", async function () {

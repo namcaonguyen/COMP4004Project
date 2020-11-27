@@ -39,35 +39,6 @@ Given("There are no existing Classes in the database", async function() {
 	assert.strictEqual(allClasses.length, 0);
 });
 
-Given("There exists a {string} {string} with email {string} and password {string}", async function(accountTypeParam, fullNameParam, emailParam, passwordParam) {
-	// Create a User object to save to the database.
-	const createdUser = new User({
-		email: emailParam,
-		password: passwordParam,
-		fullname: fullNameParam,
-		accountType: accountTypeParam,
-		approved: true
-	});
-
-	// Save the User to the database.
-	await createdUser.save();
-
-	// Find the new User in the database.
-	var newCreatedUser = await User.find({ _id: createdUser._id, accountType: accountTypeParam });
-
-	// Assert that the newly created User was found in the database.
-	assert.equal(true, newCreatedUser.length);
-
-	// Store the most recently created User Object ID in a variable for use later.
-	if ( accountTypeParam == "student" ) {
-		this.createdStudentUserObjectID = createdUser._id;
-	} else if ( accountTypeParam == "professor" ) {
-		this.createdProfessorUserObjectID = createdUser._id;
-	} else {
-		this.createdAdministratorUserObjectID = createdUser._id;
-	}
-});
-
 When("Student User tries to view list of available Classes", async function() {
 	// Get the list of available Classes.
 	this.classList = await getClassList();

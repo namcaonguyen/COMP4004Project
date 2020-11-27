@@ -76,44 +76,14 @@ Given("there are no professors in the database", async function () {
     assert.strictEqual(allUsers.length, 0);
 });
 
-Given("there exists an approved professor in the database named {string} with email {string} and password {string}", async function (userName, userEmail, userPassword) {
-    // Create user object and save it to the database.
-    const createdProfessor = new User({
-        email: userEmail,
-        password: userPassword,
-        fullname: userName,
-        accountType: "professor",
-        approved: true
-    });
-
-    // Save the user to the database.
-    await createdProfessor.save();
-
-    // Find the new User in the database.
-    var newCreatedProfessor = await User.find({ _id: createdProfessor._id, accountType: "professor" }, function (err, foundProfessors) {
-        if (err) {
-            return console.error(err);
-        } else {
-            return foundProfessors;
-        }
-    });
-
-    assert.equal(newCreatedProfessor[0].fullname, createdProfessor.fullname);
-    assert.equal(newCreatedProfessor[0].accountType, createdProfessor.accountType);
-    assert.equal(true, newCreatedProfessor[0]._id.equals(createdProfessor._id));
-
-    this.createdProfessorObjectId = createdProfessor._id;
-});
-
-
 When("An admin tries to create a class for course code {string} with {string} and capacity {int}", async function (classCode, classProfessor, classCapacity) {
     // Create class object and save it to the database.
-    result = await tryCreateClass( this.createdCourseObjectId, this.createdProfessorObjectId, classCapacity );
+    result = await tryCreateClass( this.createdCourseObjectId, this.createdProfessorUserObjectID, classCapacity );
 });
 
 Then("There exists a class for the {string} with {string} and capacity {int}", async function (classCodeString, classProfessorString, classCapacity) {
     // Find all the Classes with the given attributes.
-    const allClasses = await Class.find({ _id: result.id, course: this.createdCourseObjectId, professor: this.createdProfessorObjectId, totalCapacity: classCapacity });
+    const allClasses = await Class.find({ _id: result.id, course: this.createdCourseObjectId, professor: this.createdProfessorUserObjectID, totalCapacity: classCapacity });
 
     // Assert that a class was found, meaning it was saved.
     assert.equal(allClasses.length, 1);
