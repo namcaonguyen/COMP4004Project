@@ -91,30 +91,22 @@ Given("There exists a Course {string} with title {string}", async function(cours
 	this.createdCourseObjectID = createdCourse._id;
 });
 
-Given("There exists a Class for {string} with capacity {int}, prerequisites {string}, and precludes {string}", async function(courseCodeParam, totalCapacityParam, prereqParam, precludesParam) {
+Given("There exists a Class for {string} taught by professor with email {string} with capacity {int}", async function(courseCodeParam, emailParam, totalCapacityParam) {
 	// Get the Course Object ID.
 	var foundCourse = await Course.find({ courseCode: courseCodeParam });
 	// Assert that a Course was found.
 	assert.equal(true, foundCourse.length);
 
 	// Get the Professor Object ID.
-	var foundProfessor = await User.find({ accountType: "professor" });
+	var foundProfessor = await User.find({ email: emailParam, accountType: "professor" });
 	// Assert that a professor User was found.
 	assert.equal(true, foundProfessor.length);
-
-	// Split the prerequisites and precludes by "," into an array and remove the empty strings if there are any.
-	setOfPrereqs = prereqParam.split(",");
-	setOfPrecludes = precludesParam.split(",");
-	setOfPrereqs = setOfPrereqs.filter(item => item);
-	setOfPrecludes = setOfPrecludes.filter(item => item);
 	
 	// Create a Class object to save to the database.
 	const createdClass = new Class({
 		course: foundCourse[0]._id,
 		professor: foundProfessor[0]._id,
-		totalCapacity: totalCapacityParam,
-		prereqs: setOfPrereqs,
-		precludes: setOfPrecludes
+		totalCapacity: totalCapacityParam
 	});
 
 	// Save the Class to the database.

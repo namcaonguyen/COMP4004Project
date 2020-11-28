@@ -13,7 +13,7 @@ Feature: Students can withdraw from classes after deadline with DR
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
 
 		And There exists a Course "NAMO1001" with title "How to be Rad"
-		And There exists a Class for "NAMO1001" with capacity 300, prerequisites "", and precludes ""
+		And There exists a Class for "NAMO1001" taught by professor with email "namo@namo.com" with capacity 300
 		
 		When Student with email "gmail@gmail.com" is not enrolled in class for course with code "NAMO1001"
 
@@ -41,7 +41,7 @@ Feature: Students can withdraw from classes after deadline with DR
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
 
 		And There exists a Course "NAMO1001" with title "How to be Rad"
-		And There exists a Class for "NAMO1001" with capacity 300, prerequisites "", and precludes ""
+		And There exists a Class for "NAMO1001" taught by professor with email "namo@namo.com" with capacity 300
 		
 		When Student with email "gmail@gmail.com" is not enrolled in class for course with code "NAMO1001"
 
