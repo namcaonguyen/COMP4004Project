@@ -4,6 +4,10 @@ const Course = require("../db/course.js");
 const Deliverable = require("../db/deliverable.js");
 const ClassEnrollment = require("../db/classEnrollment.js");
 const AcademicDeadline = require("../db/academicDeadline.js");
+const {
+	addToList,
+	removeFromList
+} = require("./courseManagement.js");
 
 // Function to get a Class List of the available Classes. It includes data that is used to display information to the user.
 // Return a list of Classes.
@@ -82,6 +86,113 @@ async function isClassFull(classObjectID) {
 	}
 }
 
+/**
+ * @description	Function to check if a preclude of a prerequisite has been taken by the student.
+ * @param prereqCourseCodeParam	Course code of the prerequisite to check
+ * @param coursesTakenListParam	List of Courses taken by the student
+ * @return whether or not the the student has taken a preclude of the prerequisite.
+ */
+async function studentHasTakenPrecludedCourse( prereqCourseCodeParam, coursesTakenListParam ) {
+	// Declaration of boolean variable for if a preclude of the prerequisite was taken, initially set to false.
+	var hasStudentTakenPrecludeOfPrereq = false;
+
+	// Go through the list of Courses taken by the student.
+	// This is to check if any of the courses taken preclude the desired prerequisite.
+	for ( var i = 0; i < coursesTakenListParam.length; ++i ) {
+		// Find the Course Object with the Course Code.
+		var findCourse = await Course.find( { courseCode: coursesTakenListParam[i] } );
+
+		// If there is no such Course in the database...
+		if ( findCourse.length === 0 ) {
+			// Move onto the next Course.
+			continue;
+		} else {
+			// Declaration of variable for the precludes of the current Course.
+			var precludesOfTakenCourse = findCourse[0].precludes;
+
+			// If the prerequisite Course Code is in the list of precludes...
+			if ( precludesOfTakenCourse.indexOf(prereqCourseCodeParam) != -1 ) {
+				// The student has taken a preclude of the prereq. Set the boolean to true.
+				hasStudentTakenPrecludeOfPrereq = true;
+			}
+		}
+	}
+
+	// Find the Course Object of the prerequisite Course Code.
+	var findPrereqCourse = await Course.find( { courseCode: prereqCourseCodeParam } );
+	// If there is a Course in the database...
+	if ( findPrereqCourse.length != 0 ) {
+		// Declaration of variable for the precludes of the prerequisite.
+		var precludesOfPrerequisite = findPrereqCourse[0].precludes;
+
+		// Go through the precludes of the prerequisite.
+		for ( var i = 0; i < precludesOfPrerequisite.length; ++i ) {
+			// If the current preclude of the prerequisite is in the student's list of Courses taken...
+			if ( coursesTakenListParam.indexOf(precludesOfPrerequisite[i]) != -1 ) {
+				// The student has taken a preclude of the prereq. Set the boolean to true.
+				hasStudentTakenPrecludeOfPrereq = true;
+			}
+		}
+	}
+
+	return hasStudentTakenPrecludeOfPrereq;
+}
+
+/**
+ * @description	Function to check if the prerequisites required for the Class Course are satisfied.
+ * @param classObjectIDParam		Object ID of the Class
+ * @param studentUserObjectIDParam	Object ID of the student User
+ * @return whether or not the prerequisites are satisfied.
+ */
+async function arePrerequisitesSatisfied( classObjectIDParam, studentUserObjectIDParam ) {
+	// Get the Class Object.
+	var findClass = await Class.find( { _id: classObjectIDParam } );
+	// Get the student User Object.
+	var findStudent = await User.find( { _id: studentUserObjectIDParam } );
+
+	// If the Class or student User can't be found in the database...
+	if ( findClass.length === 0 || findStudent.length === 0 ) {
+		// Return early if the Class can't be found.
+		return false;
+	} else {
+		// Get the Course Object associated with the Class.
+		var findCourse = await Course.find( { _id: findClass[0].course } );
+		// Declaration of variables for the required prerequisites and the student's Courses Taken, and populate them.
+		var requiredPrerequisitesList = [];
+		requiredPrerequisitesList = addToList(requiredPrerequisitesList, findCourse[0].prereqs);
+		var studentCoursesTakenList = [];
+		studentCoursesTakenList = addToList(studentCoursesTakenList, findStudent[0].coursesTaken);
+
+		// Remove Courses from the prerequisites list that the student has already taken.
+		requiredPrerequisitesList = removeFromList(requiredPrerequisitesList, studentCoursesTakenList);
+
+		// If the prerequisites list is empty, then that means all prerequisites have been satisfied.
+		if ( requiredPrerequisitesList.length === 0 ) {
+			return true;
+		}
+
+		// Else, there are still some prerequisites that the student has not taken.
+		// However, it is possible that the student has taken a precluded Course of a prerequisite.
+		// Check for the precludes of the prerequisites.
+
+		// Go backwards through the list of remaining prerequisites.
+		for ( var i = requiredPrerequisitesList.length - 1; i >= 0; i-- ) {
+			// If the student has taken a preclude of the current prerequisite...
+			if ( await studentHasTakenPrecludedCourse(requiredPrerequisitesList[i], studentCoursesTakenList) ) {
+				// Remove the prerequisite from the list.
+				requiredPrerequisitesList.splice(i, 1);
+			}
+		}
+
+		// Check again if the prerequisites list is empty. That means all prerequisites have been satisfied.
+		if ( requiredPrerequisitesList.length === 0 ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
 // Function to check if the Class still exists in the database.
 // Param:	classObjectID	ID of the Class to check
 // Return boolean for if the Class still exists or not.
@@ -119,7 +230,10 @@ module.exports.tryEnrollStudentInClass = async function(studentUserObjectID, cla
 	if ( await isClassFull(classObjectID) ) {
 		return { error: "The Class is already full." };
 	}
-	// TODO: Check for prerequisites.
+	// Check if the prerequisites are satisfied.
+	if ( await arePrerequisitesSatisfied(classObjectID, studentUserObjectID) == false ) {
+		return { error: "The prerequisites for this Class are not satisfied." };
+	}
 
 	// Check again before enrolling if the Class still exists.
 	if ( await doesClassStillExist(classObjectID) == false ) {
