@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../db/user.js");
+const User = require("../../db/user.js");
 
 // GET view account requests page.
 router.get("/view-account-requests", (req, res) => {
@@ -20,7 +20,7 @@ router.get("/view-account-requests", (req, res) => {
                 accountList.push(user);
             }
         });
-        res.render("approveaccounts", { title: "Approve Account Requests" , accounts: accountList });
+        res.render("account-management/approveaccounts", { title: "Approve Account Requests" , accounts: accountList });
     } else {
         res.render("forbidden", { title: "Access Denied" });
     }
