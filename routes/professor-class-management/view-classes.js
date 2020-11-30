@@ -3,9 +3,23 @@ const multer = require("multer");
 const router = express.Router();
 const Class = require("../../db/class.js");
 const Deliverable = require("../../db/deliverable.js");
-const { getProfessorClassList, getStudentClassList, isEnrolled, isTeaching, getCourseCodeOfClass, getDeliverablesOfClass, isPastAcademicDeadline } = require("../../js/classEnrollmentManagement.js");
+const ClassEnrollment = require("../../db/classEnrollment.js");
+const User = require("../../db/user.js");
+const {
+    getProfessorClassList,
+    getStudentClassList,
+    isEnrolled,
+    isTeaching,
+    getCourseCodeOfClass,
+    getDeliverablesOfClass,
+    isPastAcademicDeadline,
+    trySetSubmissionGrade,
+    calculateFinalGrade,
+    trySubmitFinalGrade
+} = require("../../js/classEnrollmentManagement.js");
 const { tryCreateDeliverable, tryUpdateSubmissionDeliverable } = require("../../js/classManagement.js");
 const { tryDropClassNoDR, tryDropClassWithDR } = require("../../js/classEnrollmentManagement.js");
+const deliverableSubmission = require("../../db/deliverableSubmission.js");
 
 // display classes
 async function renderClasses(req, res, data={}) {
@@ -63,11 +77,90 @@ router.use("/:id", (req, res, next) => {
 
 // GET specific course
 router.get("/:id", async(req, res) => {
-    const theCourseCode = await getCourseCodeOfClass(req.params.id);
-    const foundDeliverables = await getDeliverablesOfClass(req.params.id);
-    var data = { title: "Welcome", cCode: theCourseCode, deliverables: foundDeliverables, classId: req.params.id };
-    data[res.locals.user.accountType] = true;
-    res.render("view-class", data);
+    const classID = req.params.id;
+    let optionalStudentID = req.query.selectedStudent; // professor page can specify the student in the url
+    if(res.locals.user.accountType === "student") optionalStudentID = res.locals.user._id; // student page fills it in automatically
+
+
+    const data = { title: "Welcome", cCode: await getCourseCodeOfClass(classID), classId: classID };
+
+    const foundEnrollments = await ClassEnrollment.find( { class: classID } );
+    let studentIsEnrolled = false;
+    data.studentsEnrolled = await Promise.all(foundEnrollments.map(async classEnrollment => {
+        const studentID = classEnrollment.student;
+        
+        if(optionalStudentID && optionalStudentID == studentID) {
+            data.finalGrade = classEnrollment.finalGrade;
+            studentIsEnrolled = true;
+        }
+
+        const user = (await User.find({_id: studentID}))[0];
+        const name = user && user.fullname;
+        return {
+            id: studentID,
+            name
+        };
+    }));
+
+    if(!studentIsEnrolled && optionalStudentID) {
+        optionalStudentID = undefined;
+        res.redirect(`/classes/${req.params.id}`);
+    } else {
+        data.deliverables = await getDeliverablesOfClass(classID, optionalStudentID);
+        data.displaySubmissions = !!optionalStudentID;
+        if(optionalStudentID) data.selectedStudent = optionalStudentID;
+        data.withdrawn = data.finalGrade == "WDN";
+        data.calculatedGrade = await calculateFinalGrade(classID, optionalStudentID);
+        
+        data[res.locals.user.accountType] = true;
+
+        res.render("view-class", data);
+    }
+});
+
+router.post("/:id/updateGrade", async(req, res) => {
+    if(res.locals.user.accountType !== "professor") {
+        res.redirect(`/classes/${req.params.id}`);
+        return;
+    }
+
+    let { grade, submission_id, action } = req.body;
+    if(action == "Clear") grade = -1;
+    else {
+        try {
+            grade = parseFloat(grade);
+        } catch(e) {
+            console.warn("Invalid grade submitted, expected string: ", grade);
+        }
+    }
+
+    const foundSubmissions = await deliverableSubmission.find({_id: submission_id});
+    if(!foundSubmissions.length) {
+        console.warn(`Warning: Tried to update grade to ${grade} for non-existing submission ${submission_id}, redirecting...`);
+        res.redirect(`/classes/${req.params.id}`);
+        return;
+    }
+    if(foundSubmissions.length != 1) console.warn(`Warning: more than submission found with id ${submission_id}`);
+    const submission = foundSubmissions[0];
+    const { student_id } = submission;
+
+    await trySetSubmissionGrade(submission_id, grade);
+
+    res.redirect(`/classes/${req.params.id}?selectedStudent=${student_id}`);
+});
+
+router.post("/:id/submitFinalGrade", async(req, res) => {
+    if(res.locals.user.accountType !== "professor") {
+        res.redirect(`/classes/${req.params.id}`);
+        return;
+    }
+
+    const classID = req.params.id;
+    let { finalGrade, student_id } = req.body;
+    const {success, error} = await trySubmitFinalGrade(classID, student_id, finalGrade);
+    if(!success) console.warn(error);
+
+    res.redirect(`/classes/${classID}?selectedStudent=${student_id}`);
 });
 
 // get create deliverable

@@ -41,7 +41,7 @@ When("Student with email {string} successfully drops class for course with code 
 	if(!enrollment) throw new Error("Student was not enrollment in any classes with course code");
 	const {student, class: class_} = enrollment;
 	const {success, error} = await tryDropClassNoDR(student, class_);
-	if(!success || error) throw new Error("Failed to drop class, error:", error);
+	if(!success || error) throw new Error("Failed to drop class, error:" + error);
 });
 
 When("Student with email {string} fails to drop class for course with code {string} for no DR", async function(email, courseCode) {
@@ -59,7 +59,7 @@ When("Student with email {string} successfully withdraws from the class for cour
 	if(!enrollment) throw new Error("Student was not enrollment in any classes with course code");
 	const {student, class: class_} = enrollment;
 	const {success, error} = await tryDropClassWithDR(student, class_);
-	if(!success || error) throw new Error("Failed to drop class, error:", error);
+	if(!success || error) throw new Error("Failed to drop class, error:" + error);
 });
 
 When("Student with email {string} fails to withdraw from the class for course with code {string} with DR", async function(email, courseCode) {
