@@ -1,0 +1,64 @@
+<style>
+    .card {
+        margin: 0 auto;
+        float: none;
+        margin-bottom: 10px;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-8 mx-auto">
+            <div class="card card-signin my-5">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Course Management System</h3>
+                    <h5 class="card-title text-center">View Students</h5>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">View Students</li>
+                        </ol>
+                    </nav>
+
+                    {{#if error}}
+                        <div class="alert alert-danger">Error: {{error}}</div>
+                    {{/if}}
+
+                    <hr class="my-4">
+                    <div id="message" style="text-align: center;"></div>
+                    <br>
+
+                    {{#each students}}
+                        <form method="POST">
+                            <div class="card" style="width: 30rem;">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{this.fullname}}</h5>
+                                    <h5 class="card-title">{{this.email}}</h5>
+                                    <h7 class="card-subtitle mb-2 text-muted">Courses Taken: {{this.coursesTaken}}</h7>
+                                    <br>
+                                    <input type="hidden" value="{{this._id}}" name="studentObjectID">
+                                    <button class="btn btn-lg btn-primary btn-block text-uppercase" name="deleteStudent" type="submit">Delete Student</button>
+                                </div>
+                            </div>
+                        </form>
+                    {{/each}}
+
+                    <hr class="my-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">View Students</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var data = "{{students}}";
+    if (data.length === 0) {
+        $("#message").html("There are no students at this moment!");
+    } else {
+        $("#message").html("Here are all the students with an account.");
+    }
+</script>

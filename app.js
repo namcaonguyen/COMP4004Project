@@ -74,7 +74,8 @@ app.use((req, res, next) => {
 
 // Any routes that appear below here will be checked by the middleware first.
 app.use("/", require("./routes/index.js"));
-app.use("/manage-accounts", require("./routes/accountmanagement.js"));
+app.use("/manage-accounts", require("./routes/account-management/accountmanagement.js"));
+app.use("/view-students", require("./routes/account-management/view-students.js"));
 
 app.use("/view-courses", require("./routes/course-management/view-courses"));
 app.use("/view-classes", require("./routes/course-management/view-classes"));
