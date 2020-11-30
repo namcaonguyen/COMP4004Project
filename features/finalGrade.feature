@@ -83,7 +83,7 @@ Feature: Professors can Calculate and/or Submit Final Grades
 		And A professor with email "namo@namo.com" submits the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 500 and fails
 
 
-	Scenario: A professor overrides the final grade for a student in their class with an invalid number and fails
+	Scenario: A professor overrides the final grade for a student in their class with an invalid number and is successful
         Given The database is clear
 		And There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
