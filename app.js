@@ -75,6 +75,7 @@ app.use((req, res, next) => {
 // Any routes that appear below here will be checked by the middleware first.
 app.use("/", require("./routes/index.js"));
 app.use("/manage-accounts", require("./routes/account-management/accountmanagement.js"));
+app.use("/view-students", require("./routes/account-management/view-students.js"));
 
 app.use("/view-courses", require("./routes/course-management/view-courses"));
 app.use("/view-classes", require("./routes/course-management/view-classes"));
@@ -156,19 +157,19 @@ process.on("SIGINT", () => {
 //Use [ CTRL + K + U ] to uncomment a block of code
 //Use [ CTRL + K + C ] to comment a block of code
 
-{
-    const createdadmin = new User({
-        email: "admin@admin.com",
-        password: "password",
-        fullname: "admin guy",
-        accountType: "administrator",
-        approved: true
-    });
-    createdadmin.save(function (err, createdadmin) {
-        if (err) {
-            return console.error(err);
-        }
-    });
+//{
+//    const createdadmin = new User({
+//        email: "admin@admin.com",
+//        password: "password",
+//        fullname: "admin guy",
+//        accountType: "administrator",
+//        approved: true
+//    });
+//    createdadmin.save(function (err, createdadmin) {
+//        if (err) {
+//            return console.error(err);
+//        }
+//    });
 
 //    const createdstudent = new User({
 //        email: "tj@tj",
@@ -233,4 +234,4 @@ process.on("SIGINT", () => {
 //      return console.error(err);  
 //		}
 //    });
-}
+//}
