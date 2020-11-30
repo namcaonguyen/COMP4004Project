@@ -8,6 +8,7 @@ const {
 	addToList,
 	removeFromList
 } = require("./courseManagement.js");
+const deliverableSubmission = require("../db/deliverableSubmission.js");
 
 // Function to get a Class List of the available Classes. It includes data that is used to display information to the user.
 // Return a list of Classes.
@@ -361,14 +362,106 @@ module.exports.getCourseCodeOfClass = async function (classId) {
 /**
  * @description returns a list of deliverables for a class.
  * @param {string} classId - The id of the class.
+ * @param {string=} optionalStudentId - The id of the student, if you want the grades and file names to be filled in
  */
-module.exports.getDeliverablesOfClass = async function (classId) {
-
-	//get list of deliverables for a class
-	const foundDeliverables = (await Deliverable.find({ class_id: classId })).map(result => {
+async function getDeliverablesOfClass (classId, optionalStudentId=undefined) {
+	const query = { class_id: classId };
+	const deliverables = (await Deliverable.find(query)).map(result => {
 		const { _id, title, weight } = result;
 		return { _id, title, weight };
 	});
 
-	return foundDeliverables;
+	if(optionalStudentId) {
+		for(const deliverable of deliverables) {
+			const studentSubmissions = await deliverableSubmission.find({
+				deliverable_id: deliverable._id,
+				student_id: optionalStudentId
+			});
+			
+			if(studentSubmissions.length) {
+				if(studentSubmissions.length != 1) console.warn(`Warning: Found multiple submissions for deliverable id ${deliverable._id} and student id ${optionalStudentId}`);
+				const studentSubmission = studentSubmissions[0];
+				
+				deliverable.submission_id = studentSubmission._id;
+
+				const rawGrade = deliverable.grade = studentSubmission.grade; // may be -1
+				if(rawGrade < 0) {
+					deliverable.graded = false;
+				} else {
+					deliverable.graded = true;
+				}
+
+				deliverable.file_name = studentSubmission.file_name;
+			}
+		}
+	}
+
+	return deliverables;
+}
+module.exports.getDeliverablesOfClass = getDeliverablesOfClass;
+
+/**
+ * @description This function updates the grade of a deliverable submission
+ * @param {string} submission_id - The id of the submission.
+ * @param {number=-1} grade - The new grade from 0-100.
+ */
+module.exports.trySetSubmissionGrade = async function (submission_id, grade=-1) {
+    if(typeof grade == "number" && !isNaN(grade)) {
+        if((grade >= 0 && grade <= 100) || grade == -1) {
+            await deliverableSubmission.updateMany({ _id: submission_id }, { $set: { grade }});
+            return { success: true };
+        } else return { success: false, error: "Grade must be in range [0, 100] (or -1 to clear)" };
+    } else return { success: false, error: "Grade must be of type number" };
+}
+
+/**
+ * @description This function returns the final grade. Assumes student is enrolled
+ * @param {string} class_id - The id of the class
+ * @param {string} student_id - The id of the student
+ * @returns {number}
+ */
+module.exports.calculateFinalGrade = async function (class_id, student_id) {
+	const precision = 100; // eg. precision=100 -> 25.79%... eg. precision=10 -> 25.8%
+
+    const deliverables = await getDeliverablesOfClass(class_id, student_id); // some of these will have marks
+    let totalWeight = 0;
+    let totalWeightedGrade = 0;
+    for(const deliverable of deliverables) {
+		let grade = deliverable.grade;
+		if(!(grade >= 0)) grade = 0; // not graded = -1, not submitted = undefined
+        const weight = deliverable.weight;
+        const weightedGrade = grade * weight;
+        totalWeight += weight;
+        totalWeightedGrade += weightedGrade;
+    }
+    if(totalWeight <= 0) return 0;
+    else return Math.round(precision * totalWeightedGrade / totalWeight) / precision;
+}
+
+/**
+ * @description This function updates the final grade of a student enrolled in a class
+ * @param {string} class_id - The id of the student.
+ * @param {string} student_id - The id of the student.
+ * @param {number=-1} finalGrade - The new final grade
+ */
+module.exports.trySubmitFinalGrade = async function (class_id, student_id, finalGrade) {
+	try {
+		finalGrade = parseFloat(finalGrade);
+	} catch(e) {
+		return { success: false, error: "Grade must be number" };
+	}
+
+	const enrollments = await ClassEnrollment.find({student: student_id, class: class_id});
+	if(!enrollments.length) return { success: false, error: `Tried to update non-existing enrollment` };
+	if(enrollments.length != 1) console.warn(`Warning: multiple enrollments for student: ${student_id}, class: ${class_id}`);
+	const enrollment = enrollments[0];
+
+	if(enrollment.finalGrade == "WDN") return { success: false, error: "Can't update final grade of withdrawn (WDN) enrollment" }
+
+	if(typeof finalGrade == "number" && !isNaN(finalGrade)) {
+        if(finalGrade >= 0 && finalGrade <= 100) {
+            await ClassEnrollment.updateMany({ _id: enrollment._id }, { $set: { finalGrade }});
+            return { success: true };
+        } else return { success: false, error: "Grade must be in range [0, 100]" };
+	} else return { success: false, error: "Grade must be of type number" };
 }
