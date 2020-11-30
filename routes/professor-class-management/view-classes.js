@@ -81,7 +81,6 @@ router.get("/:id", async(req, res) => {
     let optionalStudentID = req.query.selectedStudent; // professor page can specify the student in the url
     if(res.locals.user.accountType === "student") optionalStudentID = res.locals.user._id; // student page fills it in automatically
 
-
     const data = { title: "Welcome", cCode: await getCourseCodeOfClass(classID), classId: classID };
 
     const foundEnrollments = await ClassEnrollment.find( { class: classID } );
@@ -102,8 +101,7 @@ router.get("/:id", async(req, res) => {
         };
     }));
 
-    if(!studentIsEnrolled && optionalStudentID) {
-        optionalStudentID = undefined;
+    if(!studentIsEnrolled && req.query.selectedStudent) {
         res.redirect(`/classes/${req.params.id}`);
     } else {
         data.deliverables = await getDeliverablesOfClass(classID, optionalStudentID);
