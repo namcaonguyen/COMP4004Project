@@ -7,6 +7,7 @@ const DeliverableSubmission = require("../../db/deliverableSubmission.js");
 const ClassEnrollment = require("../../db/classEnrollment.js");
 const { tryUpdateSubmissionDeliverable } = require("../../js/classManagement.js");
 const { tryToDeleteStudent } = require("../../js/accountManagement.js");
+const { tryToDeleteProfessor } = require("../../js/accountManagement.js");
 const fs = require("fs");
 
 Given("Student with email {string} submits a text file with name {string} and contents {string}", async function(emailParam, fileNameParam, contentsParam) {
@@ -48,4 +49,34 @@ Then("All information pertaining to the deleted student was removed from the dat
 	assert.strictEqual(0, findDeliverableSubmissions.length);
 	assert.strictEqual(0, findClassEnrollments.length);
 	assert.strictEqual(0, findUsers.length);
+});
+
+When("Admin tries to delete the professor with email {string}", async function (emailParam) {
+	// Find the professor User object with the email.
+	var findProfessor = await User.find({ email: emailParam });
+
+	// Assert that the professor was found.
+	assert.equal(true, findProfessor.length);
+
+	// Try to delete the professor User.
+	await tryToDeleteProfessor(findProfessor[0]._id);
+
+	// Store the deleted professor's ID in a variable, for use later.
+	this.deletedProfessorUserObjectID = findProfessor[0]._id;
+});
+
+Then("The professor does not exist in the database", async function () {
+	// Find any Users with the deleted professor's User ID.
+	var findUsers = await User.find({ _id: this.deletedProfessorUserObjectID });
+
+	// Assert that nothing was found.
+	assert.strictEqual(0, findUsers.length);
+});
+
+Then("The professor still exists in the database", async function () {
+	// Find any Users with the deleted professor's User ID.
+	var findUsers = await User.find({ _id: this.deletedProfessorUserObjectID });
+
+	// Assert that the prof was found.
+	assert.strictEqual(1, findUsers.length);
 });

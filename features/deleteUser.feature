@@ -11,3 +11,17 @@ Feature: An administrator User can delete Users.
 		And Student with email "gmail@gmail.com" submits a text file with name "tester.txt" and contents "Hello."
 		When Admin tries to delete the student with email "gmail@gmail.com"
 		Then All information pertaining to the deleted student was removed from the database
+
+	Scenario: An administrator User deletes a professor who is not assigned to any classes.
+		Given There are no existing Users in the database
+		And There exists a "professor" "TJ Mendicino" with email "tj@cms.com" and password "password" and courses taken ""
+		When Admin tries to delete the professor with email "tj@cms.com"
+		Then The professor does not exist in the database
+
+	Scenario: An administrator User cannot deletes a professor who is assigned to a class.
+		Given There are no existing Users in the database
+		And There exists a "professor" "TJ Mendicino" with email "tj@cms.com" and password "password" and courses taken ""
+		And There is a course in the database with code "COMP3203" and title "Principles of Computer Networks" and prereqs "" and precludes ""
+		And There exists a Class for "COMP3203" taught by professor with email "tj@cms.com" with capacity 69
+		When Admin tries to delete the professor with email "tj@cms.com"
+		Then The professor still exists in the database
