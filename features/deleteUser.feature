@@ -25,3 +25,16 @@ Feature: An administrator User can delete Users.
 		And There exists a Class for "COMP3203" taught by professor with email "tj@cms.com" with capacity 69
 		When Admin tries to delete the professor with email "tj@cms.com"
 		Then The professor still exists in the database
+
+	Scenario: An administrator User deletes another an admin.
+		Given There are no existing Users in the database
+		And There exists a "administrator" "TJ Mendicino" with email "tj@cms.admin.com" and password "password" and courses taken ""
+		And There exists a "administrator" "the admin remover" with email "idestroyadminaccounts@cms.com" and password "password" and courses taken ""
+		When Admin with email "idestroyadminaccounts@cms.com" tries to delete the administrator with email "tj@cms.admin.com"
+		Then The attempted deleted administrator does not exist in the database
+
+	Scenario: An administrator User tries to delete themself but cannot.
+		Given There are no existing Users in the database
+		And There exists a "administrator" "the admin remover" with email "idestroyadminaccounts@cms.com" and password "password" and courses taken ""
+		When Admin with email "idestroyadminaccounts@cms.com" tries to delete the administrator with email "idestroyadminaccounts@cms.com"
+		Then The attempted deleted administrator still exists in the database

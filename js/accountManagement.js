@@ -90,3 +90,48 @@ module.exports.tryToDeleteProfessor = async function (professorUserObjectID) {
 
 	return { success: true };
 }
+
+/**
+ * @description Function to get a list of admin Users. It includes data that is used to display information to the user.
+ * @return a list of admin Users.
+ */
+module.exports.getAdministratorList = async function () {
+	var adminUserList = [];
+
+	// Find all the admin Users in the database.
+	var foundAdminUsers = await User.find({ accountType: "administrator", approved: true });
+
+	// Go through the results of the query.
+	for (let i = 0; i < foundAdminUsers.length; ++i) {
+		let userInfo = {};
+
+		userInfo._id = foundAdminUsers[i]._id;
+		userInfo.email = foundAdminUsers[i].email;
+		userInfo.fullname = foundAdminUsers[i].fullname;
+
+		adminUserList.push(userInfo);
+	}
+
+	return adminUserList;
+}
+
+/**
+ * @description	Function to try to delete a admin User.
+ * @param	adminUserObjectID		Object ID of the admin User to delete
+ * @param	loggedInAdminObjectID	Object ID of the admin trying to delete the other admin
+ * @return success or error.
+ */
+module.exports.tryToDeleteAdministrator = async function (adminUserObjectID, loggedInAdminObjectID) {
+	// Stringify the IDs
+	var adminUserObjectIDJSON = JSON.stringify(adminUserObjectID);
+	var loggedInAdminUserObjectIDJSON = JSON.stringify(loggedInAdminObjectID);
+
+	// An admin cannot delete their own account.
+	if (adminUserObjectIDJSON == loggedInAdminUserObjectIDJSON) {
+		return { success: false, error: "You cannot delete your own account." };
+	} else {
+		// Delete the specified administrator.
+		await User.deleteOne({ _id: adminUserObjectID });
+		return { success: true };
+	}
+}
