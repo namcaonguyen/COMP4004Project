@@ -14,6 +14,7 @@ const deliverableSubmission = require('../../db/deliverableSubmission.js');
 
 Given("The database is clear", async function () {
     await Class.deleteMany({}); // delete all classes
+    await ClassEnrollment.deleteMany({}); // delete all class enrollments
     await Course.deleteMany({}); // delete all courses    
     await User.deleteMany({}); // delete all users
     await Deliverable.deleteMany({}); // delete all deliverables
