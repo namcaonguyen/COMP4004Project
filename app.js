@@ -77,6 +77,7 @@ app.use("/", require("./routes/index.js"));
 app.use("/manage-accounts", require("./routes/account-management/accountmanagement.js"));
 app.use("/view-students", require("./routes/account-management/view-students.js"));
 app.use("/view-professors", require("./routes/account-management/view-professors.js"));
+app.use("/view-administrators", require("./routes/account-management/view-administrators.js"));
 
 app.use("/view-courses", require("./routes/course-management/view-courses"));
 app.use("/view-classes", require("./routes/course-management/view-classes"));

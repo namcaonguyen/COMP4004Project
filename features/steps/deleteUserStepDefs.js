@@ -8,6 +8,7 @@ const ClassEnrollment = require("../../db/classEnrollment.js");
 const { tryUpdateSubmissionDeliverable } = require("../../js/classManagement.js");
 const { tryToDeleteStudent } = require("../../js/accountManagement.js");
 const { tryToDeleteProfessor } = require("../../js/accountManagement.js");
+const { tryToDeleteAdministrator } = require("../../js/accountManagement.js");
 const fs = require("fs");
 
 Given("Student with email {string} submits a text file with name {string} and contents {string}", async function(emailParam, fileNameParam, contentsParam) {
@@ -78,5 +79,39 @@ Then("The professor still exists in the database", async function () {
 	var findUsers = await User.find({ _id: this.deletedProfessorUserObjectID });
 
 	// Assert that the prof was found.
+	assert.strictEqual(1, findUsers.length);
+});
+
+When("Admin with email {string} tries to delete the administrator with email {string}", async function (adminRemoverEmailParam, victimAdminEmailParam) {
+	// Find the administrator User object with the email.
+	var victimAdmin = await User.find({ email: victimAdminEmailParam });
+	var removerAdmin = await User.find({ email: adminRemoverEmailParam });
+
+	const victimID = victimAdmin[0]._id;
+	const removerID = removerAdmin[0]._id;
+
+	// Assert that the admin was found.
+	assert.equal(true, victimAdmin.length);
+	
+	// Try to delete the admin User.
+	await tryToDeleteAdministrator(victimID, removerID);
+
+	// Store the deleted admin's ID in a variable, for use later.
+	this.deletedAdminUserObjectID = victimAdmin[0]._id;
+});
+
+Then("The attempted deleted administrator does not exist in the database", async function () {
+	// Find any Users with the deleted admin's User ID.
+	var findUsers = await User.find({ _id: this.deletedAdminUserObjectID });
+
+	// Assert that nothing was found.
+	assert.strictEqual(0, findUsers.length);
+});
+
+Then("The attempted deleted administrator still exists in the database", async function () {
+	// Find any Users with the deleted admin's User ID.
+	var findUsers = await User.find({ _id: this.deletedAdminUserObjectID });
+	
+	// Assert that nothing was found.
 	assert.strictEqual(1, findUsers.length);
 });
