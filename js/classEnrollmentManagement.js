@@ -209,6 +209,33 @@ async function doesClassStillExist(classObjectID) {
 	}
 }
 
+/**
+ * @description Function to check if the Class is over capacity. If it is, then delete any excess enrollments.
+ * @param	classObjectID	ID of the Class to check
+ * @return boolean for if the Class is over capacity or not
+ */
+async function checkAndEnforceIsClassOverCapacity( classObjectID ) {
+	// Get the Total Capacity of the Class.
+	var currentClass = await Class.find( { _id: classObjectID } );
+	// Get all the enrollments of the Class.
+	var currentlyEnrolled = await ClassEnrollment.find( { class: classObjectID } );
+	
+	// Count the number of students enrolled in the Class.
+	// If the number of students enrolled in the Class is greater than the Total Capacity, then the Class is over capacity.
+	if ( currentlyEnrolled.length > currentClass[0].totalCapacity ) {
+		// Delete the most recent enrollments above the capacity.
+		for ( var i = currentlyEnrolled.length; i > currentClass[0].totalCapacity; i-- ) {
+			await ClassEnrollment.deleteOne( { _id: currentlyEnrolled[i - 1]._id } );
+		}
+		
+		var findtest = await ClassEnrollment.find({});
+
+		return true;
+	} else {
+		return false;
+	}
+}
+
 // Function to try and enroll a student User in a Class.
 // Param:	studentUserObjectID	ID of the student User enrolling
 // Param:	classObjectID		ID of the Class to enroll in
@@ -243,6 +270,17 @@ module.exports.tryEnrollStudentInClass = async function(studentUserObjectID, cla
 
 	// Save the Enrollment record to the database.
 	const enrollment = await new ClassEnrollment({ student: studentUserObjectID, class: classObjectID, finalGrade: "IN PROGRESS" }).save();
+	
+	// Check if the Class is over capacity. If it is, then delete the excess enrollments.
+	if ( await checkAndEnforceIsClassOverCapacity(classObjectID) ) {
+		// Try to find the created Enrollment in the database.
+		const findEnrollment = await ClassEnrollment.find( { _id: enrollment._id } );
+		// If the enrollment wasn't in the database, then it was deleted because the Class was over capacity.
+		if ( findEnrollment.length === 0 ) {
+			return { error: "The Class is already full." };
+		}
+	}
+	
 	return { id: enrollment._id };
 }
 

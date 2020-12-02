@@ -43,6 +43,7 @@ let professorIDArray = new Array();
 let courseIDArray = new Array();
 let classIDArray = new Array();
 let deliverableIDArray = new Array();
+let studentIDWantsToEnrollArray = new Array();
 
 Given("{string} {int} applies for an account with name {string}, email {string}, password {string}", async function(accountTypeParam, userIndexParam, fullnameParam, emailParam, passwordParam) {
     // Create an unapproved User to save to the database.
@@ -336,4 +337,40 @@ Then("An admin deletes {string} {int}", async function(accountTypeParam, userInd
         // Assert that no professor was found in the database.
         assert.strictEqual(0, findProfessors.length);
 	}
+});
+
+Given("Student {int} wants to enroll in Class {int}", async function(studentIndexParam, classIndexParam) {
+    // Store the student that wants to enroll in an array.
+    studentIDWantsToEnrollArray.push(studentIDArray[studentIndexParam - 1]);
+});
+
+When("All students who want to enroll in Class {int} try to enroll at the same time", async function(classIndexParam) {
+    // Go through all the students that want to enroll.
+    for ( var i = 0; i < studentIDWantsToEnrollArray.length; ++i ) {
+        // Try to enroll the student in the Class.
+        // NOTE: In order to mimic multiple students trying to enroll at the same time, we will NOT use the 'await' keyword here!!!
+        tryEnrollStudentInClass(studentIDWantsToEnrollArray[i], classIDArray[classIndexParam - 1]);
+	}
+
+    // Wait for the students to finish trying to enroll.
+    await new Promise(r => setTimeout(r, 100));
+});
+
+Then("Only {int} of the students that wanted to enroll in Class {int} were able to", async function(expectedEnrollmentsParam, classIndexParam) {
+    // Declaration of variable to keep track of the number of successful enrollments.
+    var numberOfSuccessfulEnrollments = 0;
+
+    // Go through all the students that tried to enroll.
+    for ( var i = 0; i < studentIDWantsToEnrollArray.length; ++i ) {
+        // Try to find the student's ClassEnrollment in the database.
+        const findClassEnrollment = await ClassEnrollment.find( { student: studentIDWantsToEnrollArray[i], class: classIDArray[classIndexParam - 1] } );
+        // If the student was able to enroll in the Class...
+        if ( findClassEnrollment.length === 1 ) {
+            // Increment the variable.
+            ++numberOfSuccessfulEnrollments;
+		}
+	}
+
+    // Assert that exactly the expected number of students were able to enroll.
+    assert.strictEqual(numberOfSuccessfulEnrollments, expectedEnrollmentsParam);
 });
