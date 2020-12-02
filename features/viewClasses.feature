@@ -23,6 +23,8 @@ Feature: View Assigned and Enrolled Classes
 
 	Scenario Outline: A student views their classes
 		Given The database is empty
+		And There is an Academic Deadline set in the database
+		And The administrator wants to update the Academic Deadline to year 3000, month 1, day 1
 		And There is a course in the database with code "COMP4004" and title "Software Quality Assurance" before viewing all classes
 		And There exists a "professor" "Jean-Pierre Corriveau" with email "jp@cms.com" and password "password" and courses taken ""
 		And There exists a class for course code "COMP4004" with "Jean-Pierre Corriveau" <capacity> <prereqs> <precluded> before viewing all classes
