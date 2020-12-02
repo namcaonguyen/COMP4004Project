@@ -62,34 +62,35 @@
                         <a href="/classes/{{../classId}}/{{this.title}}">
                             <h5 class="card-title">{{this.title}}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">Weight: {{this.weight}}%</h6>
-                        </a>
-                        {{#if ../displaySubmissions}}
-                        {{#if this.submission_id}}
-                        {{#if this.graded}}
-                        <h6 class="card-subtitle mb-2 text-muted">Grade: {{this.grade}}%</h6>
-                        {{else}}
-                        <h6 class="card-subtitle mb-2 text-muted">Not Graded</h6>
-                        {{/if}}
+                            {{#if ../displaySubmissions}}
+                            {{#if this.submission_id}}
+                                {{#if this.graded}}
+                                <h6 class="card-subtitle mb-2 text-muted">Grade: {{this.grade}}%</h6>
+                                {{else}}
+                                <h6 class="card-subtitle mb-2 text-muted">Not Graded</h6>
+                                {{/if}}
+                                </a>
+                                <h6 class="card-subtitle mb-2 text-muted">Submitted:&nbsp;<a href="/classes/{{../classId}}/{{this.title}}/{{this.file_name}}">{{this.file_name}}</a></h6>
+                                {{#if ../professor}}
+                                <form method="POST" action="/classes/{{../classId}}/updateGrade" style="white-space: nowrap; margin-right: 15px;">
+                                    <label style="display: inline" class="card-subtitle mb-2 text-muted">New Grade:</label>
+                                    <input type="hidden" name="submission_id" value="{{this.submission_id}}" />
+                                    <input name="action" type="submit" value="Clear"
+                                        style="display: inline; float: right"></input>
+                                    <input name="action" type="submit" value="Update"
+                                        style="display: inline; float: right"></input>
+                                    <input type="number" step="0.01" name="grade" min="0" max="100"
+                                        style="width: 25%; display: inline; float: right" placeholder="50">
+                                </form>
+                                <br>
+                                {{/if}}
+                            {{else}}
+                                <h6 class="card-subtitle mb-2 text-muted">Not Submitted</h6>
+                            {{/if}}
+                            {{/if}}
+                            </a>
                         {{#if ../professor}}
-                        <form method="POST" action="/classes/{{../classId}}/updateGrade" style="white-space: nowrap">
-                            <label style="display: inline" class="card-subtitle mb-2 text-muted">New Grade:</label>
-                            <input type="hidden" name="submission_id" value="{{this.submission_id}}" />
-                            <input name="action" type="submit" value="Clear"
-                                style="display: inline; float: right"></input>
-                            <input name="action" type="submit" value="Update"
-                                style="display: inline; float: right"></input>
-                            <input type="number" step="0.01" name="grade" min="0" max="100"
-                                style="width: 25%; display: inline; float: right" placeholder="50">
-                        </form>
-                        <br>
-                        {{/if}}
-                        <h6 class="card-subtitle mb-2 text-muted">Submitted. File (TODO: make this a link):
-                            {{this.file_name}}%</h6>
-                        {{else}}
-                        <h6 class="card-subtitle mb-2 text-muted">Not Submitted</h6>
-                        {{/if}}
-                        {{#if ../professor}}
-                        {{/if}}
+                        <a class="flex-fill btn btn-outline-primary" href="/classes/{{../classId}}/{{this.title}}/view-deliverable-submissions">View All Submissions</a>
                         {{/if}}
                     </div>
                     {{/each}}

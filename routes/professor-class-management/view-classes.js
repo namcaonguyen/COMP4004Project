@@ -1,8 +1,10 @@
 const express = require("express");
 const multer = require("multer");
 const router = express.Router();
+const path = require("path");
 const Class = require("../../db/class.js");
 const Deliverable = require("../../db/deliverable.js");
+const DeliverableSubmission = require("../../db/deliverableSubmission.js");
 const ClassEnrollment = require("../../db/classEnrollment.js");
 const User = require("../../db/user.js");
 const {
@@ -17,9 +19,19 @@ const {
     calculateFinalGrade,
     trySubmitFinalGrade
 } = require("../../js/classEnrollmentManagement.js");
-const { tryCreateDeliverable, tryUpdateSubmissionDeliverable } = require("../../js/classManagement.js");
+const { tryCreateDeliverable, tryUpdateSubmissionDeliverable, tryUpdateDeliverable, tryToDeleteDeliverable, tryRetrieveSubmittedDeliverables } = require("../../js/classManagement.js");
 const { tryDropClassNoDR, tryDropClassWithDR } = require("../../js/classEnrollmentManagement.js");
-const deliverableSubmission = require("../../db/deliverableSubmission.js");
+
+const upload = multer({
+    storage : multer.diskStorage({
+        destination: "uploads/",
+        filename: async (req, file, cb) => {
+            const user = await User.find({ email: req.cookies.email, password: req.cookies.password });
+            const theCourseCode = await getCourseCodeOfClass(req.params.id);
+            cb(null, (user[0]._id + "-" + theCourseCode + "-" + (req.params.deliverable || req.body.title) + "-" + file.originalname));
+        }
+    })
+});
 
 // display classes
 async function renderClasses(req, res, data={}) {
@@ -132,7 +144,7 @@ router.post("/:id/updateGrade", async(req, res) => {
         }
     }
 
-    const foundSubmissions = await deliverableSubmission.find({_id: submission_id});
+    const foundSubmissions = await DeliverableSubmission.find({_id: submission_id});
     if(!foundSubmissions.length) {
         console.warn(`Warning: Tried to update grade to ${grade} for non-existing submission ${submission_id}, redirecting...`);
         res.redirect(`/classes/${req.params.id}`);
@@ -174,11 +186,11 @@ router.get("/:id/create-deliverable", async (req, res) => {
 });
 
 // POST create deliverable
-router.post("/:id/create-deliverable", async (req, res) => {
+router.post("/:id/create-deliverable", upload.any("deliverable_file"), async (req, res) => {
     if (res.locals.user.accountType === "professor") {
         //create deliverable in databas
-        // TO-DO: Use multer parser later when file submission for deliverable specification is being implemented.
-        var { id, errorArray } = await tryCreateDeliverable(req.body.classId, req.body.title, req.body.description, req.body.weight);
+        var fileName = (req.files.length === 0) ? "" : req.files[0].filename;
+        var { id, errorArray } = await tryCreateDeliverable(req.body.classId, req.body.title, req.body.description, req.body.weight, fileName, req.body.deadline);
 
         if (!id) {
             // Declaration of variable for an Error Message.
@@ -202,61 +214,106 @@ router.post("/:id/create-deliverable", async (req, res) => {
 
 // middleware to ensure the deliverable exists before moving on.
 router.use("/:id/:deliverable", async (req, res, next) => {
-    if ((await Deliverable.find({ class_id: req.params.id, title: req.params.deliverable })).length === 0) {
+    res.locals.deliverable = (await Deliverable.find({ class_id: req.params.id, title: req.params.deliverable }))[0];
+    if (!res.locals.deliverable || res.locals.deliverable.is_deleting) {
         res.send("The deliverable you are requesting does not exist for this class.");
     } else {
+        res.locals.data = { courseCode: (await getCourseCodeOfClass(req.params.id)), deliverableName: req.params.deliverable, classId: req.params.id, description: res.locals.deliverable.description, deadline: res.locals.deliverable.deadline };
+        res.locals.data[res.locals.user.accountType] = true;
+        // get specification file name
+        if (res.locals.deliverable.specification_file) {
+            let file_name = res.locals.deliverable.specification_file.split("-");
+            res.locals.data.specification_file = file_name[file_name.length-1];
+        }
         next();
     }
-})
+});
 
 // GET view deliverable
 router.get("/:id/:deliverable", async (req, res) => {
-    const theCourseCode = await getCourseCodeOfClass(req.params.id);
-    var data = { title: "Submit Deliverable", courseCode: theCourseCode, deliverableName: req.params.deliverable, classId: req.params.id };
-    data[res.locals.user.accountType] = true;
+    var data = res.locals.data;
+    data.title = (res.locals.user.accountType === "student") ? "Submit Deliverable" : "Update Deliverable";
+    // get submission file name if exists
+    let file_name = (await DeliverableSubmission.find({ deliverable_id: res.locals.deliverable._id, student_id: res.locals.user._id }))[0];
+    if (file_name) {
+        file_name = file_name.file_name.split("-");
+        data.file_name = file_name[file_name.length-1];
+    }
     res.render("professor-class-management/view-deliverable", data);
 });
 
 // POST submit deliverable
-router.post("/:id/:deliverable", async (req, res) => {
-    const theCourseCode = await getCourseCodeOfClass(req.params.id);
-    var data = { courseCode: theCourseCode, deliverableName: req.params.deliverable, classId: req.params.id };
-    data[res.locals.user.accountType] = true;
+router.post("/:id/:deliverable", upload.any("deliverable_file"), async (req, res) => {
+    var deliverable = res.locals.deliverable, data = res.locals.data;
+    var fileName = (req.files) ? req.files[0].filename : null;
 
+    data.title = "Failed!";
     if (res.locals.user.accountType === "student") {
-        // TO-DO: Deliverable Deadline
-
-        var fileName = res.locals.user._id + "-" + theCourseCode + "-" + req.params.deliverable + "-";
-        var storage = multer.diskStorage({
-            destination: "uploads/",
-            filename: function (req, file, cb) {
-                fileName += file.originalname;
-                cb(null, fileName);
-            }
-        });
-        var upload = multer({ storage : storage }).any();
-
-        upload(req, res, function(err) {
-            if(!err && tryUpdateSubmissionDeliverable(req.params.id, res.locals.user._id, req.params.deliverable, fileName)) {
-                data.title = "Submitted!";
-                data.success = "Successfully submitted deliverable!";
-                res.render("professor-class-management/view-deliverable", data);
-            } else {
-                data.title = "Failed!";
-                data.error = "Failed to update deliverable submission. Please try again.";
-                res.render("professor-class-management/view-deliverable", data);
-            }
-        });
-    } else {
-        if ("delete" in req.body) {
-            // TO-DO: remove deliverable
-            res.redirect("/classes/" + req.params.id + "/");
+        var { result, response } = await tryUpdateSubmissionDeliverable(req.params.id, res.locals.user._id, req.params.deliverable, fileName);
+        // get updated submission file name
+        let file_name = (await DeliverableSubmission.find({ deliverable_id: res.locals.deliverable._id, student_id: res.locals.user._id }))[0];
+        if (file_name) {
+            file_name = file_name.file_name.split("-");
+            data.file_name = file_name[file_name.length-1];
+        }
+        if (result) {
+            data.title = "Success!";
+            data.success = "Successfully submitted deliverable!";
+            res.render("professor-class-management/view-deliverable", data);
         } else {
-            // TO-DO: update deliverable
-            data.title = "Updated!";
-            data.success = "Successfully updated deliverable!";
+            data.error = "ERROR: Failed to update submission, " + response;
             res.render("professor-class-management/view-deliverable", data);
         }
+    } else {
+        if ("delete" in req.body) {
+            await tryToDeleteDeliverable(deliverable._id);
+        } else if (!(await tryUpdateDeliverable(req.params.id, req.body.title, req.body.description, fileName, req.body.weight, req.body.deadline))) {
+            data.error = "Failed to update deliverable. Please try again.";
+            res.render("professor-class-management/view-deliverable", data);
+            return;
+        }
+        res.redirect("/classes/" + req.params.id + "/");
+    }
+});
+
+// GET submitted deliverables
+router.get("/:id/:deliverable/view-deliverable-submissions", async (req, res) => {
+    if (res.locals.user.accountType === "professor") {
+        var deliverable = res.locals.deliverable, data = res.locals.data;
+        data.submissions = await tryRetrieveSubmittedDeliverables(deliverable._id);
+        data.title = req.params.deliverable + " Submissions";
+        res.render("professor-class-management/view-deliverable-submissions", data);
+    } else {
+        res.render("forbidden", { title: "Access Denied" });
+    }
+});
+
+// GET file
+router.get("/:id/:deliverable/:fileNameOrStudentId", async (req, res) => {
+    var deliverable = res.locals.deliverable, data = res.locals.data;
+    var spec_file_name = deliverable.specification_file.split("-");
+    spec_file_name = spec_file_name[spec_file_name.length-1];
+
+    if (req.params.fileNameOrStudentId === spec_file_name) { // check if the user is trying to download the specification file
+        res.sendFile(path.resolve(__dirname + "../../../uploads/" + deliverable.specification_file));
+    } else { // if not then either the spec file isn't uploaded or they are requesting for a specific submission file
+        var query;
+        if (res.locals.user.accountType === "student") { // if the user making the request is a student then they should only be able to download their own submissions
+            let fileName = res.locals.user._id + "-" + data.courseCode + "-" + req.params.deliverable + "-" + req.params.fileNameOrStudentId;
+            query = { file_name: fileName, student_id: res.locals.user._id };
+        } else { // otherwise professors/admins can download any
+            query = { deliverable_id: deliverable._id, student_id: req.params.fileNameOrStudentId }
+        }
+        try {
+            var submission = (await DeliverableSubmission.find(query))[0];
+            if (submission) {
+                res.sendFile(path.resolve(__dirname + "../../../uploads/" + submission.file_name));
+                return;
+            }
+        } catch(err) {
+            console.warn("Parameter " + req.params.fileNameOrStudentId + " is not of type ObjectId.");
+        }
+        res.send("An error has occured, there are a few possible reasons this may have happened:<br>-The requested file does not exist.<br>-You are trying to access a file that you're not eligble to.");
     }
 });
 

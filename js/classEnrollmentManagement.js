@@ -391,7 +391,8 @@ async function getDeliverablesOfClass (classId, optionalStudentId=undefined) {
 					deliverable.graded = true;
 				}
 
-				deliverable.file_name = studentSubmission.file_name;
+				let filename = studentSubmission.file_name.split("-");
+				deliverable.file_name = filename[filename.length-1];
 			}
 		}
 	}
