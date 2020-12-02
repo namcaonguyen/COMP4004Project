@@ -139,17 +139,12 @@ module.exports.tryToUpdateClassInformation = async function( classIDParam, profe
  */
 module.exports.tryCreateDeliverable = async function (classIDParam, titleParam, descriptionParam, weightParam, specificationFile, deadlineParam) {
     // Check the inputs for errors.
-    var errorArray = await validateCreateDeliverableInputs(classIDParam, titleParam, descriptionParam, weightParam, deadlineParam);
+    var errorArray = await validateCreateDeliverableInputs(classIDParam, titleParam, descriptionParam, weightParam, specificationFile, deadlineParam);
 
     // If there are errors in the deliverable inputs...
     if (errorArray.length > 0) {
         return { errorArray: errorArray };
     } else {
-        if (!specificationFile) specificationFile = "";
-        if (!deadlineParam) {
-            deadlineParam = new Date();
-            deadlineParam.setDate(deadlineParam.getDate() + 1);
-        }
         // Create deliverable object and save it to the database.
         const createdDeliverable = new Deliverable({
             class_id: classIDParam,
@@ -173,7 +168,7 @@ module.exports.tryCreateDeliverable = async function (classIDParam, titleParam, 
 // Param:   professorIDParam    Object ID of the professor User being assigned
 // Param:   capacityParam       New capacity
 // Return an error array full of error messages.
-async function validateCreateDeliverableInputs(classIDParam, titleParam, descriptionParam, weightParam) {
+async function validateCreateDeliverableInputs(classIDParam, titleParam, descriptionParam, weightParam, specificationFile, deadlineParam) {
     // Declaration of array varible to hold error messages.
     var errorArray = [];
 
@@ -188,6 +183,19 @@ async function validateCreateDeliverableInputs(classIDParam, titleParam, descrip
     // Check if the description is not greater than 255 characters.
     if (descriptionParam.length > 255) {
         errorArray.push("The description of the deliverable can be at most 255 characters.");
+    }
+    // Check if spec file is provided or not
+    if (!specificationFile) {
+        specificationFile = "";
+    }
+    // Check if deadline has not passed yet or is even provided
+    if (deadlineParam) {
+        if (new Date() > deadlineParam) {
+            errorArray.push("The deadline has already passed.");
+        }
+    } else {
+        deadlineParam = new Date();
+        deadlineParam.setDate(deadlineParam.getDate() + 1);
     }
     
 
