@@ -70,7 +70,12 @@
                                 <h6 class="card-subtitle mb-2 text-muted">Not Graded</h6>
                                 {{/if}}
                                 </a>
-                                <h6 class="card-subtitle mb-2 text-muted">Submitted:&nbsp;<a href="/classes/{{../classId}}/{{this.title}}/{{this.file_name}}">{{this.file_name}}</a></h6>
+                                {{#if ../professor}}
+                                <h6 class="card-subtitle mb-2 text-muted">Submitted:&nbsp;<a href="/classes/{{../classId}}/{{this.title}}/{{this.file_name}}">{{this.original_file_name}}</a></h6>
+                                {{/if}}
+                                {{#if ../student}}
+                                <h6 class="card-subtitle mb-2 text-muted">Submitted:&nbsp;<a href="/classes/{{../classId}}/{{this.title}}/{{this.original_file_name}}">{{this.original_file_name}}</a></h6>
+                                {{/if}}
                                 {{#if ../professor}}
                                 <form method="POST" action="/classes/{{../classId}}/updateGrade" style="white-space: nowrap; margin-right: 15px;">
                                     <label style="display: inline" class="card-subtitle mb-2 text-muted">New Grade:</label>

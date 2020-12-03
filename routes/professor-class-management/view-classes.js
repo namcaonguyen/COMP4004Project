@@ -19,7 +19,7 @@ const {
     calculateFinalGrade,
     trySubmitFinalGrade
 } = require("../../js/classEnrollmentManagement.js");
-const { tryCreateDeliverable, tryUpdateSubmissionDeliverable, tryUpdateDeliverable, tryToDeleteDeliverable, tryRetrieveSubmittedDeliverables } = require("../../js/classManagement.js");
+const { tryCreateDeliverable, tryUpdateSubmissionDeliverable, tryUpdateDeliverable, tryToDeleteDeliverable, tryRetrieveSubmittedDeliverables, getOriginalFileName } = require("../../js/classManagement.js");
 const { tryDropClassNoDR, tryDropClassWithDR } = require("../../js/classEnrollmentManagement.js");
 
 const upload = multer({
@@ -220,42 +220,33 @@ router.use("/:id/:deliverable", async (req, res, next) => {
     } else {
         res.locals.data = { courseCode: (await getCourseCodeOfClass(req.params.id)), deliverableName: req.params.deliverable, classId: req.params.id, description: res.locals.deliverable.description, deadline: res.locals.deliverable.deadline };
         res.locals.data[res.locals.user.accountType] = true;
-        // get specification file name
-        if (res.locals.deliverable.specification_file) {
-            let file_name = res.locals.deliverable.specification_file.split("-");
-            res.locals.data.specification_file = file_name[file_name.length-1];
-        }
+        if (res.locals.deliverable.specification_file) // get specification file name
+            res.locals.data.specification_file = getOriginalFileName(res.locals.deliverable.specification_file, res.locals.deliverable.title);
         next();
     }
 });
 
 // GET view deliverable
 router.get("/:id/:deliverable", async (req, res) => {
-    var data = res.locals.data;
+    var deliverable = res.locals.deliverable, data = res.locals.data;
     data.title = (res.locals.user.accountType === "student") ? "Submit Deliverable" : "Update Deliverable";
     // get submission file name if exists
     let file_name = (await DeliverableSubmission.find({ deliverable_id: res.locals.deliverable._id, student_id: res.locals.user._id }))[0];
-    if (file_name) {
-        file_name = file_name.file_name.split("-");
-        data.file_name = file_name[file_name.length-1];
-    }
+    if (file_name) data.file_name = getOriginalFileName(file_name.file_name, deliverable.title);
     res.render("professor-class-management/view-deliverable", data);
 });
 
 // POST submit deliverable
 router.post("/:id/:deliverable", upload.any("deliverable_file"), async (req, res) => {
     var deliverable = res.locals.deliverable, data = res.locals.data;
-    var fileName = (req.files) ? req.files[0].filename : null;
+    var fileName = (typeof req.files === "undefined" || req.files.length === 0) ? "" : req.files[0].filename;
 
     data.title = "Failed!";
     if (res.locals.user.accountType === "student") {
         var { result, response } = await tryUpdateSubmissionDeliverable(req.params.id, res.locals.user._id, req.params.deliverable, fileName);
         // get updated submission file name
         let file_name = (await DeliverableSubmission.find({ deliverable_id: res.locals.deliverable._id, student_id: res.locals.user._id }))[0];
-        if (file_name) {
-            file_name = file_name.file_name.split("-");
-            data.file_name = file_name[file_name.length-1];
-        }
+        if (file_name) data.file_name = getOriginalFileName(file_name.file_name, deliverable.title);
         if (result) {
             data.title = "Success!";
             data.success = "Successfully submitted deliverable!";
@@ -291,8 +282,7 @@ router.get("/:id/:deliverable/view-deliverable-submissions", async (req, res) =>
 // GET file
 router.get("/:id/:deliverable/:fileNameOrStudentId", async (req, res) => {
     var deliverable = res.locals.deliverable, data = res.locals.data;
-    var spec_file_name = deliverable.specification_file.split("-");
-    spec_file_name = spec_file_name[spec_file_name.length-1];
+    var spec_file_name = getOriginalFileName(deliverable.specification_file, deliverable.title);
 
     if (req.params.fileNameOrStudentId === spec_file_name) { // check if the user is trying to download the specification file
         res.sendFile(path.resolve(__dirname + "../../../uploads/" + deliverable.specification_file));
@@ -302,12 +292,13 @@ router.get("/:id/:deliverable/:fileNameOrStudentId", async (req, res) => {
             let fileName = res.locals.user._id + "-" + data.courseCode + "-" + req.params.deliverable + "-" + req.params.fileNameOrStudentId;
             query = { file_name: fileName, student_id: res.locals.user._id };
         } else { // otherwise professors/admins can download any
-            query = { deliverable_id: deliverable._id, student_id: req.params.fileNameOrStudentId }
+            if (req.params.fileNameOrStudentId.includes(".")) query = { deliverable_id: deliverable._id, file_name: req.params.fileNameOrStudentId }
+            else query = { deliverable_id: deliverable._id, student_id: req.params.fileNameOrStudentId }
         }
         try {
             var submission = (await DeliverableSubmission.find(query))[0];
             if (submission) {
-                res.sendFile(path.resolve(__dirname + "../../../uploads/" + submission.file_name));
+                res.download(path.resolve(__dirname + "../../../uploads/" + submission.file_name), getOriginalFileName(submission.file_name, deliverable.title));
                 return;
             }
         } catch(err) {

@@ -306,17 +306,38 @@ module.exports.tryUpdateDeliverable = async function (classId, title, descriptio
     } else return false;
 }
 
+
+/**
+ * @description returns the original file name.
+ * @param {string} file_name - The string to parse.
+ * @param {string} deliverable_title - The title of the deliverable.
+ */
+function getOriginalFileName (file_name, deliverable_title) {
+	let fileNameArr = file_name.split("-"), index = 0;
+	for (let i = 0; i < fileNameArr.length; i++) {
+		index += fileNameArr[i].length + 1; // +1 for the hyphen thats missing
+		if (fileNameArr[i] === deliverable_title) break;
+	}
+	let fileName = "";
+	for (let i = index; i < file_name.length; i++) {
+		fileName += file_name[i];
+	}
+	return fileName;
+};
+module.exports.getOriginalFileName = getOriginalFileName;
+
 /**
  * @description This function attempts to retrieve all the deliverable submissions and other related info.
  * @param {string} deliverableId - The id of the deliverable.
  */
 module.exports.tryRetrieveSubmittedDeliverables = async function (deliverableId) {
+    var title = (await Deliverable.findById(deliverableId)).title;
     var submissions = (await DeliverableSubmission.find({ deliverable_id: deliverableId }));
     var allSubmissions = [];
     for (let i = 0; i < submissions.length; i++) {
         let currentSubmission = {};
         currentSubmission.studentId = submissions[i].student_id;
-        currentSubmission.fileName = submissions[i].file_name.split("-")[submissions[i].file_name.split("-").length-1];
+        currentSubmission.fileName = getOriginalFileName(submissions[i].file_name, title);
         currentSubmission.fullName = (await User.findById(submissions[i].student_id)).fullname;
         currentSubmission.grade = submissions[i].grade;
         allSubmissions.push(currentSubmission);

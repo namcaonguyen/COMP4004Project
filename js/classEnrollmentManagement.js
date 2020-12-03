@@ -9,6 +9,7 @@ const {
 	removeFromList
 } = require("./courseManagement.js");
 const deliverableSubmission = require("../db/deliverableSubmission.js");
+const { getOriginalFileName } = require("./classManagement.js");
 
 // Function to get a Class List of the available Classes. It includes data that is used to display information to the user.
 // Return a list of Classes.
@@ -391,8 +392,10 @@ async function getDeliverablesOfClass (classId, optionalStudentId=undefined) {
 					deliverable.graded = true;
 				}
 
-				let filename = studentSubmission.file_name.split("-");
-				deliverable.file_name = filename[filename.length-1];
+				if (studentSubmission.file_name) {
+					deliverable.file_name = studentSubmission.file_name;
+					deliverable.original_file_name = getOriginalFileName(studentSubmission.file_name, deliverable.title);
+				}
 			}
 		}
 	}
