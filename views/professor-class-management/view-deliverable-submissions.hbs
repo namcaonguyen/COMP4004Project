@@ -1,0 +1,37 @@
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-12 mx-auto">
+            <div class="card card-signin my-5">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Course Management System</h3>
+                    <h5 class="card-title text-center">{{deliverableName}}</h5>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item"><a href="/classes">View Classes</a></li>
+                            <li class="breadcrumb-item"><a href="/classes/{{classId}}">{{courseCode}}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">{{deliverableName}} Submissions</li>
+                        </ol>
+                    </nav>
+
+                    <hr class="my-4">
+                    {{#if message}}
+                    <div class="alert alert-info" role="alert">{{message}}</div>
+                    <hr class="my-4">
+                    {{/if}}
+                    
+                    {{#each submissions}}
+                    
+                    <div class="d-flex" style="border: 1px solid #ccc; padding: 15px;">
+                        <a class="flex-fill" href="/classes/{{../classId}}/{{../deliverableName}}/{{this.studentId}}">
+                            <h5 class="card-title">{{this.fullName}}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">File Name: {{this.fileName}}</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">Grade: {{this.grade}}</h6>
+                        </a>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

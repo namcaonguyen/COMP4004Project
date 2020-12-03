@@ -11,22 +11,27 @@ const { tryCreateCourse } = require("../../js/courseManagement.js");
 const { tryEnrollStudentInClass } = require('../../js/classEnrollmentManagement.js');
 const fs = require("fs");
 
-(async () => {
+async function WipeDB() {
     await Class.deleteMany({}); // delete all classes
     await Course.deleteMany({}); // delete all courses    
     await User.deleteMany({}); // delete all users
     await Deliverable.deleteMany({}); // delete all deliverables
     await DeliverableSubmission.deleteMany({}); // delete all deliverable submissions
-})();
+}
 
-Given("A professor creates a deliverable for a class with valid input", async function () {
+Given("A professor creates a deliverable for a class {string} a deadline", async function (deadline) {
+    await WipeDB();
     this.course = await tryCreateCourse("COMP1405", "Introduction To Computer Science I", [], []);
     assert(true, !!this.course.id);
     this.professor = await new User({ email: "jp@cms.com", password: "password", fullname: "Jean-Pierre Corriveau", accountType: "professor", approved: true }).save();
     assert(true, !!(await User.findById(this.professor._id)));
     this.class = await tryCreateClass(this.course.id, this.professor._id, 10);
     assert(true, !!this.class.id);
-    this.deliverable = await tryCreateDeliverable(this.class.id, "Assignment 1", "", 15);
+    if (deadline === "with") {
+        this.date = new Date();
+        this.date.setSeconds(this.date.getSeconds()+1); // deadline 1 second from now
+        this.deliverable = await tryCreateDeliverable(this.class.id, "Assignment 1", "", 15, "", this.date);
+    } else this.deliverable = await tryCreateDeliverable(this.class.id, "Assignment 1", "", 15);
     assert(true, !!this.deliverable.id);
 });
 
@@ -37,13 +42,22 @@ When("There exists an approved student with name {string} email {string} and pas
     assert(true, !!(await ClassEnrollment.find({ student: this.student._id })));
 });
 
+When("The student waits until its past the deadline", async function() {
+    while(this.date - new Date() > 0) { }
+    assert(true);
+});
+
 When("{string} submits a text file named {string} as submission to that deliverable with the contents being {string}", async function(student, fileName, text) {
     var deliverable = await Deliverable.findById(this.deliverable.id);
     this.fileName = this.student._id + "-" + (await Course.findById(this.course.id)).courseCode + "-" + deliverable.title + "-" + fileName;
     fs.writeFileSync("uploads/" + this.fileName, text);
-    assert(true, await tryUpdateSubmissionDeliverable(this.class.id, this.student._id, deliverable.title, this.fileName));
+    await tryUpdateSubmissionDeliverable(this.class.id, this.student._id, deliverable.title, this.fileName);
 });
 
 Then("There exists a deliverable submission in the DB for {string} in the first deliverable for that class", async function (student) {
-    assert(true, await DeliverableSubmission.find({ student_id: this.student._id, file_name: this.fileName }));
+    assert.strictEqual(1, (await DeliverableSubmission.find({ student_id: this.student._id, file_name: this.fileName })).length);
+});
+
+Then("The submission should not exist", async function () {
+    assert.strictEqual(0, (await DeliverableSubmission.find({ student_id: this.student._id, file_name: this.fileName })).length);
 });

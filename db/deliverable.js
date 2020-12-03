@@ -7,7 +7,8 @@ var deliverableSchema = new Schema({
     description: String,
     specification_file: String,
     weight: Number,
-    deadline: Date
+    deadline: Date,
+    is_deleting: Boolean
 });
 
 module.exports = mongoose.model("Deliverable", deliverableSchema);

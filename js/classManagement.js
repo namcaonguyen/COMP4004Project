@@ -128,15 +128,18 @@ module.exports.tryToUpdateClassInformation = async function( classIDParam, profe
     }
 }
 
-// Function to create a deliverable.
-// Param:   classIDParam            Object ID of the Class Object being updated
-// Param:   titleParam              Title of the deliverable
-// Param:   descriptionParam        Description of the deliverable
-// Param:   weightParam             Weight of the deliverable
-// Return success or an error array.
-module.exports.tryCreateDeliverable = async function (classIDParam, titleParam, descriptionParam, weightParam) {
+/**
+ * @description This function to create a deliverable. Returns success or an error array.
+ * @param {string} classIDParam - Object ID of the Class Object being updated
+ * @param {string} titleParam - Title of the deliverable
+ * @param {string} descriptionParam - Description of the deliverable
+ * @param {string} weightParam - Weight of the deliverable
+ * @param {string} specificationFile - The specification file of the deliverable
+ * @param {string} deadlineParam - The deadline of the deliverable
+ */
+module.exports.tryCreateDeliverable = async function (classIDParam, titleParam, descriptionParam, weightParam, specificationFile, deadlineParam) {
     // Check the inputs for errors.
-    var errorArray = await validateCreateDeliverableInputs(classIDParam, titleParam, descriptionParam, weightParam);
+    var errorArray = await validateCreateDeliverableInputs(classIDParam, titleParam, descriptionParam, weightParam, specificationFile, deadlineParam);
 
     // If there are errors in the deliverable inputs...
     if (errorArray.length > 0) {
@@ -147,7 +150,10 @@ module.exports.tryCreateDeliverable = async function (classIDParam, titleParam, 
             class_id: classIDParam,
             title: titleParam,
             description: descriptionParam,
-            weight: weightParam
+            specification_file: specificationFile,
+            weight: weightParam,
+            deadline: deadlineParam,
+            is_deleting: false
         });
 
         // Save the deliverable to the database.
@@ -162,7 +168,7 @@ module.exports.tryCreateDeliverable = async function (classIDParam, titleParam, 
 // Param:   professorIDParam    Object ID of the professor User being assigned
 // Param:   capacityParam       New capacity
 // Return an error array full of error messages.
-async function validateCreateDeliverableInputs(classIDParam, titleParam, descriptionParam, weightParam) {
+async function validateCreateDeliverableInputs(classIDParam, titleParam, descriptionParam, weightParam, specificationFile, deadlineParam) {
     // Declaration of array varible to hold error messages.
     var errorArray = [];
 
@@ -178,6 +184,20 @@ async function validateCreateDeliverableInputs(classIDParam, titleParam, descrip
     if (descriptionParam.length > 255) {
         errorArray.push("The description of the deliverable can be at most 255 characters.");
     }
+    // Check if spec file is provided or not
+    if (!specificationFile) {
+        specificationFile = "";
+    }
+    // Check if deadline has not passed yet or is even provided
+    if (deadlineParam) {
+        if (new Date() > deadlineParam) {
+            errorArray.push("The deadline has already passed.");
+        }
+    } else {
+        deadlineParam = new Date();
+        deadlineParam.setDate(deadlineParam.getDate() + 1);
+    }
+    
 
     // Before creating the deliverable, make sure that the class selected still exists in the database. This is to ensure ACID properties remain in effect.
     const foundClass = await Class.find({ _id: classIDParam });
@@ -195,6 +215,35 @@ async function validateCreateDeliverableInputs(classIDParam, titleParam, descrip
 }
 
 /**
+ * @description This function tries to delete a deliverable and all related content for it in a specific class.
+ * @param {string} deliverableId - The id of the deliverable.
+ */
+module.exports.tryToDeleteDeliverable = async function(deliverableId) {
+    // update is_deleting flag so no one can interact with this deliverable while deletion is in process.
+    await Deliverable.updateOne({ _id: deliverableId }, { $set: { is_deleting: true } });
+
+    // remove spec file if exists
+    let specFile = (await Deliverable.findById(deliverableId)).specification_file;
+    if (specFile) fs.unlinkSync("uploads/" + specFile);
+
+    // remove all submission files for this deliverable before deleting the deliverable itself.
+    let allSubmissions = await DeliverableSubmission.find({ deliverable_id: deliverableId });
+    for (let i = 0; i < allSubmissions.length; i++) {
+        if (allSubmissions[i].file_name) {
+            fs.unlinkSync("uploads/" + allSubmissions[i].file_name);
+        }
+    }
+
+    // delete all deliverable submissions for this deliverable from database.
+    await DeliverableSubmission.deleteMany({ deliverable_id: deliverableId });
+
+    // delete deliverable
+    await Deliverable.deleteOne({ _id: deliverableId });
+
+    return true;
+}
+
+/**
  * @description This function updates the deliverable submission info for a specific student in a class.
  * @param {string} classId - The id of the class.
  * @param {string} studentId - The id of the student submitting the file.
@@ -202,25 +251,96 @@ async function validateCreateDeliverableInputs(classIDParam, titleParam, descrip
  * @param {string} fileNameRef - The name of the file to reference later.
  */
 module.exports.tryUpdateSubmissionDeliverable = async function (classId, studentId, deliverableTitle, fileNameRef) {
+    if (!fileNameRef) return { result: false, response: "a file was not submited! Please try again." };
     const deliverable = await Deliverable.find({ class_id: classId, title: deliverableTitle });
     if (deliverable.length !== 0) { // check if deliverable exists in this class.
-        const query = { deliverable_id: deliverable[0]._id, student_id: studentId };
-        const deliverableSubmission = await DeliverableSubmission.find(query);
-        if (deliverableSubmission.length === 0) { // create submission deliverable if it doesn't exist.
-            const submission = new DeliverableSubmission({
-                deliverable_id: deliverable[0]._id,
-                student_id: studentId,
-                file_name: fileNameRef,
-                grade: -1
-            });
-        
-            await submission.save(); // save the submission to the database.
-        } else { // otherwise update existing submission deliverable.
-            console.log(deliverableSubmission[0].file_name);
-            fs.unlinkSync("uploads/" + deliverableSubmission[0].file_name); // delete old submission file
-            await DeliverableSubmission.updateOne(query, { $set: { file_name: fileNameRef } }); // update file name reference in db to new file
+        if (new Date() > deliverable[0].deadline) {
+            return { result: false, response: "you cannot submit past the deadline."};
+        } else {
+            const query = { deliverable_id: deliverable[0]._id, student_id: studentId };
+            const deliverableSubmission = await DeliverableSubmission.find(query);
+            if (deliverableSubmission.length === 0) { // create submission deliverable if it doesn't exist.
+                const submission = new DeliverableSubmission({
+                    deliverable_id: deliverable[0]._id,
+                    student_id: studentId,
+                    file_name: fileNameRef,
+                    grade: -1
+                });
+            
+                await submission.save(); // save the submission to the database.
+            } else { // otherwise update existing submission deliverable.
+                if (deliverableSubmission[0].file_name !== fileNameRef) fs.unlinkSync("uploads/" + deliverableSubmission[0].file_name); // delete old submission file only if filename is different otherwise multer automatically replaces it old file
+                await DeliverableSubmission.updateOne(query, { $set: { file_name: fileNameRef } }); // update file name reference in db to new file
+            }
+            return { result: true, response: "" }; // sucessfully updated submission deliverable
         }
-        return true; // sucessfully updated submission deliverable
     }
-    return false; // something went wrong
+    return { result: false, response: "UNKNOWN" }; // something went wrong
+}
+
+
+/**
+ * @description This function attempts to update the deliverable info for a specific class.
+ * @param {string} class_id - The id of the class.
+ * @param {string} title - The name of the deliverable.
+ * @param {string} description - The description of the deliverable.
+ * @param {string} specification_file - The name of the specification file to reference later.
+ * @param {string} weight - The weight of the deliverable.
+ * @param {string} deadline - The deadline of the deliverable.
+ */
+module.exports.tryUpdateDeliverable = async function (classId, title, description, specification_file, weight, deadline) {
+    if (!classId) return false;
+
+    var updateValues = { $set: { } };
+    if (title) updateValues.$set.title = title;
+    if (description) updateValues.$set.description = description;
+    if (specification_file) updateValues.$set.specification_file = specification_file;
+    if (weight) updateValues.$set.weight = weight;
+    if (deadline) updateValues.$set.deadline = deadline;
+
+    if (Object.keys(updateValues.$set).length > 0) {
+        var oldSpecFile = (await Deliverable.find({ class_id: classId }))[0].specification_file;
+        if (oldSpecFile) fs.unlinkSync("uploads/" + oldSpecFile);
+        await Deliverable.updateOne({ class_id: classId }, updateValues);
+        return true;
+    } else return false;
+}
+
+
+/**
+ * @description returns the original file name.
+ * @param {string} file_name - The string to parse.
+ * @param {string} deliverable_title - The title of the deliverable.
+ */
+function getOriginalFileName (file_name, deliverable_title) {
+	let fileNameArr = file_name.split("-"), index = 0;
+	for (let i = 0; i < fileNameArr.length; i++) {
+		index += fileNameArr[i].length + 1; // +1 for the hyphen thats missing
+		if (fileNameArr[i] === deliverable_title) break;
+	}
+	let fileName = "";
+	for (let i = index; i < file_name.length; i++) {
+		fileName += file_name[i];
+	}
+	return fileName;
+};
+module.exports.getOriginalFileName = getOriginalFileName;
+
+/**
+ * @description This function attempts to retrieve all the deliverable submissions and other related info.
+ * @param {string} deliverableId - The id of the deliverable.
+ */
+module.exports.tryRetrieveSubmittedDeliverables = async function (deliverableId) {
+    var title = (await Deliverable.findById(deliverableId)).title;
+    var submissions = (await DeliverableSubmission.find({ deliverable_id: deliverableId }));
+    var allSubmissions = [];
+    for (let i = 0; i < submissions.length; i++) {
+        let currentSubmission = {};
+        currentSubmission.studentId = submissions[i].student_id;
+        currentSubmission.fileName = getOriginalFileName(submissions[i].file_name, title);
+        currentSubmission.fullName = (await User.findById(submissions[i].student_id)).fullname;
+        currentSubmission.grade = submissions[i].grade;
+        allSubmissions.push(currentSubmission);
+    }
+    return allSubmissions;
 }
