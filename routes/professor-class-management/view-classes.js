@@ -292,8 +292,8 @@ router.get("/:id/:deliverable/:fileNameOrStudentId", async (req, res) => {
             let fileName = res.locals.user._id + "-" + data.courseCode + "-" + req.params.deliverable + "-" + req.params.fileNameOrStudentId;
             query = { file_name: fileName, student_id: res.locals.user._id };
         } else { // otherwise professors/admins can download any
-            if (req.params.fileNameOrStudentId.includes(".")) query = { deliverable_id: deliverable._id, file_name: req.params.fileNameOrStudentId }
-            else query = { deliverable_id: deliverable._id, student_id: req.params.fileNameOrStudentId }
+            query = (req.params.fileNameOrStudentId.includes(".")) ? { file_name: req.params.fileNameOrStudentId } : { student_id: req.params.fileNameOrStudentId };
+            query.deliverable_id = deliverable._id;
         }
         try {
             var submission = (await DeliverableSubmission.find(query))[0];
