@@ -37,17 +37,17 @@ Feature: Apply for Account Feature
 
 	Scenario: A User applies for an account and enters an email that is already registered.
 		Given There are no existing Users
-		And A "student" user exists with name "First Guy" email <email> and password "secretkey"
-		When A "student" user tries to apply with name <firstName> <lastName>
+		And A <accountType> user exists with name "First Guy" email <email> and password "secretkey"
+		When A <accountType> user tries to apply with name <firstName> <lastName>
 		And User email is <email>
 		And User password <password> is confirmed as <confirmPassword>
 		Then Input fields are not valid with <number> errors
 		And The Application is not saved to the database
 	Examples:
-		| firstName	| lastName	| email						| password		| confirmPassword	| number	|
-		| "Joe"		| "Johnson"	| "already@registered.com"	| "password123"	| "password123"		| 1			|
-		| "Joe"		| ""		| "already@registered.com"	| "password123"	| "password123"		| 2			|
-		| ""		| "Johnson"	| "already@registered.com"	| "password123"	| "password123"		| 2			|
-		| "Joe"		| "Johnson"	| "already@registered.com"	| "pass"		| "pass"			| 2			|
-		| "Jo"		| "Johnson"	| "already@registered.com"	| "password123"	| "password456"		| 2			|
-		| ""		| ""		| "already@registered.com"	| "pass"		| "no"				| 5			|
+		| accountType	| firstName	| lastName	| email						| password		| confirmPassword	| number	|
+		| "student"		| "Joe"		| "Johnson"	| "already@registered.com"	| "password123"	| "password123"		| 1			|
+		| "professor"	| "Joe"		| ""		| "already@registered.com"	| "password123"	| "password123"		| 2			|
+		| "student"		| ""		| "Johnson"	| "already@registered.com"	| "password123"	| "password123"		| 2			|
+		| "professor"	| "Joe"		| "Johnson"	| "already@registered.com"	| "pass"		| "pass"			| 2			|
+		| "student"		| "Jo"		| "Johnson"	| "already@registered.com"	| "password123"	| "password456"		| 2			|
+		| "professor"	| ""		| ""		| "already@registered.com"	| "pass"		| "no"				| 5			|
