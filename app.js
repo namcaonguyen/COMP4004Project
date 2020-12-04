@@ -155,24 +155,41 @@ process.on("SIGINT", () => {
     });
 }
 
+// There must always be at least one admin account, so create one on startup if there isn't one already.
+{
+    // Find an admin in the database.
+    User.find( { email: "admin@admin.com" }, async function(err, findAdmin) {
+        if ( err ) {
+            return console.error(err);  
+		} else {
+            // If this admin does not exist in the database yet...
+            if ( findAdmin.length === 0 ) {
+                console.log("Couldn't find an Administrator account. Creating one now...");
+                // Create an administrator account and save it to the database.
+                const createdAdmin = new User({
+                    email: "admin@admin.com",
+                    password: "password",
+                    fullname: "Admin Guy",
+                    accountType: "administrator",
+                    approved: true
+				});
+                createdAdmin.save(function(err, createdAdmin) {
+                    if ( err ) {
+                        return console.error(err);           
+					} else {
+                        console.log("Saved Admin!");
+					}
+				});
+			}
+		}
+	});
+}
+
 //Handy dev tool to create a student, an admin, a prof, a class, a course and a deliverable.
 //Use [ CTRL + K + U ] to uncomment a block of code
 //Use [ CTRL + K + C ] to comment a block of code
 
 //{
-//    const createdadmin = new User({
-//        email: "admin@admin.com",
-//        password: "password",
-//        fullname: "admin guy",
-//        accountType: "administrator",
-//        approved: true
-//    });
-//    createdadmin.save(function (err, createdadmin) {
-//        if (err) {
-//            return console.error(err);
-//        }
-//    });
-
 //    const createdstudent = new User({
 //        email: "tj@tj",
 //        password: "password",

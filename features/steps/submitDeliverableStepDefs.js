@@ -8,7 +8,7 @@ const DeliverableSubmission = require("../../db/deliverableSubmission.js");
 const ClassEnrollment = require('../../db/classEnrollment.js');
 const { tryUpdateSubmissionDeliverable, tryCreateClass, tryCreateDeliverable } = require("../../js/classManagement.js");
 const { tryCreateCourse } = require("../../js/courseManagement.js");
-const { tryEnrollStudentInClass } = require('../../js/classEnrollmentManagement.js');
+const { tryEnrollStudentInClass, tryDropClassNoDR } = require('../../js/classEnrollmentManagement.js');
 const fs = require("fs");
 
 async function WipeDB() {
@@ -19,12 +19,15 @@ async function WipeDB() {
     await DeliverableSubmission.deleteMany({}); // delete all deliverable submissions
 }
 
-Given("A professor creates a deliverable for a class {string} a deadline", async function (deadline) {
+Given("A professor {string} creates a deliverable for a class {string} {string} a deadline", async function (profName, courseCode, deadline) {
     await WipeDB();
-    this.course = await tryCreateCourse("COMP1405", "Introduction To Computer Science I", [], []);
+    // Create a Course.
+    this.course = await tryCreateCourse(courseCode, "Introduction To Computer Science I", [], []);
     assert(true, !!this.course.id);
-    this.professor = await new User({ email: "jp@cms.com", password: "password", fullname: "Jean-Pierre Corriveau", accountType: "professor", approved: true }).save();
+    // Create a professor User.
+    this.professor = await new User({ email: "jp@cms.com", password: "password", fullname: profName, accountType: "professor", approved: true }).save();
     assert(true, !!(await User.findById(this.professor._id)));
+    // Create a Class.
     this.class = await tryCreateClass(this.course.id, this.professor._id, 10);
     assert(true, !!this.class.id);
     if (deadline === "with") {
@@ -60,4 +63,11 @@ Then("There exists a deliverable submission in the DB for {string} in the first 
 
 Then("The submission should not exist", async function () {
     assert.strictEqual(0, (await DeliverableSubmission.find({ student_id: this.student._id, file_name: this.fileName })).length);
+});
+
+When("{string} drops the Class", async function(studentNameParam) {
+    // Try to drop the Class.
+    var result = await tryDropClassNoDR(this.student._id, this.class.id);
+    // Assert that the student was able to drop the Class.
+    assert(!!result.success);
 });

@@ -195,9 +195,11 @@ async function arePrerequisitesSatisfied( classObjectIDParam, studentUserObjectI
 	}
 }
 
-// Function to check if the Class still exists in the database.
-// Param:	classObjectID	ID of the Class to check
-// Return boolean for if the Class still exists or not.
+/**
+ * @description Function to check if the Class still exists in the database.
+ * @param	classObjectID	ID of the Class to check
+ * @return boolean for if the Class still exists or not.
+ */
 async function doesClassStillExist(classObjectID) {
 	// Look for the current Class in the database.
 	var currentClass = await Class.find( { _id: classObjectID } );
@@ -209,6 +211,7 @@ async function doesClassStillExist(classObjectID) {
 		return true;
 	}
 }
+module.exports.doesClassStillExist = doesClassStillExist;
 
 /**
  * @description Function to check if the Class is over capacity. If it is, then delete any excess enrollments.

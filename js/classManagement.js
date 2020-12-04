@@ -244,6 +244,41 @@ module.exports.tryToDeleteDeliverable = async function(deliverableId) {
 }
 
 /**
+ * @description Function to check of a Class with an Object ID exists in the database.
+ * @param   classID Object ID of the Class
+ * @return whether or not the Class exists in the database
+ */
+async function doesClassExist( classID ) {
+    // Try to find the Class in the database.
+    var findClass = await Class.find( { _id: classID } );
+
+    // If no Classes with the ID were found in the database...
+    if ( findClass.length === 0 ) {
+        return false;
+	} else {
+        return true;
+	}
+}
+
+/**
+ * @description Function to check if a student is enrolled in a Class.
+ * @param   studentIDParam
+ * @param   classIDParam
+ * @return whether or not the student is enrolled in the Class.
+ */
+ async function isStudentEnrolledInClass( studentIDParam, classIDParam ) {
+    // Try to find the ClassEnrollment in the database.
+    var findClassEnrollment = await ClassEnrollment.find( { student: studentIDParam, class: classIDParam } );
+
+    // If the ClassEnrollment was not found in the database...
+    if ( findClassEnrollment.length === 0 ) {
+        return false;
+	} else {
+        return true;
+	}
+ }
+
+/**
  * @description This function updates the deliverable submission info for a specific student in a class.
  * @param {string} classId - The id of the class.
  * @param {string} studentId - The id of the student submitting the file.
@@ -251,11 +286,23 @@ module.exports.tryToDeleteDeliverable = async function(deliverableId) {
  * @param {string} fileNameRef - The name of the file to reference later.
  */
 module.exports.tryUpdateSubmissionDeliverable = async function (classId, studentId, deliverableTitle, fileNameRef) {
-    if (!fileNameRef) return { result: false, response: "a file was not submited! Please try again." };
+    // Check if the Class still exists.
+    if ( await doesClassExist(classId) == false ) {
+        return { result: false, response: "This class does not exist. If this is a mistake please contact an administrator." };
+	}
+    // Check if the student is enrolled in the Class.
+    if ( await isStudentEnrolledInClass(studentId, classId) == false ) {
+        return { result: false, response: "You are not enrolled in this Class." };
+	}
+
+    // Check if a file was submitted.
+    if (!fileNameRef) return { result: false, response: "A file was not submitted! Please try again." };
+
+    // Find the associated Deliverable.
     const deliverable = await Deliverable.find({ class_id: classId, title: deliverableTitle });
     if (deliverable.length !== 0) { // check if deliverable exists in this class.
         if (new Date() > deliverable[0].deadline) {
-            return { result: false, response: "you cannot submit past the deadline."};
+            return { result: false, response: "You cannot submit past the deadline."};
         } else {
             const query = { deliverable_id: deliverable[0]._id, student_id: studentId };
             const deliverableSubmission = await DeliverableSubmission.find(query);
@@ -275,7 +322,7 @@ module.exports.tryUpdateSubmissionDeliverable = async function (classId, student
             return { result: true, response: "" }; // sucessfully updated submission deliverable
         }
     }
-    return { result: false, response: "UNKNOWN" }; // something went wrong
+    return { result: false, response: "This Deliverable does not exist." }; // something went wrong
 }
 
 
