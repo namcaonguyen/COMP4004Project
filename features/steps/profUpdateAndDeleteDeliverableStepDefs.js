@@ -8,7 +8,7 @@ const Deliverable = require("../../db/deliverable.js");
 const DeliverableSubmission = require("../../db/deliverableSubmission.js");
 const { tryCreateClass, tryCreateDeliverable, tryUpdateDeliverable, tryToDeleteDeliverable } = require("../../js/classManagement.js");
 const { tryCreateCourse } = require("../../js/courseManagement.js");
-const { tryEnrollStudentInClass } = require("../../js/classEnrollmentManagement.js");
+const { deleteClass } = require("../../js/classManagement.js");
 
 async function WipeDB() {
     await Class.deleteMany({}); // delete all classes
@@ -67,4 +67,9 @@ Given("The professor tries to delete that deliverable", async function () {
 
 Then("The result is a unsuccessful delete attempt", async function () {
     assert.strictEqual(false, this.success);
+});
+
+When("An administrator deletes the class", async function () {
+    await deleteClass(this.class.id);
+    assert.strictEqual(0, (await Class.find({ _id: this.class.id })).length);
 });
