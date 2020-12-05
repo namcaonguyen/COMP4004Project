@@ -21,7 +21,7 @@ Given("A professor creates a deliverable with info {string} {string} {int}", asy
     this.course = await tryCreateCourse("COMP1405", "Introduction To Computer Science I", [], []);
     this.professor = await new User({ email: "jp@cms.com", password: "password", fullname: "Jean-Pierre Corriveau", accountType: "professor", approved: true }).save();
     this.class = await tryCreateClass(this.course.id, this.professor._id, 10);
-    this.deliverable = await tryCreateDeliverable(this.class.id, title, description, weight);
+    this.deliverable = await tryCreateDeliverable(this.professor._id, this.class.id, title, description, weight);
     assert.strictEqual(true, !!this.deliverable.id);
 });
 

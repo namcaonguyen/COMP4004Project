@@ -5,7 +5,8 @@ const Class = require("../../db/class.js");
 const Course = require("../../db/course.js");
 const Deliverable = require("../../db/deliverable.js");
 const {
-    tryCreateDeliverable
+    tryCreateDeliverable,
+    tryToUpdateClassInformation
 } = require("../../js/classManagement.js");
 
 Given("The database is empty before creating a deliverable", async function () {
@@ -44,11 +45,14 @@ Given("There exists a course with course code {string} and title {string}", asyn
     this.createdCourseObjectId = createdCourse._id;
 });
 
-Given("There exists a class for COMP4004 with JP as the professor and class capacity of {int}", async function (classCapacity) {
+Given("There exists a class for COMP4004 with {string} as the professor and class capacity of {int}", async function (emailParam, classCapacity) {
+    // Try to find the professor with the email in the database.
+    const findProf = await User.find( { email: emailParam, accountType: "professor" } );
+    
     // Create class object and save it to the database.
     const createdClass = new Class({
         course: this.createdCourseObjectId,
-        professor: this.createdProfessorUserObjectId,
+        professor: findProf[0]._id,
         totalCapacity: classCapacity
     });
 
@@ -69,11 +73,13 @@ Given("There exists a class for COMP4004 with JP as the professor and class capa
     this.createdClassObjectId = createdClass._id;
 });
 
-When("JP tries to create a deliverable for COMP4004 with {string} {string} and {int}", async function (deliverableTitle, deliverableDesc, deliverableWeight) {
+When("Professor with email {string} tries to create a deliverable for COMP4004 with {string} {string} and {int}", async function (emailParam, deliverableTitle, deliverableDesc, deliverableWeight) {
+    // Try to find the professor with the email in the database.
+    const findProf = await User.find( { email: emailParam, accountType: 'professor' } );
 
     // Create deliverable object and save it to the database.
-    result = await tryCreateDeliverable(this.createdClassObjectId, deliverableTitle, deliverableDesc, deliverableWeight);
-
+    result = await tryCreateDeliverable(findProf[0]._id, this.createdClassObjectId, deliverableTitle, deliverableDesc, deliverableWeight);
+    
     this.createdDeliverableObjectId = result.id;
 });
 
@@ -100,4 +106,11 @@ Given("The class was deleted", async function () {
 
     // Assert that the class was not found, meaning they was deleted.
     assert.strictEqual(theClass.length, 0);
+});
+
+When("An administrator tries reassign the class to professor with email {string}", async function(emailParam) {
+    // Try to find the professor with the email in the database.
+    const findProf = await User.find( { email: emailParam } );
+    // Try to update the Class information.
+    await tryToUpdateClassInformation(this.createdClassObjectId, findProf[0]._id, 50);
 });

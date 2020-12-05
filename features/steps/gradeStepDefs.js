@@ -30,7 +30,7 @@ Given("A professor with email {string} creates a deliverable for their class wit
         const course = await Course.findOne({courseCode});
         const prof = await User.findOne({email});
         const class_ = await Class.findOne({course: course._id, professor: prof._id});
-        const deliverable = await tryCreateDeliverable(class_._id, title, "", weight);
+        const deliverable = await tryCreateDeliverable(prof._id, class_._id, title, "", weight);
         assert(!!deliverable.id);
     }
 );

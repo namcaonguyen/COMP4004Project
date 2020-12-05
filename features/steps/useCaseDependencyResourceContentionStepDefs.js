@@ -226,9 +226,9 @@ When("Professor {int} can see Class {int} in their Class list", async function(p
     assert.strictEqual(1, findClass.length);
 });
 
-When("The professor creates Deliverable {int} for Class {int} with title {string}, description {string}, and weight {int}", async function(deliverableIndexParam, classIndexParam, titleParam, descriptionParam, weightParam) {
+When("Professor {int} creates Deliverable {int} for Class {int} with title {string}, description {string}, and weight {int}", async function(professorIndexParam, deliverableIndexParam, classIndexParam, titleParam, descriptionParam, weightParam) {
     // Try to create a Deliverable for the Class.
-    var result = await tryCreateDeliverable(classIDArray[classIndexParam - 1], titleParam, descriptionParam, weightParam);
+    var result = await tryCreateDeliverable(professorIDArray[professorIndexParam - 1], classIDArray[classIndexParam - 1], titleParam, descriptionParam, weightParam);
 
     // Assert that the Deliverable was created.
     assert(!!result.id);
