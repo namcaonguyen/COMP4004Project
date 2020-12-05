@@ -131,13 +131,49 @@ Given("An admin creates Course {int} for {string} with title {string} and prereq
     courseIDArray[courseIndexParam - 1] = result.id;
 });
 
+Given("{string}s {int} and {int} apply for an account with name {string} and {string}, email {string} and {string}, password {string} and {string}", async function(accountTypeParam, userIndex1Param, userIndex2Param, fullname1Param, fullname2Param, email1Param, email2Param, password1Param, password2Param) {
+    // Create the first unapproved User to save to the database.
+    const createdUnapprovedUser1 = new User({
+        email: email1Param,
+        password: password1Param,
+        fullname: fullname1Param,
+        accountType: accountTypeParam,
+        approved: false
+	});
+    // Create the second unapproved User to save to the database.
+    const createdUnapprovedUser2 = new User({
+        email: email2Param,
+        password: password2Param,
+        fullname: fullname2Param,
+        accountType: accountTypeParam,
+        approved: false
+	});
+
+    // Save the unapproved Users to the database.
+    // NOTE: In order to mimic simultaneous registrations, we will NOT use the 'await' keyword here!!!
+    createdUnapprovedUser1.save();
+    createdUnapprovedUser2.save();
+
+    // Wait for the Users to finish trying to register.
+    await new Promise(r => setTimeout(r, 100));
+
+    // Store the created User IDs in an array.
+    if ( accountTypeParam === 'student' ) {
+        studentIDArray[userIndex1Param - 1] = createdUnapprovedUser1._id;
+        studentIDArray[userIndex2Param - 1] = createdUnapprovedUser2._id;
+	} else if ( accountTypeParam === 'professor' ) {
+        professorIDArray[userIndex1Param - 1] = createdUnapprovedUser1._id;
+        professorIDArray[userIndex2Param - 1] = createdUnapprovedUser2._id;
+	}
+});
+
 Given("An admin creates Class {int} for Course {int} taught by Professor {int} with capacity {int}", async function(classIndexParam, courseIndexParam, professorIndexParam, capacityParam) {
     // Try to create the Class.
     var result = await tryCreateClass(courseIDArray[courseIndexParam - 1], professorIDArray[professorIndexParam - 1], capacityParam);
     
     // Assert that the Class was successfully created.
     assert(!!result.id);
-
+    
     // Store the created Class ID in an array.
     classIDArray[classIndexParam - 1] = result.id;
 });
@@ -167,7 +203,7 @@ Given("{string} {int} can login with email {string} and password {string}", asyn
 	}
 
     // Find the User with the info in the database.
-    const findUser = await User.find( { accountType: accountTypeParam, _id: userObjectID, email: emailParam, password: passwordParam } );
+    const findUser = await User.find( { accountType: accountTypeParam, _id: userObjectID, email: emailParam, password: passwordParam, approved: true } );
     // Assert that this User is in the database.
     assert.strictEqual(1, findUser.length);
 });
@@ -214,6 +250,27 @@ Given("Student {int} drops Class {int} with no DR", async function(studentIndexP
     assert.strictEqual(0, findClassEnrollment.length);
 });
 
+When("Students {int} and {int} submit for Deliverable {int} a text file with name {string} and {string} and contents {string} and {string}", async function(studentIndex1Param, studentIndex2Param, deliverableIndexParam, fileName1Param, fileName2Param, contents1Param, contents2Param) {
+    // Find the Deliverable in the database.
+    const findDeliverable = await Deliverable.findById(deliverableIDArray[deliverableIndexParam - 1]);
+
+    // Write both text files that will be used for the Deliverable Submissions.
+    fs.writeFileSync("uploads/" + fileName1Param, contents1Param);
+    fs.writeFileSync("uploads/" + fileName2Param, contents2Param);
+
+    // Try to update the Deliverable Submission.
+    // NOTE: In order to mimic students simultaneously submitting their files, we will NOT use the 'await' keyword here!!!
+    var result1 = tryUpdateSubmissionDeliverable(findDeliverable.class_id, studentIDArray[studentIndex1Param - 1], findDeliverable.title, fileName1Param);
+    var result2 = tryUpdateSubmissionDeliverable(findDeliverable.class_id, studentIDArray[studentIndex2Param - 1], findDeliverable.title, fileName2Param);
+
+    // Wait for the students to finish submitting.
+    await new Promise(r => setTimeout(r, 100));
+
+    // Assert that the Deliverable Submissions went through.
+    assert(true, result1);
+    assert(true, result2);
+});
+
 Given("An admin cancels Class {int}", async function(classIndexParam) {
     // Delete the Class.
     await deleteClass();
@@ -248,7 +305,7 @@ When("Student {int} submits for Deliverable {int} a text file with name {string}
     assert(true, await tryUpdateSubmissionDeliverable(findDeliverable.class_id, studentIDArray[studentIndexParam - 1], findDeliverable.title, fileNameParam));
 });
 
-When("Professor grades Deliverable {int} for Student {int} with a mark of {float}", async function(deliverableIndexParam, studentIndexParam, markParam) {
+When("Professor {int} grades Deliverable {int} for Student {int} with a mark of {float}", async function(professorIndexParam, deliverableIndexParam, studentIndexParam, markParam) {
     // Find the Deliverable Submission of the student for this Deliverable in the database.
     const findDeliverableSubmission = await DeliverableSubmission.find( { deliverable_id: deliverableIDArray[deliverableIndexParam - 1], student_id: studentIDArray[studentIndexParam - 1] } );
     // Assert that this Deliverable Submission is in the database.
@@ -257,7 +314,7 @@ When("Professor grades Deliverable {int} for Student {int} with a mark of {float
 
     // Try to grade the Deliverable Submission.
     var result = await trySetSubmissionGrade(findDeliverableSubmission[0]._id, markParam);
-
+    
     // Assert that the Deliverable Submission was succesfully graded.
     assert(!!result.success);
 });
@@ -271,6 +328,20 @@ When("Professor calculates a final grade for Student {int} of Class {int}", asyn
 
     // Assert that the student's final grade was submitted.
     assert(!!result.success);
+});
+
+Then("Professor {int} and {int} calculate a final grade for student {int} of Class {int} and student {int} of Class {int}", async function(professorIndex1Param, professorIndex2Param, studentIndex1Param, classIndex1Param, studentIndex2Param, classIndex2Param) {
+    // Calculate and a final grade for both students, based on their Deliverable grades.
+    const calculatedFinalGrade1 = await calculateFinalGrade(classIDArray[classIndex1Param - 1], studentIDArray[studentIndex1Param - 1]);
+    const calculatedFinalGrade2 = await calculateFinalGrade(classIDArray[classIndex2Param - 1], studentIDArray[studentIndex2Param - 1]);
+
+    // Try to submit the students' final grade.
+    // NOTE: In order to mimic two professors simultaneously submitting the final grades, we do NOT use the 'await' keyword here!!!
+    var result1 = trySubmitFinalGrade(classIDArray[classIndex1Param - 1], studentIDArray[studentIndex1Param - 1], calculatedFinalGrade1);
+    var result2 = trySubmitFinalGrade(classIDArray[classIndex2Param - 1], studentIDArray[studentIndex2Param - 1], calculatedFinalGrade2);
+
+    // Wait for the final grades to submit.
+    await new Promise(r => setTimeout(r, 100));
 });
 
 Then("Student {int} sees their grade of {float} for Class {int}", async function(studentIndexParam, gradeParam, classIndexParam) {
