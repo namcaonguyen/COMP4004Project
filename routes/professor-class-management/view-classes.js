@@ -261,7 +261,12 @@ router.post("/:id/:deliverable", upload.any("deliverable_file"), async (req, res
         }
     } else {
         if ("delete" in req.body) {
-            await tryToDeleteDeliverable(deliverable._id);
+            var result = await tryToDeleteDeliverable(deliverable._id);
+            if (!result) {
+                data.error = "Failed to delete deliverable.";
+                res.render("professor-class-management/view-deliverable", data);
+                return;
+            }
         } else if (!(await tryUpdateDeliverable(req.params.id, req.body.title, req.body.description, fileName, req.body.weight, req.body.deadline))) {
             data.error = "Failed to update deliverable. Please try again.";
             res.render("professor-class-management/view-deliverable", data);
