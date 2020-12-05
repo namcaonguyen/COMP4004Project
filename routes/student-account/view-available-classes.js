@@ -13,7 +13,7 @@ const {
 router.get("/view-available-classes", async (req, res) => {
     if (res.locals.user.accountType === "student") {
         // Get the list of available Classes.
-        var classList = await getClassList();
+        var classList = await getClassList(res.locals.user._id);
 
         const data = { title: "View Available Classes", classes: classList };
         data[res.locals.user.accountType] = true;
@@ -44,7 +44,7 @@ router.post("/view-available-classes", async (req, res) => {
         // If the record was not successfully saved, rerender the page with the error message displayed.
         if ( !id ) {
             // Get the list of available Classes.
-            var classList = await getClassList();
+            var classList = await getClassList(res.locals.user._id);
             
             const data = { title: "View Available Classes", classes: classList, error: error };
             data[res.locals.user.accountType] = true;

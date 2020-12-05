@@ -2,6 +2,7 @@ const User = require('./user.js');
 const Course = require('./course.js');
 const Class = require('./class.js');
 const mongoose = require('mongoose');
+const course = require('./course.js');
 mongoose.connect('mongodb://localhost/cmsApp');
 
 // The purpose of this script is to generate temporary data for testing purposes.
@@ -54,24 +55,24 @@ var users = [
 var courses = [
     new Course({
         courseCode: "COMP1405",
-        title: "Introduction to Computer Science I",
+        title: "Introduction to Computer Science I"
     }),
     new Course({
         courseCode: "COMP1406",
-        title: "Introduction to Computer Science II",
+        title: "Introduction to Computer Science II"
     }),
     new Course({
         courseCode: "COMP1501",
-        title: "Introduction to Computer Game Design",
+        title: "Introduction to Computer Game Design"
     }),
     new Course({
         courseCode: "COMP1601",
-        title: "Introduction to Mobile Application DevelopmenT",
+        title: "Introduction to Mobile Application DevelopmenT"
     }),
     new Course({
         courseCode: "COMP1805",
-        title: "Discrete Structures I",
-    }),
+        title: "Discrete Structures I"
+    })
 ];
 
 var classes = [
@@ -109,8 +110,11 @@ var classes = [
         totalCapacity: 300,
         prereqs: [],
         precludes: []
-    }),
+    })
 ];
+
+for (let i = 1; i < courses.length-1; i++)
+    courses[i].prereqs = [courses[0].courseCode];
 
 // delete everything from the database before adding the new content
 User.deleteMany({}, function(err){
