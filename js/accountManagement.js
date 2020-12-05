@@ -80,14 +80,15 @@ module.exports.tryToDeleteProfessor = async function (professorUserObjectID) {
 	// Find all the classes where the professor is the professor of that class.
 	var foundClasses = await Class.find({ professor: professorUserObjectID });
 
-	// Delete the professor.
-	if (foundClasses.length > 0) {
-		return { success: false, error: "You cannot delete a professor if they are assigned to a class." };
-	} else {
-		await User.deleteOne({ _id: professorUserObjectID });
-		return { success: true };
-    }
+	// Delete all of the Classes and ClassEnrollments that the prof is related to
+	for (var i = 0; i < foundClasses.length; i++) {
+		currentClassID = foundClasses[i]._id;
+		await Class.deleteMany({ _id: currentClassID });
+		await ClassEnrollment.deleteMany({ class: currentClassID });
+	}
 
+	// Then delete the prof and return success
+	await User.deleteOne({ _id: professorUserObjectID });
 	return { success: true };
 }
 

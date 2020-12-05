@@ -59,6 +59,18 @@ When("Admin tries to delete the professor with email {string}", async function (
 	// Assert that the professor was found.
 	assert.equal(true, findProfessor.length);
 
+	var classesTheProfTeaches = await Class.find({ professor: findProfessor[0]._id });
+	var classEnrollmentsProfTeaches = []
+	for (var i = 0; i < classesTheProfTeaches; i++) {
+		var classEnrolls = await ClassEnrollment.find({ class: classesTheProfTeaches[i]._id });
+		for (classEnroll in classEnrolls) {
+			classEnrollmentsProfTeaches.push(classEnroll);
+        }
+	}
+
+	this.classesTheProfTeaches = classesTheProfTeaches;
+	this.classEnrollmentsProfTeaches = classEnrollmentsProfTeaches;
+
 	// Try to delete the professor User.
 	await tryToDeleteProfessor(findProfessor[0]._id);
 
@@ -74,12 +86,26 @@ Then("The professor does not exist in the database", async function () {
 	assert.strictEqual(0, findUsers.length);
 });
 
-Then("The professor still exists in the database", async function () {
+Then("The professor does not exist in the database along with all of the classes they teach and the related class enrollments", async function () {
 	// Find any Users with the deleted professor's User ID.
 	var findUsers = await User.find({ _id: this.deletedProfessorUserObjectID });
 
-	// Assert that the prof was found.
-	assert.strictEqual(1, findUsers.length);
+	// For all of the Classes the prof teaches, make sure they were deleted
+	for (aClass in this.classesTheProfTeaches) {
+		var findClasses = await Class.find({ _id: aClass._id });
+		// Assert that the class was not found.
+		assert.strictEqual(0, findClasses.length);
+	}
+
+	// FFor all of the Class Enrollments the prof was related to, make sure they were deleted
+	for (aClassEnrollment in this.classEnrollmentsProfTeaches) {
+		var findClassEnrollments = await ClassEnrollment.find({ _id: aClass._id });
+		// Assert that the class was not found.
+		assert.strictEqual(0, findClassEnrollments.length);
+	}
+
+	// Assert that the prof was not deleted.
+	assert.strictEqual(0, findUsers.length);
 });
 
 When("Admin with email {string} tries to delete the administrator with email {string}", async function (adminRemoverEmailParam, victimAdminEmailParam) {
