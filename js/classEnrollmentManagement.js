@@ -286,7 +286,22 @@ module.exports.tryEnrollStudentInClass = async function(studentUserObjectID, cla
 }
 
 // before deadline
-module.exports.tryDropClassNoDR = async function(studentID, classID) {
+module.exports.tryDropClassNoDR = async function (studentID, classID) {
+
+	// Check to see if the class still exists
+	var foundClasses = await Class.find({ _id: classID });
+	// If the class doesn't exist, return error.
+	if (!foundClasses.length) {
+		return { success: false, error: "The class was already cancelled by an administrator." }
+	}
+
+	// Check to see if the student is still enrolled in the class
+	var foundEnrollments = await ClassEnrollment.find({ student: studentID, class: classID });
+	// If the student is not enrolled, return error.
+	if (!foundEnrollments.length) {
+		return { success: false, error: "You are not enrolled in that class." }
+	}
+
 	const query = {
 		student: studentID,
 		class: classID
@@ -297,7 +312,6 @@ module.exports.tryDropClassNoDR = async function(studentID, classID) {
 	const { deletedCount } = await ClassEnrollment.deleteMany(query);
 
 	if(!deletedCount) return { success: false, error: "Not already enrolled." };
-	
 	return { success: true }; // no error
 }
 

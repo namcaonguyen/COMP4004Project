@@ -36,7 +36,7 @@ async function findEnrollmentFromEmailAndCourseCode(email, courseCode) {
 
 // before deadline
 
-When("Student with email {string} successfully drops class for course with code {string} for no DR", async function(email, courseCode) {
+When("Student with email {string} successfully drops class for course with code {string} for no DR", async function (email, courseCode) {
 	const enrollment = await findEnrollmentFromEmailAndCourseCode(email, courseCode);
 	if(!enrollment) throw new Error("Student was not enrollment in any classes with course code");
 	const {student, class: class_} = enrollment;
@@ -44,11 +44,11 @@ When("Student with email {string} successfully drops class for course with code 
 	if(!success || error) throw new Error("Failed to drop class, error:" + error);
 });
 
-When("Student with email {string} fails to drop class for course with code {string} for no DR", async function(email, courseCode) {
-	const enrollment = await findEnrollmentFromEmailAndCourseCode(email, courseCode);
-	if(!enrollment) throw new Error("Student was not enrollment in any classes with course code");
-	const {student, class: class_} = enrollment;
-	const {success, error} = await tryDropClassNoDR(student, class_);
+When("Student with email {string} fails to drop class for course with code {string} for no DR", async function (email, courseCodeParam) {
+	const findStudent = await User.find({ email: email, accountType: "student" });
+	const findClass = await Class.find({ courseCode: courseCodeParam });
+
+	const { success, error } = await tryDropClassNoDR(findStudent, findClass);
 	assert(!success && error);
 });
 
@@ -66,7 +66,7 @@ When("Student with email {string} fails to withdraw from the class for course wi
 	const enrollment = await findEnrollmentFromEmailAndCourseCode(email, courseCode);
 	if(!enrollment) throw new Error("Student was not enrollment in any classes with course code");
 	const {student, class: class_} = enrollment;
-	const {success, error} = await tryDropClassWithDR(student, class_);
+	const { success, error } = await tryDropClassWithDR(student, class_);
 	assert(!success && error);
 });
 
