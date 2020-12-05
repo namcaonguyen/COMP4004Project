@@ -243,7 +243,20 @@ async function validateCreateDeliverableInputs(classIDParam, titleParam, descrip
  * @description This function tries to delete a deliverable and all related content for it in a specific class.
  * @param {string} deliverableId - The id of the deliverable.
  */
-module.exports.tryToDeleteDeliverable = async function(deliverableId) {
+module.exports.tryToDeleteDeliverable = async function (deliverableId) {
+
+    // Find the deliverable to make sure it still exists
+    var foundDeliverable = await Deliverable.find({ _id: deliverableId });
+    if (!foundDeliverable.length) {
+        return false;
+    }
+
+    // Find the deliverable submissions, if there are any then return an error
+    var deliverableSubmissions = await DeliverableSubmission.find({ deliverable_id: deliverableId });
+    if (deliverableSubmissions.length > 0) {
+        return false;
+    }
+
     // update is_deleting flag so no one can interact with this deliverable while deletion is in process.
     await Deliverable.updateOne({ _id: deliverableId }, { $set: { is_deleting: true } });
 

@@ -12,3 +12,18 @@ Feature: Professor Update and Delete Deliverable
 		Given A professor creates a deliverable with info "Assignment 1" "This is your first assignment" 20
 		And The professor deletes that deliverable
 		Then The deliverable should not exist anymore in the database
+
+	Scenario: A professor tries to delete a deliverable that does not exist anymore
+		Given A professor creates a deliverable with info "Assignment 1" "This is your first assignment" 20
+		And The professor deletes that deliverable
+		And The professor tries to delete that deliverable again
+		Then The result is a unsuccessful delete attempt
+
+	Scenario: A professor tries to delete a deliverable which has submissions
+		Given A professor creates a deliverable with info "Assignment 1" "This is your first assignment" 20
+		And There is an Academic Deadline set in the database
+		And The administrator wants to update the Academic Deadline to year 3000, month 11, day 15
+		And There exists an approved student with name "Zahid Dawod" email "zahid.dawod@cms.com" and password "password"
+		And "Zahid Dawod" submits a text file named "a1.txt" as submission to that deliverable with the contents being "Hi this is my submission"
+		And The professor tries to delete that deliverable
+		Then The result is a unsuccessful delete attempt
