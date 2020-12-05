@@ -27,3 +27,9 @@ Feature: Professor Update and Delete Deliverable
 		And "Zahid Dawod" submits a text file named "a1.txt" as submission to that deliverable with the contents being "Hi this is my submission"
 		And The professor tries to delete that deliverable
 		Then The result is a unsuccessful delete attempt
+
+	Scenario: A professor tries to delete a deliverable but the class its for doesn't exist anymore
+		Given A professor creates a deliverable with info "Assignment 1" "This is your first assignment" 20
+		When An administrator deletes the class
+		And The professor tries to delete that deliverable
+		Then The result is a unsuccessful delete attempt

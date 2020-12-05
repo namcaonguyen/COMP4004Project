@@ -60,7 +60,7 @@ module.exports.deleteClass = async function (id) {
     const class_ = classes[0];
 
     await ClassEnrollment.deleteMany({ class: class_ });
-    await Class.deleteMany({_id: id});
+    await Class.deleteMany({ _id: id });
 }
 
 // Function to validate the inputs for when Class information is being updated.
@@ -254,6 +254,11 @@ module.exports.tryToDeleteDeliverable = async function (deliverableId) {
     // Find the deliverable submissions, if there are any then return an error
     var deliverableSubmissions = await DeliverableSubmission.find({ deliverable_id: deliverableId });
     if (deliverableSubmissions.length > 0) {
+        return false;
+    }
+
+    var foundClass = await Class.find({ _id: foundDeliverable[0].class_id });
+    if (!foundClass.length) {
         return false;
     }
 
