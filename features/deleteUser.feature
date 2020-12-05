@@ -18,13 +18,13 @@ Feature: An administrator User can delete Users.
 		When Admin tries to delete the professor with email "tj@cms.com"
 		Then The professor does not exist in the database
 
-	Scenario: An administrator User cannot deletes a professor who is assigned to a class.
+	Scenario: An administrator User deletes a professor who is assigned to a class.
 		Given There are no existing Users in the database
 		And There exists a "professor" "TJ Mendicino" with email "tj@cms.com" and password "password" and courses taken ""
 		And There is a course in the database with code "COMP3203" and title "Principles of Computer Networks" and prereqs "" and precludes ""
-		And There exists a Class for "COMP3203" taught by professor with email "tj@cms.com" with capacity 69
+		And There exists a Class for "COMP3203" taught by professor with email "tj@cms.com" with capacity 5
 		When Admin tries to delete the professor with email "tj@cms.com"
-		Then The professor still exists in the database
+		Then The professor does not exist in the database along with all of the classes they teach and the related class enrollments
 
 	Scenario: An administrator User deletes another an admin.
 		Given There are no existing Users in the database
