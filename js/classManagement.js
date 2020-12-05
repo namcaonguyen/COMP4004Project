@@ -129,7 +129,25 @@ module.exports.tryToUpdateClassInformation = async function( classIDParam, profe
 }
 
 /**
+ * @description Function to check if a professor is assigned to a Class.
+ * @param   professorIDParam    Object ID of the professor
+ * @param   classIDParam        Object ID of the Class
+ */
+async function isProfessorAssignedToClass( professorIDParam, classIDParam ) {
+    // Try to find the Class in the database which is assigned to the professor.
+    var findClass = await Class.find( { _id: classIDParam, professor: professorIDParam } );
+    
+    // If the Class could not be found in the database...
+    if ( findClass.length === 0 ) {
+        return false;
+	} else {
+        return true;
+	}
+}
+
+/**
  * @description This function to create a deliverable. Returns success or an error array.
+ * @param {string} professorIDParam - Object ID of the professor User trying to create a deliverable
  * @param {string} classIDParam - Object ID of the Class Object being updated
  * @param {string} titleParam - Title of the deliverable
  * @param {string} descriptionParam - Description of the deliverable
@@ -137,7 +155,14 @@ module.exports.tryToUpdateClassInformation = async function( classIDParam, profe
  * @param {string} specificationFile - The specification file of the deliverable
  * @param {string} deadlineParam - The deadline of the deliverable
  */
-module.exports.tryCreateDeliverable = async function (classIDParam, titleParam, descriptionParam, weightParam, specificationFile, deadlineParam) {
+module.exports.tryCreateDeliverable = async function (professorIDParam, classIDParam, titleParam, descriptionParam, weightParam, specificationFile, deadlineParam) {
+    // Check if the professor User is assigned to the Class.
+    if ( await isProfessorAssignedToClass(professorIDParam, classIDParam) == false ) {
+        var errorArray = [];
+        errorArray.push("You are not assigned to this Class!");
+        return { errorArray: errorArray };
+	}
+    
     // Check the inputs for errors.
     var errorArray = await validateCreateDeliverableInputs(classIDParam, titleParam, descriptionParam, weightParam, specificationFile, deadlineParam);
 

@@ -81,7 +81,7 @@ router.use("/:id", (req, res, next) => {
             if (await isEnrolled(res.locals.user._id, req.params.id) || await isTeaching(res.locals.user._id, req.params.id)) {
                 next();
             } else {
-                res.send("You are not enrolled in this class.");
+                res.send("You are not allowed to see this class.");
             }
         }
     });
@@ -188,9 +188,13 @@ router.get("/:id/create-deliverable", async (req, res) => {
 // POST create deliverable
 router.post("/:id/create-deliverable", upload.any("deliverable_file"), async (req, res) => {
     if (res.locals.user.accountType === "professor") {
-        //create deliverable in databas
+        // Get the current professor User's Object ID.
+        var currentProfessor = await User.find( { email: req.cookies.email, password: req.cookies.password, accountType: 'professor' } );
+        const professorUserObjectID = currentProfessor[0]._id;
+
+        // Create Deliverable in database
         var fileName = (req.files.length === 0) ? "" : req.files[0].filename;
-        var { id, errorArray } = await tryCreateDeliverable(req.body.classId, req.body.title, req.body.description, req.body.weight, fileName, req.body.deadline);
+        var { id, errorArray } = await tryCreateDeliverable(professorUserObjectID, req.body.classId, req.body.title, req.body.description, req.body.weight, fileName, req.body.deadline);
 
         if (!id) {
             // Declaration of variable for an Error Message.

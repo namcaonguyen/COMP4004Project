@@ -88,11 +88,11 @@ Feature: This feature file is to test out the Use Case Dependencies. See the Del
 		# T(pid1,tid4)
 		And Professor 1 can see Class 4 in their Class list
 		# U(did1,tid4)
-		And The professor creates Deliverable 1 for Class 4 with title "First Deliverable", description "Do stuff.", and weight 10
+		And Professor 1 creates Deliverable 1 for Class 4 with title "First Deliverable", description "Do stuff.", and weight 10
 		# V(sid1,did1)
 		And Student 1 submits for Deliverable 1 a text file with name "CarefullyResearchedEssay.txt" and contents "Hello, I spent 500 hours on this essay."
 		# U(did2,tid4)
-		And The professor creates Deliverable 2 for Class 4 with title "Second Deliverable", description "Do more stuff.", and weight 90
+		And Professor 1 creates Deliverable 2 for Class 4 with title "Second Deliverable", description "Do more stuff.", and weight 90
 		# V(sid1,did2)
 		And Student 1 submits for Deliverable 2 a text file with name "MoreTimeSpent.txt" and contents "I spent even more time on this because it's worth 90%. I hope I get a good mark."
 		# P(sid2,tid4)

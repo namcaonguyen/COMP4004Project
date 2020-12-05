@@ -33,8 +33,8 @@ Given("A professor {string} creates a deliverable for a class {string} {string} 
     if (deadline === "with") {
         this.date = new Date();
         this.date.setSeconds(this.date.getSeconds()+1); // deadline 1 second from now
-        this.deliverable = await tryCreateDeliverable(this.class.id, "Assignment 1", "", 15, "", this.date);
-    } else this.deliverable = await tryCreateDeliverable(this.class.id, "Assignment 1", "", 15);
+        this.deliverable = await tryCreateDeliverable(this.professor._id, this.class.id, "Assignment 1", "", 15, "", this.date);
+    } else this.deliverable = await tryCreateDeliverable(this.professor._id, this.class.id, "Assignment 1", "", 15);
     assert(true, !!this.deliverable.id);
 });
 
