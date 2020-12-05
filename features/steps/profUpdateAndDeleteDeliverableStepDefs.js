@@ -2,11 +2,13 @@ const assert = require('assert');
 const { Given, When, Then } = require('@cucumber/cucumber');
 const User = require("../../db/user.js");
 const Class = require("../../db/class.js");
+const ClassEnrollment = require("../../db/classEnrollment.js");
 const Course = require("../../db/course.js");
 const Deliverable = require("../../db/deliverable.js");
 const DeliverableSubmission = require("../../db/deliverableSubmission.js");
 const { tryCreateClass, tryCreateDeliverable, tryUpdateDeliverable, tryToDeleteDeliverable } = require("../../js/classManagement.js");
 const { tryCreateCourse } = require("../../js/courseManagement.js");
+const { tryEnrollStudentInClass } = require("../../js/classEnrollmentManagement.js");
 
 async function WipeDB() {
     await Class.deleteMany({}); // delete all classes
@@ -51,4 +53,18 @@ Then("The deliverable {string} should now be {string}", async function (info, va
 
 Then("The deliverable weight should still be {int}", async function (value) {
     assert.strictEqual(value, (await Deliverable.findById(this.deliverable.id)).weight);
+});
+
+Given("The professor tries to delete that deliverable again", async function () {
+    var success = await tryToDeleteDeliverable(this.deliverable.id);
+    this.success = success;
+});
+
+Given("The professor tries to delete that deliverable", async function () {
+    var success = await tryToDeleteDeliverable(this.deliverable.id);
+    this.success = success;
+});
+
+Then("The result is a unsuccessful delete attempt", async function () {
+    assert.strictEqual(false, this.success);
 });
