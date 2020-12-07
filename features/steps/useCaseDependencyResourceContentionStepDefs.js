@@ -427,6 +427,22 @@ When("All students who want to enroll in Class {int} try to enroll at the same t
     await new Promise(r => setTimeout(r, 100));
 });
 
+When("All students who want to enroll in Class {int} try to enroll at the same time while student {int} drops the Class", async function(classIndexParam, studentIndexParam) {
+    // Try to drop the Class for the student.
+    // NOTE: In order to mimic dropping the class while the other students try to enroll at the same time, we will NOT use the 'await' keyword here!!!
+    tryDropClassNoDR(studentIDArray[studentIndexParam - 1], classIDArray[classIndexParam - 1]);
+    
+    // Go through all the students that want to enroll.
+    for ( var i = 0; i < studentIDWantsToEnrollArray.length; ++i ) {
+        // Try to enroll the student in the Class.
+        // NOTE: In order to mimic multiple students trying to enroll at the same time, we will NOT use the 'await' keyword here!!!
+        tryEnrollStudentInClass(studentIDWantsToEnrollArray[i], classIDArray[classIndexParam - 1]);
+	}
+
+    // Wait for the students to finish trying to enroll.
+    await new Promise(r => setTimeout(r, 100));
+});
+
 Then("Only {int} of the students that wanted to enroll in Class {int} were able to", async function(expectedEnrollmentsParam, classIndexParam) {
     // Declaration of variable to keep track of the number of successful enrollments.
     var numberOfSuccessfulEnrollments = 0;
@@ -444,4 +460,24 @@ Then("Only {int} of the students that wanted to enroll in Class {int} were able 
 
     // Assert that exactly the expected number of students were able to enroll.
     assert.strictEqual(numberOfSuccessfulEnrollments, expectedEnrollmentsParam);
+});
+
+Then("No more than {int} of the students that wanted to enroll in Class {int} should have been able to", async function(expectedEnrollmentsParam, classIndexParam) {
+    // Declaration of variable to keep track of the number of successful enrollments.
+    var numberOfSuccessfulEnrollments = 0;
+
+    // Go through all the students that tried to enroll.
+    for ( var i = 0; i < studentIDWantsToEnrollArray.length; ++i ) {
+        // Try to find the student's ClassEnrollment in the database.
+        const findClassEnrollment = await ClassEnrollment.find( { student: studentIDWantsToEnrollArray[i], class: classIDArray[classIndexParam - 1] } );
+        // If the student was able to enroll in the Class...
+        if ( findClassEnrollment.length === 1 ) {
+            // Increment the variable.
+            ++numberOfSuccessfulEnrollments;
+		}
+	}
+
+    // Assert that no more than the expected number of students were able to enroll.
+    // Since actions are being done simultaneously, it's possible that less than the expected number of students were able to enroll if the first student took too long to drop.
+    assert.strictEqual(true, numberOfSuccessfulEnrollments <= expectedEnrollmentsParam);
 });
