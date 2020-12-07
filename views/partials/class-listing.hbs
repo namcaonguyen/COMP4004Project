@@ -9,6 +9,9 @@
         <br>
         <h7 class="card-subtitle mb-2 text-muted">Precludes: {{this.precludes}}</h7>
         <br>
+        {{#if this.isEnrolled}}
+            <button class="btn btn-lg btn-primary btn-block text-uppercase" disabled>Already Enrolled</button>
+        {{else}}
         <form method="POST">
             {{#if ../student}}
             <input type="hidden" value="{{this._id}}" name="classID">
@@ -16,6 +19,7 @@
                 Class</button>
             {{/if}}
         </form>
+        {{/if}}
         {{#if ../administrator}}
             <form method="GET" action="edit-class">
                 <input type="hidden" value="{{this._id}}" name="classID">

@@ -12,6 +12,12 @@ function validateClassCapacity(cap) {
     return (cap >= 1);
 }
 
+/**
+ * @description Deletes a class and all associated data
+ * @param course Object ID of the Course
+ * @param professor Object ID of the Professor
+ * @param totalCapacity The desired total capacity for the class
+ */
 module.exports.tryCreateClass = async function (course, professor, totalCapacity) { // returns {id:string} if success, returns {error:string} if failed
     if (!course) return { error: "Course empty" };
     if (!professor) return { error: "Professor empty" };
@@ -52,8 +58,10 @@ module.exports.tryCreateClass = async function (course, professor, totalCapacity
     return { id: someClass._id };
 }
 
-// deletes class and associated data
-// - delete class enrollment data
+/**
+ * @description Deletes a class and all associated data
+ * @param classIDParam Object ID of the Class
+ */
 module.exports.deleteClass = async function (id) {
     const classes = await Class.find({_id: id});
     if(!classes.length) return;
@@ -63,12 +71,14 @@ module.exports.deleteClass = async function (id) {
     await Class.deleteMany({ _id: id });
 }
 
-// Function to validate the inputs for when Class information is being updated.
-// Param:   classIDParam        Object ID of the Class Object being updated
-// Param:   professorIDParam    Object ID of the professor User being assigned
-// Param:   capacityParam       New capacity
-// Return an error array full of error messages.
-async function validateUpdateClassInputs( classIDParam, professorIDParam, capacityParam ) {
+/**
+ * @description Function to validate the inputs for when Class information is being updated.
+ * @param classIDParam Object ID of the Class
+ * @param professorIDParam Object ID of the professor
+ * @param capacityParam New capacity
+ * @return {string[]} An array of error messages.
+ */
+async function validateUpdateClassInputs(classIDParam, professorIDParam, capacityParam) {
 	// Declaration of array varible to hold error messages.
     var errorArray = [];
 
@@ -107,11 +117,12 @@ async function validateUpdateClassInputs( classIDParam, professorIDParam, capaci
     return errorArray;
 }
 
-// Function to try and update Class information.
-// Param:   classIDParam        Object ID of the Class Object being updated
-// Param:   professorIDParam    Object ID of the professor User being assigned
-// Param:   capacityParam       New capacity
-// Return success or an error array.
+/**
+ * @description Function to try and update Class information.
+ * @param classIDParam Object ID of the Class Object being updated
+ * @param professorIDParam Object ID of the professor User being assigned
+ * @param capacityParam New capacity
+ */
 module.exports.tryToUpdateClassInformation = async function( classIDParam, professorIDParam, capacityParam ) {
     // Check the inputs for errors.
     var errorArray = await validateUpdateClassInputs( classIDParam, professorIDParam, capacityParam );
@@ -135,14 +146,7 @@ module.exports.tryToUpdateClassInformation = async function( classIDParam, profe
  */
 async function isProfessorAssignedToClass( professorIDParam, classIDParam ) {
     // Try to find the Class in the database which is assigned to the professor.
-    var findClass = await Class.find( { _id: classIDParam, professor: professorIDParam } );
-    
-    // If the Class could not be found in the database...
-    if ( findClass.length === 0 ) {
-        return false;
-	} else {
-        return true;
-	}
+    return ((await Class.find({ _id: classIDParam, professor: professorIDParam })).length !== 0 );
 }
 
 /**
@@ -188,11 +192,16 @@ module.exports.tryCreateDeliverable = async function (professorIDParam, classIDP
     }
 }
 
-// Function to validate the inputs for when Class information is being updated.
-// Param:   classIDParam        Object ID of the Class Object being updated
-// Param:   professorIDParam    Object ID of the professor User being assigned
-// Param:   capacityParam       New capacity
-// Return an error array full of error messages.
+/**
+ * @description Function to validate the inputs for when Class information is being updated.
+ * @param {string} classIDParam - Object ID of the Class Object being updated
+ * @param {string} titleParam - Title of the deliverable
+ * @param {string} descriptionParam - Description of the deliverable
+ * @param {string} weightParam - Weight of the deliverable
+ * @param {string} specificationFile - The specification file of the deliverable
+ * @param {string} deadlineParam - The deadline of the deliverable
+ * @return {string[]} An array of error messages.
+ */
 async function validateCreateDeliverableInputs(classIDParam, titleParam, descriptionParam, weightParam, specificationFile, deadlineParam) {
     // Declaration of array varible to hold error messages.
     var errorArray = [];
@@ -320,6 +329,7 @@ async function doesClassExist( classID ) {
         return true;
 	}
  }
+ module.exports.isStudentEnrolledInClass = isStudentEnrolledInClass;
 
 /**
  * @description This function updates the deliverable submission info for a specific student in a class.
@@ -398,9 +408,10 @@ module.exports.tryUpdateDeliverable = async function (classId, title, descriptio
 
 
 /**
- * @description returns the original file name.
- * @param {string} file_name - The string to parse.
+ * @description Parses string input and figures out the original file name.
+ * @param {string} file_name - The string of the path to the file to parse.
  * @param {string} deliverable_title - The title of the deliverable.
+ * @return {string} The original file name.
  */
 function getOriginalFileName (file_name, deliverable_title) {
 	let fileNameArr = file_name.split("-"), index = 0;

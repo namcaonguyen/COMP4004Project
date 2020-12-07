@@ -1,18 +1,20 @@
 const AcademicDeadline = require("../db/academicDeadline.js");
 
-// Function to get the Academic Deadline from the database.
-// Return the Academic Deadline object, which includes a Date.
+/**
+ * @description Function to get the Academic Deadline from the database.
+ * @returns The Academic Deadline object, which includes a Date.
+ */
 module.exports.getAcademicDeadline = async function() {
-	var findAcademicDeadline = await AcademicDeadline.find({});
-
-	return findAcademicDeadline;
+	return (await AcademicDeadline.find({}));
 }
 
-// Function to validate the date inputs.
-// Param:	yearParam	The input year
-// Param:	monthParam	The input month
-// Param:	dayParam	The input day
-// Return an array of error messages.
+/**
+ * @description Function to validate the date inputs.
+ * @param {number} yearParam - The year input.
+ * @param {number} monthParam - The month input.
+ * @param {number} dayParam - The day input.
+ * @returns An array of error messages.
+ */
 function validateDateInputs(yearParam, monthParam, dayParam) {
 	// Declaration of array varible to hold error messages.
     var errorArray = [];
@@ -37,6 +39,13 @@ function validateDateInputs(yearParam, monthParam, dayParam) {
 	return errorArray;
 }
 
+/**
+ * @description This function tries to update the academic deadline.
+ * @param {number} yearParam - The year input.
+ * @param {number} monthParam - The month input.
+ * @param {number} dayParam - The day input.
+ * @returns Wether it was successfully updated or not.
+ */
 module.exports.tryToUpdateAcademicDeadline = async function(yearParam, monthParam, dayParam) {
 	// Check the inputs for errors.
 	var errorArray = validateDateInputs(yearParam, monthParam, dayParam);

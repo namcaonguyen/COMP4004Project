@@ -4,16 +4,15 @@ const Course = require("../db/course.js");
 const Deliverable = require("../db/deliverable.js");
 const ClassEnrollment = require("../db/classEnrollment.js");
 const AcademicDeadline = require("../db/academicDeadline.js");
-const {
-	addToList,
-	removeFromList
-} = require("./courseManagement.js");
-const deliverableSubmission = require("../db/deliverableSubmission.js");
-const { getOriginalFileName } = require("./classManagement.js");
+const DeliverableSubmission = require("../db/deliverableSubmission.js");
+const { addToList, removeFromList } = require("./courseManagement.js");
+const { getOriginalFileName, isStudentEnrolledInClass } = require("./classManagement.js");
 
-// Function to get a Class List of the available Classes. It includes data that is used to display information to the user.
-// Return a list of Classes.
-module.exports.getClassList = async function() {
+/**
+ * @description	Function to get a Class List of the available Classes. It includes data that is used to display information to the user.
+ * @param studentId The ID of the student.
+ */
+module.exports.getClassList = async function(studentId) {
 	var classList = [];
 
 	// Find all the Classes in the database.
@@ -21,15 +20,19 @@ module.exports.getClassList = async function() {
 
 	// Go through the results of the query.
 	for ( let i = 0; i < foundClasses.length; ++i ) {
-		classList.push(await getClassInfo(foundClasses[i]));
+		var result = await getClassInfo(foundClasses[i]);
+		if (studentId && (await isStudentEnrolledInClass(studentId, foundClasses[i]._id)))
+			result.isEnrolled = true;
+		classList.push(result);
 	}
 
 	return classList;
 }
 
-// Function to get the info of an individual Class object.
-// Param:	class_	Class object
-// Return info about the Class object.
+/**
+ * @description	Function to get the info of an individual Class object.
+ * @param class_ The class object.
+ */
 async function getClassInfo(class_) {
 	// Declare temporary Class variable.
 	let tempClass = {};
@@ -52,8 +55,10 @@ async function getClassInfo(class_) {
 }
 module.exports.getClassInfo = getClassInfo;
 
-// Function to check if it is past the Academic Deadline.
-// Return whether or not it is past the Academic Deadline.
+/**
+ * @description	Function to check if it is past the Academic Deadline.
+ * @returns {boolean} whether or not it is past the Academic Deadline.
+ */
 async function isPastAcademicDeadline() {
 	// Get the Academic Deadline.
 	var findAcademicDeadline = await AcademicDeadline.find({});
@@ -70,29 +75,21 @@ async function isPastAcademicDeadline() {
 }
 module.exports.isPastAcademicDeadline = isPastAcademicDeadline;
 
-// Function to check if the Class is full.
-// Param:	classObjectID	ID of the Class to check
-// Return boolean for if the Class is full or not.
+/**
+ * @description	Function to check if the Class is full.
+ * @param classObjectID	The ID of the Class to check.
+ * @returns {boolean} True for if the Class is full and False if not.
+ */
 async function isClassFull(classObjectID) {
-	// Get the Total Capacity of the Class.
-	var currentClass = await Class.find( { _id: classObjectID } );
-
-	var currentlyEnrolled = ( await ClassEnrollment.find( { class: classObjectID } ) ).length;
-	
-	// Count the number of students enrolled in the Class.
-	// If the number of students enrolled in the Class reaches the Total Capacity, then the Class is full.
-	if ( ( await ClassEnrollment.find( { class: classObjectID } ) ).length >= currentClass[0].totalCapacity ) {
-		return true;
-	} else {
-		return false;
-	}
+	var classCapacity = await Class.findById(classObjectID).totalCapacity; // Get the Total Capacity of the Class.
+	return (await ClassEnrollment.find({ class: classObjectID })).length >= classCapacity; // Count the number of students enrolled in the class and if its greater than total capacity then the class is full.
 }
 
 /**
  * @description	Function to check if a preclude of a prerequisite has been taken by the student.
  * @param prereqCourseCodeParam	Course code of the prerequisite to check
  * @param coursesTakenListParam	List of Courses taken by the student
- * @return whether or not the the student has taken a preclude of the prerequisite.
+ * @returns {boolean} whether or not the the student has taken a preclude of the prerequisite.
  */
 async function studentHasTakenPrecludedCourse( prereqCourseCodeParam, coursesTakenListParam ) {
 	// Declaration of boolean variable for if a preclude of the prerequisite was taken, initially set to false.
@@ -187,36 +184,28 @@ async function arePrerequisitesSatisfied( classObjectIDParam, studentUserObjectI
 		}
 
 		// Check again if the prerequisites list is empty. That means all prerequisites have been satisfied.
-		if ( requiredPrerequisitesList.length === 0 ) {
-			return true;
-		} else {
-			return false;
-		}
+		return (requiredPrerequisitesList.length === 0);
 	}
 }
 
 /**
  * @description Function to check if the Class still exists in the database.
  * @param	classObjectID	ID of the Class to check
- * @return boolean for if the Class still exists or not.
+ * @return {boolean} true if the Class still exists and false if not.
  */
 async function doesClassStillExist(classObjectID) {
 	// Look for the current Class in the database.
 	var currentClass = await Class.find( { _id: classObjectID } );
 
 	// If a Class with the Object ID could not be found...
-	if ( currentClass.length === 0 ) {
-		return false;
-	} else {
-		return true;
-	}
+	return (currentClass.length > 0);
 }
 module.exports.doesClassStillExist = doesClassStillExist;
 
 /**
  * @description Function to check if the Class is over capacity. If it is, then delete any excess enrollments.
- * @param	classObjectID	ID of the Class to check
- * @return boolean for if the Class is over capacity or not
+ * @param classObjectID	The ID of the Class to check
+ * @return {boolean} true for if the Class is over capacity and false if not
  */
 async function checkAndEnforceIsClassOverCapacity( classObjectID ) {
 	// Get the Total Capacity of the Class.
@@ -240,16 +229,16 @@ async function checkAndEnforceIsClassOverCapacity( classObjectID ) {
 	}
 }
 
-// Function to try and enroll a student User in a Class.
-// Param:	studentUserObjectID	ID of the student User enrolling
-// Param:	classObjectID		ID of the Class to enroll in
-// Return {id:string} for a success, and {error:string} for a failure.
+/**
+ * @description Function to try and enroll a student in a Class.
+ * @param {string} studentUserObjectID - The ID of the student enrolling.
+ * @param {string} classObjectID - The ID of the Class to enroll in.
+ */
 module.exports.tryEnrollStudentInClass = async function(studentUserObjectID, classObjectID) {
 	// Check if it is past the Academic Deadline.
 	if ( await isPastAcademicDeadline() ) {
 		return { error: "Sorry, it's too late to enroll in any Classes." };
 	}
-
 	// Check if the student User is already enrolled in the Class.
 	if ( ( await ClassEnrollment.find( { student: studentUserObjectID, class: classObjectID } ) ).length ) {
 		return { error: "You are already enrolled in that Class!" };
@@ -290,7 +279,6 @@ module.exports.tryEnrollStudentInClass = async function(studentUserObjectID, cla
 
 // before deadline
 module.exports.tryDropClassNoDR = async function (studentID, classID) {
-
 	// Check to see if the class still exists
 	var foundClasses = await Class.find({ _id: classID });
 	// If the class doesn't exist, return error.
@@ -342,8 +330,10 @@ module.exports.tryDropClassWithDR = async function(studentID, classID) {
 	return { success: true }; // no error
 }
 
-// Function to get all classes where the specified professor is the prof of the class. It includes data that is used to display information to the user.
-// Return a list of Classes of a specific professor.
+/**
+ * @description Function to get all classes where the specified professor is the prof of the class. It includes data that is used to display information to the user.
+ * @param {string} profID - The id of the professor to check.
+ */
 module.exports.getProfessorClassList = async function (profID) {
 	var classList = [];
 
@@ -364,7 +354,10 @@ module.exports.getProfessorClassList = async function (profID) {
 	return classList;
 }
 
-// function to get all classes that the specified student is enrolled in.
+/**
+ * @description Function to get all classes that the specified student is enrolled in.
+ * @param {string} id - The id of the student to check.
+ */
 module.exports.getStudentClassList = async function (id) {
 	var classList = [];
 
@@ -429,7 +422,7 @@ async function getDeliverablesOfClass (classId, optionalStudentId=undefined) {
 
 	if(optionalStudentId) {
 		for(const deliverable of deliverables) {
-			const studentSubmissions = await deliverableSubmission.find({
+			const studentSubmissions = await DeliverableSubmission.find({
 				deliverable_id: deliverable._id,
 				student_id: optionalStudentId
 			});
@@ -467,7 +460,7 @@ module.exports.getDeliverablesOfClass = getDeliverablesOfClass;
 module.exports.trySetSubmissionGrade = async function (submission_id, grade=-1) {
     if(typeof grade == "number" && !isNaN(grade)) {
         if((grade >= 0 && grade <= 100) || grade == -1) {
-            await deliverableSubmission.updateMany({ _id: submission_id }, { $set: { grade }});
+            await DeliverableSubmission.updateMany({ _id: submission_id }, { $set: { grade }});
             return { success: true };
         } else return { success: false, error: "Grade must be in range [0, 100] (or -1 to clear)" };
     } else return { success: false, error: "Grade must be of type number" };
