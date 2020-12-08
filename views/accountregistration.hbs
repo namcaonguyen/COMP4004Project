@@ -7,7 +7,7 @@
             <h5 class="card-title text-center" id="accountRegistrationPage" value="sdf">Account Registration</h5>
             <hr class="my-4">
 			{{#if error}}
-				<div class="alert alert-danger">{{error}}</div>
+				<div class="alert alert-danger" id="accountregistration-error-div">{{error}}</div>
                 <hr class="my-4">
 			{{/if}}
 			<form name="account_registration_form" method="POST">
@@ -54,7 +54,7 @@
 				</div>
 
                 <hr class="my-4">
-                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Submit</button>
+                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" name="submitRegistration">Submit Registration</button>
 			</form>
         </div>
     </div>

@@ -4,7 +4,7 @@
             <div class="card card-signin my-5">
                 <div class="card-body">
                     <h3 class="card-title text-center">Course Management System</h3>
-                    <h5 class="card-title text-center">Welcome</h5>
+                    <h5 class="card-title text-center" id="welcomePage">Welcome</h5>
 
                     {{#if administrator}}
                     {{>adminIndex}}
@@ -21,7 +21,7 @@
                     <hr class="my-4">
                     <div class="list-group">
                         <a href="/view-academic-deadline" class="list-group-item list-group-item-action">View Academic Deadline</a>
-                        <a href="/logout" class="list-group-item list-group-item-action">Logout</a>
+                        <a href="/logout" class="list-group-item list-group-item-action" name="logout">Logout</a>
                     </div>
                 </div>
             </div>
