@@ -1,5 +1,6 @@
 Feature: Create Course
         
+@test22to23
 	Scenario Outline: An admin creates a course
         Given There are no courses in the database
 		When An admin tries to create a course with code <courseCode> and title <courseTitle> and prereqs <prereqs> and precludes <precludes>
@@ -11,7 +12,8 @@ Feature: Create Course
 		| "COMP4004" | "Software Quality Assurance"     | "TEST1001,TEST1002"	| "TEST1003"			|
 		| "BUSI2301" | "Intro to Operations Management" | ""					| ""					|
 		| "COMP4109" | "Applied Cryptograph"            | "TEST1001"			| "TEST1002,TEST1003"	|
-    
+
+@test21X    
     Scenario Outline: An admin fails to create a course due to a malformed entry
         Given There are no courses in the database
 		When An admin tries to create a course with code <courseCode> and title <courseTitle> and prereqs <prereqs> and precludes <precludes>
@@ -24,7 +26,8 @@ Feature: Create Course
 		| "BUSI230"  | "Intro to Operations Management" | "TEST1001"	| "TEST1002"	|
 		| "4109COMP" | "Applied Cryptograph"            | "TEST1001"	| "TEST1002"	|
 		| "comp1234" | "Applied Cryptograph"            | "TEST1001"	| "TEST1002"	|
-    
+
+@test24
     Scenario Outline: An admin fails to create a course due to duplicate course code
         Given There are no courses in the database
 		When An admin tries to create a course with code <courseCode> and title <courseTitle> and prereqs "" and precludes ""

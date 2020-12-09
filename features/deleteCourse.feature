@@ -1,5 +1,6 @@
 Feature: Create Course
-        
+
+@test30a
 	Scenario Outline: An admin creates and deletes a course, then it doesn't exist
         Given There are no courses in the database
 		And An admin tries to create a course with code <courseCode> and title <courseTitle> and prereqs "" and precludes ""
@@ -13,7 +14,8 @@ Feature: Create Course
 		| "COMP4004" | "Software Quality Assurance"     |
 		| "BUSI2301" | "Intro to Operations Management" |
 		| "COMP4109" | "Applied Cryptograph"            |
-        
+
+@test30b 
 	Scenario: An admin creates and deletes a course, and the classes are removed too
         Given There are no existing classes in the database
 		And there are no courses in the database

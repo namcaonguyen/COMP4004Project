@@ -1,5 +1,6 @@
 Feature: Students can drop classes before deadline without DR
 
+@test38a
 	Scenario: A student enrolls in a class then drops it with no DR
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
@@ -20,6 +21,7 @@ Feature: Students can drop classes before deadline without DR
 		When Student with email "gmail@gmail.com" successfully drops class for course with code "NAMO1001" for no DR
 		Then Student with email "gmail@gmail.com" is not enrolled in class for course with code "NAMO1001"
 
+@test38b
 	Scenario: A student enrolls in two classes then drops one class with no DR
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
@@ -46,6 +48,7 @@ Feature: Students can drop classes before deadline without DR
 		Then Student with email "gmail@gmail.com" is not enrolled in class for course with code "NAMO1001"
 		And Student with email "gmail@gmail.com" is enrolled in class for course with code "NAMO1002"
 
+@test38c
 	Scenario: A student enrolls in a class then drops it with no DR, then does it all again
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
@@ -74,6 +77,7 @@ Feature: Students can drop classes before deadline without DR
 		And Student with email "gmail@gmail.com" successfully drops class for course with code "NAMO1001" for no DR
 		Then Student with email "gmail@gmail.com" is not enrolled in class for course with code "NAMO1001"
 
+@test38X
 	Scenario: A student enrolls in a class then tries to drop it with no DR, but fails
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 1, day 1
@@ -102,7 +106,7 @@ Feature: Students can drop classes before deadline without DR
 		Then Student with email "gmail@gmail.com" is enrolled in class for course with code "NAMO1001"
 		And Student with email "gmail@gmail.com" does not have a grade of "WDN" in class for course with code "NAMO1001"
 
-
+@test39
 	Scenario: A student enrolls in a class then tries to drop it with no DR, but the class does not exist
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 1, day 1
@@ -127,6 +131,7 @@ Feature: Students can drop classes before deadline without DR
 		And There are no existing Classes in the database
 		Then Student with email "gmail@gmail.com" fails to drop class for course with code "NAMO1001" for no DR
 
+@test40
 	Scenario: A student enrolls in a class then tries to drop it with no DR, but the student is already not registered in that class anymore
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12

@@ -1,5 +1,6 @@
 Feature: A administrator User can set the Academic Deadline.
 
+@test18
 	Scenario Outline: An administrator User successfully updates the Academic Deadline.
 		Given There is an Academic Deadline set in the database
 		When The administrator wants to update the Academic Deadline to year <year>, month <month>, day <day>
@@ -10,6 +11,7 @@ Feature: A administrator User can set the Academic Deadline.
 		| 2020	| 1		| 25	|
 		| 2020	| 7		| 1		|
 
+@test18X
 	Scenario Outline: An administrator User tries to update the Academic Deadline, but enters invalid inputs.
 		Given There is an Academic Deadline set in the database
 		When The administrator wants to update the Academic Deadline to year <year>, month <month>, day <day>

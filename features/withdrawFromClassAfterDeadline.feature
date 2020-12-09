@@ -1,5 +1,6 @@
 Feature: Students can withdraw from classes after deadline with DR
 
+@test41
 	Scenario: A student enrolls in a class then withdraws from it after the deadline with DR, their grade is then set to WDN
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 1, day 1
@@ -28,6 +29,7 @@ Feature: Students can withdraw from classes after deadline with DR
 		Then Student with email "gmail@gmail.com" is enrolled in class for course with code "NAMO1001"
 		And Student with email "gmail@gmail.com" has a grade of "WDN" in class for course with code "NAMO1001"
 
+@test41X
 	Scenario: A student enrolls in a class then fails to withdraw from it after the deadline with DR, their grade is unaffected
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 1, day 1

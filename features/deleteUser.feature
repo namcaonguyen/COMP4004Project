@@ -1,5 +1,6 @@
 Feature: An administrator User can delete Users.
 
+@test28
 	Scenario: An administrator User can delete student Users. It should delete all data related to the student.
 		Given There are no existing Users in the database
 		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
@@ -12,12 +13,14 @@ Feature: An administrator User can delete Users.
 		When Admin tries to delete the student with email "gmail@gmail.com"
 		Then All information pertaining to the deleted student was removed from the database
 
+@test29a
 	Scenario: An administrator User deletes a professor who is not assigned to any classes.
 		Given There are no existing Users in the database
 		And There exists a "professor" "TJ Mendicino" with email "tj@cms.com" and password "password" and courses taken ""
 		When Admin tries to delete the professor with email "tj@cms.com"
 		Then The professor does not exist in the database
 
+@test29b
 	Scenario: An administrator User deletes a professor who is assigned to a class.
 		Given There are no existing Users in the database
 		And There exists a "professor" "TJ Mendicino" with email "tj@cms.com" and password "password" and courses taken ""
@@ -26,6 +29,7 @@ Feature: An administrator User can delete Users.
 		When Admin tries to delete the professor with email "tj@cms.com"
 		Then The professor does not exist in the database along with all of the classes they teach and the related class enrollments
 
+@test28X1
 	Scenario: An administrator User deletes another an admin.
 		Given There are no existing Users in the database
 		And There exists a "administrator" "TJ Mendicino" with email "tj@cms.admin.com" and password "password" and courses taken ""
@@ -33,6 +37,7 @@ Feature: An administrator User can delete Users.
 		When Admin with email "idestroyadminaccounts@cms.com" tries to delete the administrator with email "tj@cms.admin.com"
 		Then The attempted deleted administrator does not exist in the database
 
+@test28X2
 	Scenario: An administrator User tries to delete themself but cannot.
 		Given There are no existing Users in the database
 		And There exists a "administrator" "the admin remover" with email "idestroyadminaccounts@cms.com" and password "password" and courses taken ""
