@@ -11,11 +11,6 @@ describe("Account Registration", function() {
 	const typedStudentEmail = "cypressstudent@namcao.com";
 	const typedProfessorEmail = "cypressprofessor@namcao.com";
 
-	beforeEach(function() {
-		// Visit the Login page.
-		cy.log("test?");
-	})
-
 	// Test that the Account Registration URL is correct.
 	it("Account Registration URL is correct", function() {
 		// Visit the Account Registration page by URL.

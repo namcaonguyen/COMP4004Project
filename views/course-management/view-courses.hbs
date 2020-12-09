@@ -19,7 +19,7 @@
                         </ol>
                     </nav>
                     <hr class="my-4">
-                    <a href="/create-course" class="list-group-item list-group-item-action">Create New Course</a>
+                    <a href="/create-course" class="list-group-item list-group-item-action" name="createNewCourse">Create New Course</a>
                     <hr class="my-4">
                     <div class="md-form mt-0">
                         <input class="form-control" type="text" placeholder="Search" aria-label="Search">
@@ -28,18 +28,18 @@
                     {{#each courses}}
                       <div class="card">
                         <div class="card-body">
-                          <h5 class="card-title">{{this.courseCode}}</h5>
-                          <h6 class="card-subtitle mb-2 text-muted">{{this.title}}</h6>
-                          <h7 class="card-subtitle mb-2 text-muted">Prerequisites: {{this.prereqs}}</h7>
+                          <h5 class="card-title" id='{{this.courseCode}}Label'>{{this.courseCode}}</h5>
+                          <h6 class="card-subtitle mb-2 text-muted" id='{{this.courseCode}}Title'>{{this.title}}</h6>
+                          <h7 class="card-subtitle mb-2 text-muted" id='{{this.courseCode}}Prereqs'>Prerequisites: {{this.prereqs}}</h7>
                           <br>
-                          <h7 class="card-subtitle mb-2 text-muted">Precludes: {{this.precludes}}</h7>
+                          <h7 class="card-subtitle mb-2 text-muted" id='{{this.courseCode}}Precludes'>Precludes: {{this.precludes}}</h7>
                           <br>
                           <form method="GET" action="edit-course">
                             <input type="hidden" value="{{this._id}}" name="courseID">
-                            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Edit Course</button>
+                            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" name="{{this.courseCode}}EditButton">Edit Course</button>
                           </form>
                           <form method="POST" action="delete-course">
-                            <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete"
+                            <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" id="{{this.courseCode}}DeleteButton"
                               type="submit" value="{{this._id}}" onclick="onSubmit('{{this.courseCode}}')">Delete</button>
                           </form>
                       </div>

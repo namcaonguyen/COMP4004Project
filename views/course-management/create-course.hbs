@@ -14,16 +14,16 @@
                     </nav>
                     <hr class="my-4">
                     {{#if error}}
-                    <div class="alert alert-danger">Error: {{error}}</div>
+                    <div class="alert alert-danger" id="courseCreation-error-div">Error: {{error}}</div>
                     <hr class="my-4">
                     {{/if}}
                     <form method="POST">
                         <div class="form-label-group">
                             <label for="courseCode">Course Code:</label>
-                            <input id="courseCode" name="courseCode" class="form-control {{response}}" placeholder="COMP4004" required autofocus>
+                            <input id="courseCode" name="courseCode" class="form-control {{response}}" placeholder="Example: COMP4004" required autofocus>
                             <br>
                             <label for="title">Title:</label>
-                            <input id="title" name="title" class="form-control {{response}}" placeholder="Software Quality Assurance" required autofocus>
+                            <input id="title" name="title" class="form-control {{response}}" placeholder="Example: Software Quality Assurance" required autofocus>
                             <br>
                             <label for="prereqs">Prerequisites for the class:</label>
                             <select class="browser-default custom-select" name="prereqs" id="prereqs" multiple>
@@ -42,7 +42,7 @@
                               {{/each}}
                             </select>
                             <hr class="my-4">
-                            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Create Course</button>
+                            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" name="createCourse">Create Course</button>
                         </div>
                     </form>
                 </div>

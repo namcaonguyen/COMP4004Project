@@ -1,5 +1,5 @@
 // Cypress Test for Login input
-describe('CMS Cypress Example', function() {
+describe('Login Screen', function() {
 	// Before each test...
 	beforeEach(function() {
 		// Visit the Login page.
