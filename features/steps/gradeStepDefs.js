@@ -45,17 +45,19 @@ When("A student with email {string} submits a text file named {string} for deliv
     assert(true, await tryUpdateSubmissionDeliverable(class_._id, student._id, deliverable.title, fileName));
 });
 
-Then("A professor grades a submission for deliverable {string} as {float} and is successful", async function(title, grade) {
+Then("A professor with email {string} grades a submission for deliverable {string} as {float} and is successful", async function(profEmail, title, grade) {
+    const prof = await User.findOne({email: profEmail});
     const deliverable = await Deliverable.findOne({title});
     const submission = await deliverableSubmission.findOne({deliverable_id: deliverable._id});
-    const { success, error } = await trySetSubmissionGrade(submission._id, grade);
+    const { success, error } = await trySetSubmissionGrade(prof._id, submission._id, grade);
     assert(success && !error);
 });
 
-Then("A professor grades a submission for deliverable {string} as {float} and fails", async function(title, grade) {
+Then("A professor with email {string} grades a submission for deliverable {string} as {float} and fails", async function(profEmail, title, grade) {
+    const prof = await User.findOne({email: profEmail});
     const deliverable = await Deliverable.findOne({title});
     const submission = await deliverableSubmission.findOne({deliverable_id: deliverable._id});
-    const { success, error } = await trySetSubmissionGrade(submission._id, grade);
+    const { success, error } = await trySetSubmissionGrade(prof._id, submission._id, grade);
     assert(!success && error);
 });
 

@@ -21,9 +21,9 @@ Feature: Professors can Calculate and/or Submit Final Grades
         And A student with email "gmail@gmail.com" submits a text file named "My Submission 2" for deliverable <d2>
         And A student with email "gmail@gmail.com" submits a text file named "My Submission 3" for deliverable <d3>
 
-        And A professor grades a submission for deliverable <d1> as <g1> and is successful
-        And A professor grades a submission for deliverable <d2> as <g2> and is successful
-        And A professor grades a submission for deliverable <d3> as <g3> and is successful
+        And A professor with email "namo@namo.com" grades a submission for deliverable <d1> as <g1> and is successful
+        And A professor with email "namo@namo.com" grades a submission for deliverable <d2> as <g2> and is successful
+        And A professor with email "namo@namo.com" grades a submission for deliverable <d3> as <g3> and is successful
 
 		Then A professor with email "namo@namo.com" calculates the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being <calculated>
 
@@ -52,8 +52,8 @@ Feature: Professors can Calculate and/or Submit Final Grades
         And A student with email "gmail@gmail.com" submits a text file named "My Submission 1" for deliverable "A1"
         And A student with email "gmail@gmail.com" submits a text file named "My Submission 2" for deliverable "A2"
 
-        And A professor grades a submission for deliverable "A1" as 30 and is successful
-        And A professor grades a submission for deliverable "A2" as 40 and is successful
+        And A professor with email "namo@namo.com" grades a submission for deliverable "A1" as 30 and is successful
+        And A professor with email "namo@namo.com" grades a submission for deliverable "A2" as 40 and is successful
 
 		Then A professor with email "namo@namo.com" submits the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 50 and is successful
 	
@@ -77,8 +77,8 @@ Feature: Professors can Calculate and/or Submit Final Grades
         And A student with email "gmail@gmail.com" submits a text file named "My Submission 1" for deliverable "A1"
         And A student with email "gmail@gmail.com" submits a text file named "My Submission 2" for deliverable "A2"
 
-        And A professor grades a submission for deliverable "A1" as 30 and is successful
-        And A professor grades a submission for deliverable "A2" as 40 and is successful
+        And A professor with email "namo@namo.com" grades a submission for deliverable "A1" as 30 and is successful
+        And A professor with email "namo@namo.com" grades a submission for deliverable "A2" as 40 and is successful
 
 		Then A professor with email "namo@namo.com" calculates the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 35
 		And A professor with email "namo@namo.com" submits the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 500 and fails
@@ -99,7 +99,7 @@ Feature: Professors can Calculate and/or Submit Final Grades
         
         When A professor with email "namo@namo.com" creates a deliverable for their class with course code "NAMO1001", titled "A1" with weight 100
         And A student with email "gmail@gmail.com" submits a text file named "My Submission 1" for deliverable "A1"
-        And A professor grades a submission for deliverable "A1" as 70 and is successful
+        And A professor with email "namo@namo.com" grades a submission for deliverable "A1" as 70 and is successful
 		
 		And The administrator wants to update the Academic Deadline to year 2020, month 1, day 1
 		And The Academic Deadline is successfully updated to year 2020, month 1, day 1

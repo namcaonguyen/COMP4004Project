@@ -6,7 +6,7 @@ const ClassEnrollment = require("../db/classEnrollment.js");
 const AcademicDeadline = require("../db/academicDeadline.js");
 const DeliverableSubmission = require("../db/deliverableSubmission.js");
 const { addToList, removeFromList } = require("./courseManagement.js");
-const { getOriginalFileName, isStudentEnrolledInClass } = require("./classManagement.js");
+const { getOriginalFileName, isStudentEnrolledInClass, isProfessorAssignedToClass } = require("./classManagement.js");
 
 /**
  * @description	Function to get a Class List of the available Classes. It includes data that is used to display information to the user.
@@ -457,7 +457,18 @@ module.exports.getDeliverablesOfClass = getDeliverablesOfClass;
  * @param {string} submission_id - The id of the submission.
  * @param {number=-1} grade - The new grade from 0-100.
  */
-module.exports.trySetSubmissionGrade = async function (submission_id, grade=-1) {
+module.exports.trySetSubmissionGrade = async function (prof_id, submission_id, grade=-1) {
+	const foundSubmission = await DeliverableSubmission.findById(submission_id);
+	if(!foundSubmission) return { success: false, error: "Submission doesn't exist" };
+
+	const foundDeliverable = await Deliverable.findById(foundSubmission.deliverable_id);
+	if(!foundDeliverable) return { success: false, error: "Deliverable doesn't exist" };
+
+	const foundClass = await Class.findById(foundDeliverable.class_id);
+	if(!foundClass) return { success: false, error: "Class doesn't exist" };
+
+	if(!await isProfessorAssignedToClass(prof_id, foundClass._id)) return { success: false, error: "Prof not assigned to class" };
+	
     if(typeof grade == "number" && !isNaN(grade)) {
         if((grade >= 0 && grade <= 100) || grade == -1) {
             await DeliverableSubmission.updateMany({ _id: submission_id }, { $set: { grade }});
