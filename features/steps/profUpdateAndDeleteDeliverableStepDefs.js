@@ -8,7 +8,7 @@ const Deliverable = require("../../db/deliverable.js");
 const DeliverableSubmission = require("../../db/deliverableSubmission.js");
 const { tryCreateClass, tryCreateDeliverable, tryUpdateDeliverable, tryToDeleteDeliverable } = require("../../js/classManagement.js");
 const { tryCreateCourse } = require("../../js/courseManagement.js");
-const { deleteClass } = require("../../js/classManagement.js");
+const { deleteClass, tryToUpdateClassInformation } = require("../../js/classManagement.js");
 
 async function WipeDB() {
     await Class.deleteMany({}); // delete all classes
@@ -40,7 +40,7 @@ When("The professor updates the deliverable {string} to {string}", async functio
 });
 
 When("The professor deletes that deliverable", async function() {
-    assert.strictEqual(true, (await tryToDeleteDeliverable(this.deliverable.id)));
+    assert.strictEqual(true, (await tryToDeleteDeliverable(this.professor._id, this.deliverable.id)));
 });
 
 Then("The deliverable should not exist anymore in the database", async function() {
@@ -56,12 +56,12 @@ Then("The deliverable weight should still be {int}", async function (value) {
 });
 
 Given("The professor tries to delete that deliverable again", async function () {
-    var success = await tryToDeleteDeliverable(this.deliverable.id);
+    var success = await tryToDeleteDeliverable(this.professor._id, this.deliverable.id);
     this.success = success;
 });
 
 Given("The professor tries to delete that deliverable", async function () {
-    var success = await tryToDeleteDeliverable(this.deliverable.id);
+    var success = await tryToDeleteDeliverable(this.professor._id, this.deliverable.id);
     this.success = success;
 });
 
@@ -73,3 +73,10 @@ When("An administrator deletes the class", async function () {
     await deleteClass(this.class.id);
     assert.strictEqual(0, (await Class.find({ _id: this.class.id })).length);
 });
+
+When("An admin reassigns the Class to professor with email {string}", async function(emailParam) {
+    // Try to find the professor with the email in the database.
+    const findProf = await User.find( { email: emailParam } );
+    // Try to update the Class information.
+    var result = await tryToUpdateClassInformation(this.class.id, findProf[0]._id, 10);
+})

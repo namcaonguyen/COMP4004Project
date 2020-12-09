@@ -261,7 +261,12 @@ router.post("/:id/:deliverable", upload.any("deliverable_file"), async (req, res
         }
     } else {
         if ("delete" in req.body) {
-            var result = await tryToDeleteDeliverable(deliverable._id);
+            // Get the current professor User's Object ID.
+            var currentProfessor = await User.find( { email: req.cookies.email, password: req.cookies.password, accountType: 'professor' } );
+            const professorUserObjectID = currentProfessor[0]._id;
+
+            // Try to delete the Deliverable.
+            var result = await tryToDeleteDeliverable(professorUserObjectID, deliverable._id);
             if (!result) {
                 data.error = "Failed to delete deliverable.";
                 res.render("professor-class-management/view-deliverable", data);
