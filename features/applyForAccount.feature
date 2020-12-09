@@ -1,5 +1,6 @@
 Feature: Apply for Account Feature
 
+@test71
 	Scenario Outline: A User applies for an account and enters their information correctly.
 		Given There are no existing Users
 		When A <accountType> user tries to apply with name "Joe" "Johnson"
@@ -13,6 +14,7 @@ Feature: Apply for Account Feature
 		| "professor"		|
 		| "administrator"	|
 
+@test71X
 	Scenario Outline: A User applies for an account and enters their information incorrectly.
 		Given There are no existing Users
 		When A "student" user tries to apply with name <firstName> <lastName>
@@ -35,6 +37,7 @@ Feature: Apply for Account Feature
 		# Test for multiple errors.
 		| ""		| ""		| "hello"			| "asdf"		| "fdsa"			| 5			|
 
+@test72
 	Scenario: A User applies for an account and enters an email that is already registered.
 		Given There are no existing Users
 		And A <accountType> user exists with name "First Guy" email <email> and password "secretkey"

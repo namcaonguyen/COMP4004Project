@@ -1,5 +1,6 @@
 Feature: Professors can Calculate and/or Submit Final Grades
 
+@test62a
 	Scenario Outline: A professor calculates a final grade for a student in their class
         Given The database is clear
 		And There is an Academic Deadline set in the database
@@ -32,7 +33,7 @@ Feature: Professors can Calculate and/or Submit Final Grades
 		| "A1" | 25 | 40 | "A2" | 25 | 60 | "A3" | 50 | 70 |         60 |
 		| "A1" |  1 | 90 | "A2" |  2 | 60 | "A3" |  3 | 30 |         50 |
 	
-
+@test62b
 	Scenario: A professor overrides the final grade for a student in their class
         Given The database is clear
 		And There is an Academic Deadline set in the database
@@ -57,7 +58,7 @@ Feature: Professors can Calculate and/or Submit Final Grades
 
 		Then A professor with email "namo@namo.com" submits the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 50 and is successful
 	
-
+@test62X1
 	Scenario: A professor overrides the final grade for a student in their class with an invalid number and fails
         Given The database is clear
 		And There is an Academic Deadline set in the database
@@ -83,7 +84,7 @@ Feature: Professors can Calculate and/or Submit Final Grades
 		Then A professor with email "namo@namo.com" calculates the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 35
 		And A professor with email "namo@namo.com" submits the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 500 and fails
 	
-	
+@test62X2
 	Scenario: A professor tries to submit the final grade for a student who has withdrawn from their class and fails
         Given The database is clear
 		And There is an Academic Deadline set in the database
@@ -110,7 +111,7 @@ Feature: Professors can Calculate and/or Submit Final Grades
 		Then A professor with email "namo@namo.com" submits the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 70 and fails
 		And Student with email "gmail@gmail.com" has a grade of "WDN" in class for course with code "NAMO1001"
 	
-	
+@test64
 	Scenario: A professor tries to submit the final grade in a class they are no longer assigned to
         Given The database is clear
 		And There is an Academic Deadline set in the database
@@ -130,7 +131,7 @@ Feature: Professors can Calculate and/or Submit Final Grades
 		And A professor with email "namo@namo.com" submits the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 99 and fails
 		Then Student with email "gmail@gmail.com" has a grade of "50" in class for course with code "NAMO1001"
 	
-	
+@test63
 	Scenario: A professor tries to submit the final grade in a class that no longer exists
         Given The database is clear
 		And There is an Academic Deadline set in the database

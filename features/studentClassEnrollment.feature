@@ -1,5 +1,6 @@
 Feature: A student User can enroll in a Class.
 
+@test33X1
 	Scenario: A student User wants to see the Classes to enroll, but there are no available Classes.
 		Given There are no existing Users in the database
 		And There are no existing Classes in the database
@@ -7,6 +8,7 @@ Feature: A student User can enroll in a Class.
 		When Student User tries to view list of available Classes
 		Then There are no available Classes
 
+@test33
 	Scenario Outline: A student User successfully enrolls in a Class.
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
@@ -53,6 +55,7 @@ Feature: A student User can enroll in a Class.
 		| "EXCL1001,GUCI1001,PREC1001"	| "COMP4004,GUCI1001,COMP4006,GUCI1002"	| 200			|
 		| "TEST1001,GUCI1001,PREC1001"	| "COMP4004,GUCI1001,COMP4006,GUCI1002"	| 200			|
 
+@test36
 	Scenario Outline: A student User tries to enroll in a Class that they don't have the prerequisites for. They are unsuccessful.
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
@@ -87,6 +90,7 @@ Feature: A student User can enroll in a Class.
 		| "EXCL1001,PREC1001"			| "COMP4004,GUCI1001,COMP4006,GUCI1002"	|
 		| "GUCI1001,PREC1001"			| "COMP4004,GUCI1001,COMP4006,GUCI1002"	|
 
+@test33X2
 	Scenario: A student User tries to enroll in a Class past the Academic Deadline.
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 2020, month 11, day 16
@@ -103,6 +107,7 @@ Feature: A student User can enroll in a Class.
 		And Student with email "gmail@gmail.com" wants to enroll in the Class
 		And Student does not enroll and an error is returned
 
+@test35
 	Scenario: A student User tries to enroll in a Class that they are already enrolled in.
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
@@ -121,6 +126,7 @@ Feature: A student User can enroll in a Class.
 		And Student with email "gmail@gmail.com" wants to enroll in the Class
 		And Student does not enroll and an error is returned
 
+@test37
 	Scenario: A student User tries to enroll in a Class that is already full.
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
@@ -140,6 +146,7 @@ Feature: A student User can enroll in a Class.
 		And Student with email "slow@guy.com" wants to enroll in the Class
 		And Student does not enroll and an error is returned
 
+@test34
 	Scenario: A student User tries to enroll in a Class. But an administrator User cancelled the Class before the student could enroll.
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
