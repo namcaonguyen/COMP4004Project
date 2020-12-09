@@ -1,5 +1,6 @@
 Feature: This feature file is to test out the Use Case Dependencies.
 
+@test84
 	Scenario: This long scenario covers Use Case Dependencies for the marking grid.
 		Given The database is clear
 		And There is an Academic Deadline set in the database
