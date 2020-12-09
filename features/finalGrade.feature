@@ -33,7 +33,7 @@ Feature: Professors can Calculate and/or Submit Final Grades
 		| "A1" |  1 | 90 | "A2" |  2 | 60 | "A3" |  3 | 30 |         50 |
 	
 
-	Scenario: A professor overrides the final grade for a student in their class and succeeds
+	Scenario: A professor overrides the final grade for a student in their class with an invalid number and fails
         Given The database is clear
 		And There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
@@ -83,7 +83,7 @@ Feature: Professors can Calculate and/or Submit Final Grades
 		And A professor with email "namo@namo.com" submits the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 500 and fails
 
 
-	Scenario: A professor overrides the final grade for a student in their class with an invalid number and is successful
+	Scenario: A professor overrides the final grade for a student in their class and succeeds
         Given The database is clear
 		And There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
@@ -133,3 +133,42 @@ Feature: Professors can Calculate and/or Submit Final Grades
 		And Student with email "gmail@gmail.com" has a grade of "WDN" in class for course with code "NAMO1001"
 
 		Then A professor with email "namo@namo.com" submits the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 70 and fails
+	
+	
+	Scenario: A professor tries to submit the final grade in a class they are no longer assigned to
+        Given The database is clear
+		And There is an Academic Deadline set in the database
+		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
+
+		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
+		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
+		And There exists a "professor" "Jean-Pierre Corriveau" with email "jeanpierre.corriveau@carleton.ca" and password "password" and courses taken ""
+
+		And There exists a Course "NAMO1001" with title "How to be Rad"
+		And There exists a Class for "NAMO1001" taught by professor with email "namo@namo.com" with capacity 300
+		And Student with email "gmail@gmail.com" wants to enroll in the Class
+		And Student is successfully enrolled
+
+		When A professor with email "namo@namo.com" submits the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 50 and is successful
+		And The info for a class updates to have prof with email "jeanpierre.corriveau@carleton.ca" and capacity of 300
+		And A professor with email "namo@namo.com" submits the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 99 and fails
+		Then Student with email "gmail@gmail.com" has a grade of "50" in class for course with code "NAMO1001"
+	
+	
+	Scenario: A professor tries to submit the final grade in a class that no longer exists
+        Given The database is clear
+		And There is an Academic Deadline set in the database
+		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
+
+		And There exists a "student" "Joe Johnson" with email "gmail@gmail.com" and password "password" and courses taken ""
+		And There exists a "professor" "NamCao Nguyen" with email "namo@namo.com" and password "password" and courses taken ""
+		And There exists a "professor" "Jean-Pierre Corriveau" with email "jeanpierre.corriveau@carleton.ca" and password "password" and courses taken ""
+
+		And There exists a Course "NAMO1001" with title "How to be Rad"
+		And There exists a Class for "NAMO1001" taught by professor with email "namo@namo.com" with capacity 300
+		And Student with email "gmail@gmail.com" wants to enroll in the Class
+		And Student is successfully enrolled
+
+		When A professor with email "namo@namo.com" submits the final grade for a student with email "gmail@gmail.com" in their class with course code "NAMO1001" as being 50 and is successful
+		And A professor with email "namo@namo.com" deletes a class and tries submits the final grade for a student with email "gmail@gmail.com" as being 99 and fails
+		Then Student with email "gmail@gmail.com" has a grade of "50" in class for course with code "NAMO1001"
