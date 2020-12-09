@@ -26,7 +26,7 @@ describe("Account Registration", function() {
 		// Visit the Login page.
 		cy.visit('http://127.0.0.1:3000/');
 
-		// Click the 'REGISTER' link to reach the Login page.
+		// Click the 'REGISTER' link to reach the Account Registration page.
 		cy.get("a[name='register']").click();
 
 		// Get the ID of the page's label to ensure we're on the correct page.

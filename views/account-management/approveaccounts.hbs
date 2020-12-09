@@ -29,7 +29,7 @@
                         <h6 class="card-subtitle mb-2 text-muted">{{this.email}}</h6>
                         <h6 class="card-subtitle mb-2 text-muted">{{this.accountType}}</h6>
                         <input id="userId" name="userId" type="hidden" value="{{this._id}}">
-                        <button class="btn btn-lg btn-primary btn-block text-uppercase" name="approve" type="submit" onclick="onSubmit('{{this.fullname}}', this)">Approve</button>
+                        <button class="btn btn-lg btn-primary btn-block text-uppercase" name="approve" type="submit" onclick="onSubmit('{{this.fullname}}', this)" id="{{this.email}}ApproveButton">Approve</button>
                         <button class="btn btn-lg btn-danger btn-block text-uppercase" name="decline" type="submit" onclick="onSubmit('{{this.fullname}}', this)">Decline</button>
                     </div>
                     </div>
