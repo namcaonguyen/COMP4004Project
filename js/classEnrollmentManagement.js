@@ -496,11 +496,19 @@ module.exports.calculateFinalGrade = async function (class_id, student_id) {
  * @param {string} student_id - The id of the student.
  * @param {number=-1} finalGrade - The new final grade
  */
-module.exports.trySubmitFinalGrade = async function (class_id, student_id, finalGrade) {
+module.exports.trySubmitFinalGrade = async function (class_id, student_id, finalGrade, professor_id) {
 	try {
 		finalGrade = parseFloat(finalGrade);
 	} catch(e) {
 		return { success: false, error: "Grade must be number" };
+	}
+
+	const class_ = await Class.findById(class_id);
+	if(!class_) return { success: false, error: `Class doesn't exist for id ${class_id}` };
+	else {
+		if(!class_.professor.equals(professor_id)) {
+			return { success: false, error: `Professor ${professor_id} doesn't teach the class with id ${class_id}` }
+		}
 	}
 
 	const enrollments = await ClassEnrollment.find({student: student_id, class: class_id});

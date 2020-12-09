@@ -6,7 +6,7 @@ const Course = require("../../db/course.js");
 const Deliverable = require("../../db/deliverable.js");
 const DeliverableSubmission = require("../../db/deliverableSubmission.js");
 const ClassEnrollment = require('../../db/classEnrollment.js');
-const { tryUpdateSubmissionDeliverable, tryCreateClass, tryCreateDeliverable } = require("../../js/classManagement.js");
+const { tryUpdateSubmissionDeliverable, tryCreateClass, tryCreateDeliverable, tryToUpdateClassInformation, deleteClass } = require("../../js/classManagement.js");
 const { tryCreateCourse } = require("../../js/courseManagement.js");
 const { tryEnrollStudentInClass, trySetSubmissionGrade, calculateFinalGrade, trySubmitFinalGrade } = require('../../js/classEnrollmentManagement.js');
 const fs = require("fs");
@@ -66,7 +66,7 @@ Then("A professor with email {string} calculates the final grade for a student w
         const student = await User.findOne({email: studentEmail});
 
         const course = await Course.findOne({courseCode});
-        const class_ = await Class.findOne({course: course._id, professor: prof._id});
+        const class_ = await Class.findOne({course: course._id});
 
         const calculatedFinalGrade = await calculateFinalGrade(class_._id, student._id);
         assert.strictEqual(finalGrade, calculatedFinalGrade);
@@ -80,9 +80,9 @@ Then("A professor with email {string} submits the final grade for a student with
         const student = await User.findOne({email: studentEmail});
 
         const course = await Course.findOne({courseCode});
-        const class_ = await Class.findOne({course: course._id, professor: prof._id});
+        const class_ = await Class.findOne({course: course._id});
 
-        const {success, error} = await trySubmitFinalGrade(class_._id, student._id, finalGrade);
+        const {success, error} = await trySubmitFinalGrade(class_._id, student._id, finalGrade, prof._id);
         assert(success && !error);
     }
 );
@@ -94,9 +94,35 @@ Then("A professor with email {string} submits the final grade for a student with
         const student = await User.findOne({email: studentEmail});
 
         const course = await Course.findOne({courseCode});
-        const class_ = await Class.findOne({course: course._id, professor: prof._id});
+        const class_ = await Class.findOne({course: course._id});
 
-        const {success, error} = await trySubmitFinalGrade(class_._id, student._id, finalGrade);
+        const {success, error} = await trySubmitFinalGrade(class_._id, student._id, finalGrade, prof._id);
+        assert(!success && error);
+    }
+);
+
+When("The info for a class updates to have prof with email {string} and capacity of {int}", async function(
+    profEmail, capacity
+    ) {
+        const prof = await User.findOne({email: profEmail});
+        const class_ = await Class.findOne({}); // there should only exist 1 at the moment
+
+        const {success, error} = await tryToUpdateClassInformation(class_.id, prof._id, capacity);
+        assert(success && !error);
+    }
+);
+
+When("A professor with email {string} deletes a class and tries submits the final grade for a student with email {string} as being {int} and fails", async function(
+    profEmail, studentEmail, finalGrade
+    ) {
+        const prof = await User.findOne({email: profEmail});
+        const student = await User.findOne({email: studentEmail});
+
+        const classID = await Class.findOne({})._id; // there should only exist 1 at the moment
+        await deleteClass(classID);
+        assert(!await Class.findById(classID));
+
+        const {success, error} = await trySubmitFinalGrade(classID, student._id, finalGrade, prof._id);
         assert(!success && error);
     }
 );

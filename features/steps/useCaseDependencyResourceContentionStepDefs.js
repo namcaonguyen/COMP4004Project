@@ -319,16 +319,16 @@ When("Professor {int} grades Deliverable {int} for Student {int} with a mark of 
     assert(!!result.success);
 });
 
-When("Professor calculates a final grade for Student {int} of Class {int}", async function(studentIndexParam, classIndexParam) {
-    // Calculate and a final grade for a student, based on their Deliverable grades.
-    const calculatedFinalGrade = await calculateFinalGrade(classIDArray[classIndexParam - 1], studentIDArray[studentIndexParam - 1]);
+// When("Professor calculates a final grade for Student {int} of Class {int}", async function(studentIndexParam, classIndexParam) {
+//     // Calculate and a final grade for a student, based on their Deliverable grades.
+//     const calculatedFinalGrade = await calculateFinalGrade(classIDArray[classIndexParam - 1], studentIDArray[studentIndexParam - 1]);
 
-    // Try to submit the student's final grade.
-    var result = await trySubmitFinalGrade(classIDArray[classIndexParam - 1], studentIDArray[studentIndexParam - 1], calculatedFinalGrade);
+//     // Try to submit the student's final grade.
+//     var result = await trySubmitFinalGrade(classIDArray[classIndexParam - 1], studentIDArray[studentIndexParam - 1], calculatedFinalGrade);
 
-    // Assert that the student's final grade was submitted.
-    assert(!!result.success);
-});
+//     // Assert that the student's final grade was submitted.
+//     assert(!!result.success);
+// });
 
 Then("Professor {int} and {int} calculate a final grade for student {int} of Class {int} and student {int} of Class {int}", async function(professorIndex1Param, professorIndex2Param, studentIndex1Param, classIndex1Param, studentIndex2Param, classIndex2Param) {
     // Calculate and a final grade for both students, based on their Deliverable grades.
@@ -337,11 +337,11 @@ Then("Professor {int} and {int} calculate a final grade for student {int} of Cla
 
     // Try to submit the students' final grade.
     // NOTE: In order to mimic two professors simultaneously submitting the final grades, we do NOT use the 'await' keyword here!!!
-    var result1 = trySubmitFinalGrade(classIDArray[classIndex1Param - 1], studentIDArray[studentIndex1Param - 1], calculatedFinalGrade1);
-    var result2 = trySubmitFinalGrade(classIDArray[classIndex2Param - 1], studentIDArray[studentIndex2Param - 1], calculatedFinalGrade2);
+    var result1 = trySubmitFinalGrade(classIDArray[classIndex1Param - 1], studentIDArray[studentIndex1Param - 1], calculatedFinalGrade1, professorIDArray[professorIndex1Param - 1]);
+    var result2 = trySubmitFinalGrade(classIDArray[classIndex2Param - 1], studentIDArray[studentIndex2Param - 1], calculatedFinalGrade2, professorIDArray[professorIndex2Param - 1]);
 
     // Wait for the final grades to submit.
-    await new Promise(r => setTimeout(r, 100));
+    await Promise.all([result1, result2]);
 });
 
 Then("Student {int} sees their grade of {float} for Class {int}", async function(studentIndexParam, gradeParam, classIndexParam) {

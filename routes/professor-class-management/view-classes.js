@@ -167,10 +167,12 @@ router.post("/:id/submitFinalGrade", async(req, res) => {
 
     const classID = req.params.id;
     let { finalGrade, student_id } = req.body;
-    const {success, error} = await trySubmitFinalGrade(classID, student_id, finalGrade);
-    if(!success) console.warn(error);
-
-    res.redirect(`/classes/${classID}?selectedStudent=${student_id}`);
+    const {success, error} = await trySubmitFinalGrade(classID, student_id, finalGrade, res.locals.user._id);
+    if(!success) {
+        res.send("Error: " + error);
+    } else {
+        res.redirect(`/classes/${classID}?selectedStudent=${student_id}`);
+    }
 });
 
 // get create deliverable
