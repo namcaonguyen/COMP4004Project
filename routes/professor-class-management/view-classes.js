@@ -154,9 +154,12 @@ router.post("/:id/updateGrade", async(req, res) => {
     const submission = foundSubmissions[0];
     const { student_id } = submission;
 
-    await trySetSubmissionGrade(submission_id, grade);
-
-    res.redirect(`/classes/${req.params.id}?selectedStudent=${student_id}`);
+    const {success, error} = await trySetSubmissionGrade(res.locals.user._id, submission_id, grade);
+    if(!success) {
+        res.send("Error: " + error);
+    } else {
+        res.redirect(`/classes/${req.params.id}?selectedStudent=${student_id}`);
+    }
 });
 
 router.post("/:id/submitFinalGrade", async(req, res) => {

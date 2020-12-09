@@ -148,6 +148,7 @@ async function isProfessorAssignedToClass( professorIDParam, classIDParam ) {
     // Try to find the Class in the database which is assigned to the professor.
     return ((await Class.find({ _id: classIDParam, professor: professorIDParam })).length !== 0 );
 }
+module.exports.isProfessorAssignedToClass = isProfessorAssignedToClass;
 
 /**
  * @description This function to create a deliverable. Returns success or an error array.

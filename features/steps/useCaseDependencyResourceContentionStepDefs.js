@@ -313,7 +313,7 @@ When("Professor {int} grades Deliverable {int} for Student {int} with a mark of 
 
 
     // Try to grade the Deliverable Submission.
-    var result = await trySetSubmissionGrade(findDeliverableSubmission[0]._id, markParam);
+    var result = await trySetSubmissionGrade(professorIDArray[professorIndexParam - 1], findDeliverableSubmission[0]._id, markParam);
     
     // Assert that the Deliverable Submission was succesfully graded.
     assert(!!result.success);

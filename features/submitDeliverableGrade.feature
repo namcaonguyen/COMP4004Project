@@ -15,7 +15,7 @@ Feature: Professors can Grade Deliverable Submissions
         
         When A professor with email "namo@namo.com" creates a deliverable for their class with course code "NAMO1001", titled "A1" with weight 10
         And A student with email "gmail@gmail.com" submits a text file named "My Submission" for deliverable "A1"
-        Then A professor grades a submission for deliverable "A1" as 53 and is successful
+        Then A professor with email "namo@namo.com" grades a submission for deliverable "A1" as 53 and is successful
 
 	Scenario: A professor submits an invalid grade for a student's deliverable in a class and fails
         Given The database is clear
@@ -32,4 +32,4 @@ Feature: Professors can Grade Deliverable Submissions
         
         When A professor with email "namo@namo.com" creates a deliverable for their class with course code "NAMO1001", titled "A1" with weight 10
         And A student with email "gmail@gmail.com" submits a text file named "My Submission" for deliverable "A1"
-        Then A professor grades a submission for deliverable "A1" as 500 and fails
+        Then A professor with email "namo@namo.com" grades a submission for deliverable "A1" as 500 and fails
