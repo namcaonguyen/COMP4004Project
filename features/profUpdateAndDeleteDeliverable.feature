@@ -33,3 +33,10 @@ Feature: Professor Update and Delete Deliverable
 		When An administrator deletes the class
 		And The professor tries to delete that deliverable
 		Then The result is a unsuccessful delete attempt
+
+	Scenario: A professor tries to delete a Deliverable for a Class, but an admin reassigned the Class to a different professor.
+		Given A professor creates a deliverable with info "Assignment 1" "This is your first assignment" 20
+		And There exists a "professor" "NamCao Nguyen" with email "nogood@okay.com" and password "spaghetti" and courses taken ""
+		When An admin reassigns the Class to professor with email "nogood@okay.com"
+		And The professor tries to delete that deliverable
+		Then The result is a unsuccessful delete attempt

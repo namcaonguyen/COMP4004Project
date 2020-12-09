@@ -250,9 +250,10 @@ async function validateCreateDeliverableInputs(classIDParam, titleParam, descrip
 
 /**
  * @description This function tries to delete a deliverable and all related content for it in a specific class.
+ * @param {string} professorID - The ID of the professor User trying to delete a Deliverable
  * @param {string} deliverableId - The id of the deliverable.
  */
-module.exports.tryToDeleteDeliverable = async function (deliverableId) {
+module.exports.tryToDeleteDeliverable = async function (professorID, deliverableId) {
 
     // Find the deliverable to make sure it still exists
     var foundDeliverable = await Deliverable.find({ _id: deliverableId });
@@ -266,10 +267,16 @@ module.exports.tryToDeleteDeliverable = async function (deliverableId) {
         return false;
     }
 
+    // Check if the Class for the Deliverable still exists.
     var foundClass = await Class.find({ _id: foundDeliverable[0].class_id });
     if (!foundClass.length) {
         return false;
     }
+
+    // Check if the professor is assigned to the Class.
+    if ( await isProfessorAssignedToClass(professorID, foundClass[0]._id) == false ) {
+        return false;
+	}
 
     // update is_deleting flag so no one can interact with this deliverable while deletion is in process.
     await Deliverable.updateOne({ _id: deliverableId }, { $set: { is_deleting: true } });
