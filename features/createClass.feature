@@ -1,5 +1,6 @@
 Feature: Create a class for a course
         
+@createClass
 	Scenario Outline: An admin creates a class for a course
         Given There are no existing classes in the database
 		And there are no courses in the database
@@ -8,12 +9,12 @@ Feature: Create a class for a course
 		And There exists a "professor" "Jean-Pierre Corriveau" with email "jp@gmail.com" and password "password" and courses taken ""
 		When An admin tries to create a class for course code "COMP4004" with "Jean-Pierre Corriveau" and capacity <capacity>
 		Then There exists a class for the "COMP4004" with "Jean-Pierre Corriveau" and capacity <capacity>
-    
     Examples:
 		| capacity          | prereqs			  | precluded	|
 		| 150				| "COMP3004,COMP3005" | "COMP2222"	|
 		| 150				| ""				  | ""			|
 
+@tryCreateClassInvalidInput
 	Scenario Outline: An admin tries to create a class for a course with invalid input
         Given There are no existing classes in the database
 		And there are no courses in the database
@@ -22,11 +23,11 @@ Feature: Create a class for a course
 		And There exists a "professor" "Jean-Pierre Corriveau" with email "jp@gmail.com" and password "password" and courses taken ""
 		When An admin tries to create a class for course code "COMP4004" with "Jean-Pierre Corriveau" and capacity <capacity>
 		Then class is not found in the database
-
 	Examples:
 		| capacity		        | prereqs			  | precluded	|
 		| -5					| "COMP3004,COMP3005" | "COMP2222"	|
 
+@tryCreateClassInvalidCourse
 	Scenario: An admin tries to create a class for a course but the course was deleted before the class was created
 		Given There are no existing classes in the database
 		And there are no courses in the database
@@ -37,6 +38,7 @@ Feature: Create a class for a course
 		When An admin tries to create a class for course code "COMP4004" with "Jean-Pierre Corriveau" and capacity 99
 		Then class is not found in the database
 
+@tryCreateClassInvalidProfessor
 	Scenario: An admin tries to create a class for a course but the prof selected was deleted before the class was created
 		Given There are no existing classes in the database
 		And there are no courses in the database

@@ -6,7 +6,6 @@ Feature: Create Course
 		When An admin tries to create a course with code <courseCode> and title <courseTitle> and prereqs <prereqs> and precludes <precludes>
         Then A new course is successfully created
 		And There exists a course with code <courseCode> and title <courseTitle> and prereqs <prereqs> and precludes <precludes>
-    
     Examples:
 		| courseCode | courseTitle                      | prereqs				| precludes				|
 		| "COMP4004" | "Software Quality Assurance"     | "TEST1001,TEST1002"	| "TEST1003"			|
@@ -19,7 +18,6 @@ Feature: Create Course
 		When An admin tries to create a course with code <courseCode> and title <courseTitle> and prereqs <prereqs> and precludes <precludes>
         Then No new course is created and an error is returned
 		And There does not exist a course with code <courseCode> and title <courseTitle>
-    
     Examples:
 		| courseCode | courseTitle                      | prereqs		| precludes		|
 		| "COMP4004" | ""                               | "TEST1001"	| "TEST1002"	|
@@ -36,7 +34,6 @@ Feature: Create Course
 		And An admin tries to create a course with code <courseCode> and title <courseTitle2> and prereqs "" and precludes ""
         Then No new course is created and an error is returned
 		And There exists a course with code <courseCode> and title <courseTitle> and prereqs "" and precludes ""
-    
     Examples:
 		| courseCode | courseTitle                      | courseTitle2                     |
 		| "COMP4004" | "Software Quality Assurance"     | "Software Quality Assurance"     |

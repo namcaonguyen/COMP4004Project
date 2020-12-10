@@ -8,7 +8,6 @@ Feature: Create Course
 		And There exists a course with code <courseCode> and title <courseTitle> and prereqs "" and precludes ""
 		When An admin deletes a course with code <courseCode>
 		Then There does not exist a course with code <courseCode> and title <courseTitle>
-    
     Examples:
 		| courseCode | courseTitle                      |
 		| "COMP4004" | "Software Quality Assurance"     |
