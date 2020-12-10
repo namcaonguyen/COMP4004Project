@@ -1,5 +1,6 @@
 Feature: An administrator User can edit the information of a Class.
 
+@editClass
 	Scenario Outline: An administrator User tries editing the professor and total capacity of a particular Class. The Class information should be updated.
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
@@ -17,6 +18,7 @@ Feature: An administrator User can edit the information of a Class.
 		| 1				|
 		| 300			|
 
+@tryEditClassInvalidProfessor
 	Scenario: An administrator User tries editing the professor of a particular Class, but the professor was deleted. The Class information will not be updated.
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
@@ -32,6 +34,7 @@ Feature: An administrator User can edit the information of a Class.
 		When An administrator tries to switch professors and change the capacity of the Class to 45
 		Then The Class information is not updated
 
+@tryEditClassInvalidInput
 	Scenario Outline: An administrator User tries editing the total capacity of a particular Class, but enters an invalid value. The Class information will not be updated.
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
@@ -49,6 +52,7 @@ Feature: An administrator User can edit the information of a Class.
 		| 0				|
 		| -1			|
 
+@tryEditClassCapacityTooLow
 	Scenario: An administrator User tries editing the total capacity of a particular Class to be lower than the current number of enrolled students. The Class information will not be updated.
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
