@@ -4,7 +4,7 @@
             <div class="card card-signin my-5">
                 <div class="card-body">
                     <h3 class="card-title text-center">Course Management System</h3>
-                    <h5 class="card-title text-center">{{title}}</h5>
+                    <h5 class="card-title text-center" id="createClassPage">{{title}}</h5>
                     <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -14,7 +14,7 @@
                     </nav>
                     <hr class="my-4">
                     {{#if error}}
-                    <div class="alert alert-danger">{{error}}</div>
+                    <div class="alert alert-danger" id="classCreation-error-div">{{error}}</div>
                     <hr class="my-4">
                     {{/if}}
                     
@@ -44,7 +44,7 @@
 
                     <br>
                     <hr class="my-4">
-                    <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Submit</button>
+                    <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" name="createClass">Create Class</button>
                 </form>
                 </div>
             </div>

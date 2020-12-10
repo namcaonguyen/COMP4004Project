@@ -1,13 +1,13 @@
 {{#each classes}}
 <div class="card" style="width: 30rem;">
     <div class="card-body">
-        <h5 class="card-title">{{this.courseCode}}</h5>
-        <h5 class="card-title">{{this.title}}</h5>
+        <h5 class="card-title" id='{{this.courseCode}}Label'>{{this.courseCode}}</h5>
+        <h5 class="card-title" id='{{this.courseCode}}Title'>{{this.title}}</h5>
         <h6 class="card-subtitle mb-2 text-muted">Taught by: {{this.professor}}</h6>
         <h6 class="card-subtitle mb-2 text-muted">Total Capacity: {{this.totalCapacity}}</h6>
-        <h7 class="card-subtitle mb-2 text-muted">Prerequisites: {{this.prereqs}}</h7>
+        <h7 class="card-subtitle mb-2 text-muted" id='{{this.courseCode}}Prereqs'>Prerequisites: {{this.prereqs}}</h7>
         <br>
-        <h7 class="card-subtitle mb-2 text-muted">Precludes: {{this.precludes}}</h7>
+        <h7 class="card-subtitle mb-2 text-muted" id='{{this.courseCode}}Precludes'>Precludes: {{this.precludes}}</h7>
         <br>
         {{#if this.isEnrolled}}
             <button class="btn btn-lg btn-primary btn-block text-uppercase" disabled>Already Enrolled</button>
@@ -23,11 +23,11 @@
         {{#if ../administrator}}
             <form method="GET" action="edit-class">
                 <input type="hidden" value="{{this._id}}" name="classID">
-                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Edit Class</button>
+                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" id="{{this.courseCode}}EditClassButton">Edit Class</button>
             </form>
             <form method="POST" action="delete-class">
                 <input type="hidden" value="{{this._id}}" name="classID">
-                <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" type="submit" onclick="onSubmit('{{this.courseCode}}')">Delete</button>
+                <button class="btn btn-lg btn-danger btn-block text-uppercase" name="delete" type="submit" onclick="onSubmit('{{this.courseCode}}')" id="{{this.courseCode}}DeleteButton">Delete</button>
             </form>
         {{/if}}
     </div>

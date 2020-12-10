@@ -1,4 +1,4 @@
-// Cypress Test for Account Registration.
+// Cypress Test for Course Management.
 describe("Course Management (Creation/Editing/Deletion)", function() {
 	// Declaration of constants.
 	const typedCourseCode1 = "NAMO1001";
@@ -211,7 +211,7 @@ describe("Course Management (Creation/Editing/Deletion)", function() {
 			// Click the 'CREATE COURSE' button to try to create the Course.
 			cy.get("button[name='createCourse']").click();
 
-			// Get the error div that should appear after a failed login attempt.
+			// Get the error div that should appear after a failed Course creation attempt.
 			cy.get("div[id='courseCreation-error-div']")
 				.should("exist");
 			// Assert that the input fields are now empty.
