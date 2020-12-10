@@ -6,7 +6,7 @@ const Course = require("../../db/course.js");
 const Deliverable = require("../../db/deliverable.js");
 const DeliverableSubmission = require("../../db/deliverableSubmission.js");
 const ClassEnrollment = require('../../db/classEnrollment.js');
-const { tryUpdateSubmissionDeliverable, tryCreateClass, tryCreateDeliverable } = require("../../js/classManagement.js");
+const { tryUpdateSubmissionDeliverable, tryCreateClass, tryCreateDeliverable, tryToDeleteDeliverable } = require("../../js/classManagement.js");
 const { tryCreateCourse } = require("../../js/courseManagement.js");
 const { tryEnrollStudentInClass, tryDropClassNoDR } = require('../../js/classEnrollmentManagement.js');
 const fs = require("fs");
@@ -71,3 +71,23 @@ When("{string} drops the Class", async function(studentNameParam) {
     // Assert that the student was able to drop the Class.
     assert(!!result.success);
 });
+
+When("The professor deletes the Deliverable, after student submits a text file named {string} as submission with contents {string}", async function(fileNameParam, textParam) {
+    // Find the Deliverable.
+    var deliverable = await Deliverable.findById(this.deliverable.id);
+    // Store the Deliverable title in a variable, for use later.
+    this.deliverableTitle = deliverable.name;
+    // Store the FileName in a variable, for use later.
+    this.fileName = this.student._id + "-" + (await Course.findById(this.course.id)).courseCode + "-" + deliverable.title + "-" + fileNameParam;
+    
+    // Try to delete the Deliverable.
+    var result = await tryToDeleteDeliverable(this.professor._id, this.deliverable.id);
+
+    // Assert that the Deliverable was deleted.
+    assert.strictEqual(true, result);
+
+    // Write to the text file.
+    fs.writeFileSync("uploads/" + this.fileName, textParam);
+    // Try to submit the Deliverable.
+    await tryUpdateSubmissionDeliverable(this.class.id, this.student._id, deliverable.title, this.fileName);
+})
