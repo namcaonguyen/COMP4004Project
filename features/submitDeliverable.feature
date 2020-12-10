@@ -32,3 +32,12 @@ Feature: Submit Deliverable
 		And "Zahid Dawod" drops the Class
 		And "Zahid Dawod" submits a text file named "a1.txt" as submission to that deliverable with the contents being "Hi this is my submission"
 		Then The submission should not exist
+
+@test45
+	Scenario: A student tries to submit, but the Deliverable does not exist anymore.
+		Given There is an Academic Deadline set in the database
+		And The administrator wants to update the Academic Deadline to year 3000, month 1, day 1
+		And A professor "Jean-Pierre Corriveau" creates a deliverable for a class "COMP1405" "without" a deadline
+		When There exists an approved student with name "Zahid Dawod" email "zahid.dawod@cms.com" and password "password"
+		And The professor deletes the Deliverable, after student submits a text file named "a1.txt" as submission with contents "Hi this is my submission"
+		Then The submission should not exist
