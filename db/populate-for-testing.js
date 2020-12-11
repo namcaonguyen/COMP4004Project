@@ -2,7 +2,6 @@ const User = require('./user.js');
 const Course = require('./course.js');
 const Class = require('./class.js');
 const mongoose = require('mongoose');
-const course = require('./course.js');
 mongoose.connect('mongodb://localhost/cmsApp');
 
 // The purpose of this script is to generate temporary data for testing purposes.

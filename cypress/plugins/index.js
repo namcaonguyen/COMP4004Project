@@ -21,7 +21,7 @@ module.exports = (on, config) => {
       console.log(message)
 
       return null
-	}
+	  }
   })
 
   on('task', {
@@ -47,46 +47,101 @@ module.exports = (on, config) => {
       User.deleteMany({accountType: "student"}, function(err) {
         if ( err ) {
           console.log(err);  
-		}
+		    }
       });
       // Delete all the professor Users.
       User.deleteMany({accountType: "professor"}, function(err) {
         if ( err ) {
           console.log(err);  
-		}
+		    }
       });
       // Delete all the Courses.
       Course.deleteMany({}, function(err) {
         if ( err ) {
           console.log(err);  
-		}
-	  });
+		    }
+	    });
       // Delete all the Classes.
       Class.deleteMany({}, function(err) {
         if ( err ) {
           console.log(err);  
-		}
-	  });
+		    }
+	    });
       // Delete all the ClassEnrollments.
       ClassEnrollment.deleteMany({}, function(err) {
         if ( err ) {
           console.log(err);  
-		}
-	  });
+		    }
+	    });
       // Delete all the Deliverables.
       Deliverable.deleteMany({}, function(err) {
         if ( err ) {
           console.log(err);  
-		}
-	  });
+		    }
+	    });
       // Delete all the DeliverableSubmissions.
       DeliverableSubmission.deleteMany({}, function(err) {
         if ( err ) {
           console.log(err);  
-		}
-	  });
+		    }
+	    });
       
       return null
-	}
+    },
+    populateDBForDeliverableTesting() {
+      const User = require("../../db/user.js");
+      const Course = require("../../db/course.js");
+      const Class = require("../../db/class.js");
+      const mongoose = require("mongoose");
+      mongoose.connect("mongodb://localhost/cmsApp");
+
+      const student = new User({
+        email: "zahid.dawod@cms.com",
+        password: "password",
+        fullname: "Zahid Dawod",
+        accountType: "student",
+        coursesTaken: [],
+        approved: true
+      });
+
+      const professor = new User({
+        email: "jp@cms.com",
+        password: "password",
+        fullname: "Jean-Pierre Corriveau",
+        accountType: "professor",
+        coursesTaken: [],
+        approved: true
+      });
+
+      const course = new Course({
+        courseCode: "COMP4004",
+        title: "Software Quality Assurance"
+      });
+
+      const class_ = new Class({
+        course: course._id,
+        professor: professor._id,
+        totalCapacity: 2
+      });
+      
+      let arr = [student, professor, course, class_]; // array of objects to return
+
+      // save to db
+      student.save();
+      professor.save();
+      course.save();
+      class_.save();
+
+      return arr;
+    },
+    forceUpdateDeadline({ newDate, classId, titleParam }) {
+      const Deliverable = require("../../db/deliverable.js");
+      const mongoose = require("mongoose");
+      mongoose.connect("mongodb://localhost/cmsApp");
+      Deliverable.updateOne({ class_id: classId, title: titleParam }, { $set: { deadline: newDate } }, (err) => {
+        if (err) throw err;
+      });
+      return null;
+    }
   })
 }
