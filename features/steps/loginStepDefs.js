@@ -56,13 +56,13 @@ When("A user tries to login with email {string} and password {string}", function
 });
 
 Then("User logs in", async function () {
-    var findUser = await User.find({ email: this.userEmail, password: this.userPassword });
+    var findUser = await User.find({ email: this.userEmail, password: this.userPassword, approved: true });
 
     assert.equal(true, findUser.length > 0);
 });
 
 Then("User fails to login", async function () {
-    var findUser = await User.find({ email: this.userEmail, password: this.userPassword });
+    var findUser = await User.find({ email: this.userEmail, password: this.userPassword, approved: true });
 
     assert.equal(true, findUser.length === 0);
 });
