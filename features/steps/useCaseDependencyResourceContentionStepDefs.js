@@ -149,13 +149,11 @@ Given("{string}s {int} and {int} apply for an account with name {string} and {st
         approved: false
 	});
 
-    // Save the unapproved Users to the database.
-    // NOTE: In order to mimic simultaneous registrations, we will NOT use the 'await' keyword here!!!
-    createdUnapprovedUser1.save();
-    createdUnapprovedUser2.save();
-
     // Wait for the Users to finish trying to register.
-    await new Promise(r => setTimeout(r, 100));
+    await Promise.all([
+        createdUnapprovedUser1.save(),
+        createdUnapprovedUser2.save()
+    ]);
 
     // Store the created User IDs in an array.
     if ( accountTypeParam === 'student' ) {
@@ -260,11 +258,13 @@ When("Students {int} and {int} submit for Deliverable {int} a text file with nam
 
     // Try to update the Deliverable Submission.
     // NOTE: In order to mimic students simultaneously submitting their files, we will NOT use the 'await' keyword here!!!
-    var result1 = tryUpdateSubmissionDeliverable(findDeliverable.class_id, studentIDArray[studentIndex1Param - 1], findDeliverable.title, fileName1Param);
-    var result2 = tryUpdateSubmissionDeliverable(findDeliverable.class_id, studentIDArray[studentIndex2Param - 1], findDeliverable.title, fileName2Param);
+    const promise1 = tryUpdateSubmissionDeliverable(findDeliverable.class_id, studentIDArray[studentIndex1Param - 1], findDeliverable.title, fileName1Param);
+    const promise2 = tryUpdateSubmissionDeliverable(findDeliverable.class_id, studentIDArray[studentIndex2Param - 1], findDeliverable.title, fileName2Param);
 
-    // Wait for the students to finish submitting.
-    await new Promise(r => setTimeout(r, 100));
+    const [result1, result2] = await Promise.all([
+        promise1,
+        promise2
+    ]);
 
     // Assert that the Deliverable Submissions went through.
     assert(true, result1);
@@ -417,30 +417,32 @@ Given("Student {int} wants to enroll in Class {int}", async function(studentInde
 
 When("All students who want to enroll in Class {int} try to enroll at the same time", async function(classIndexParam) {
     // Go through all the students that want to enroll.
+    const promises = [];
     for ( var i = 0; i < studentIDWantsToEnrollArray.length; ++i ) {
         // Try to enroll the student in the Class.
         // NOTE: In order to mimic multiple students trying to enroll at the same time, we will NOT use the 'await' keyword here!!!
-        tryEnrollStudentInClass(studentIDWantsToEnrollArray[i], classIDArray[classIndexParam - 1]);
+        promises.push(tryEnrollStudentInClass(studentIDWantsToEnrollArray[i], classIDArray[classIndexParam - 1]));
 	}
 
-    // Wait for the students to finish trying to enroll.
-    await new Promise(r => setTimeout(r, 100));
+    await Promise.all(promises);
 });
 
 When("All students who want to enroll in Class {int} try to enroll at the same time while student {int} drops the Class", async function(classIndexParam, studentIndexParam) {
     // Try to drop the Class for the student.
     // NOTE: In order to mimic dropping the class while the other students try to enroll at the same time, we will NOT use the 'await' keyword here!!!
-    tryDropClassNoDR(studentIDArray[studentIndexParam - 1], classIDArray[classIndexParam - 1]);
+    
+    const promises = [];
+
+    promises.push(tryDropClassNoDR(studentIDArray[studentIndexParam - 1], classIDArray[classIndexParam - 1]));
     
     // Go through all the students that want to enroll.
     for ( var i = 0; i < studentIDWantsToEnrollArray.length; ++i ) {
         // Try to enroll the student in the Class.
         // NOTE: In order to mimic multiple students trying to enroll at the same time, we will NOT use the 'await' keyword here!!!
-        tryEnrollStudentInClass(studentIDWantsToEnrollArray[i], classIDArray[classIndexParam - 1]);
+        promises.push(tryEnrollStudentInClass(studentIDWantsToEnrollArray[i], classIDArray[classIndexParam - 1]));
 	}
 
-    // Wait for the students to finish trying to enroll.
-    await new Promise(r => setTimeout(r, 100));
+    await Promise.all(promises);
 });
 
 Then("Only {int} of the students that wanted to enroll in Class {int} were able to", async function(expectedEnrollmentsParam, classIndexParam) {
