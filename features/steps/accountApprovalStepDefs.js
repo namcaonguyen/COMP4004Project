@@ -48,7 +48,7 @@ Then("The user does not exist in the database anymore", async function() {
 });
 
 Then("The user is able to login", async function() {
-    await User.find({ email: this.user.email, password: this.user.password }, function(err, result) {
+    await User.find({ email: this.user.email, password: this.user.password, approved: true }, function(err, result) {
         if ( err ) {
             assert(false);
             throw err;
@@ -58,7 +58,7 @@ Then("The user is able to login", async function() {
 });
 
 Then("The user is not able to login", async function() {
-    await User.find({ email: this.user.email, password: this.user.password }, function(err, result) {
+    await User.find({ email: this.user.email, password: this.user.password, approved: true }, function(err, result) {
         if ( err ) {
             assert(false);
             throw err;
