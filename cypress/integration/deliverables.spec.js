@@ -48,6 +48,9 @@ describe("Deliverable Features (Create/View/Submit/Update/Delete)", () => {
         const professor = results[1];
         const class_ = results[3];
 
+        // Visit the Login page.
+        cy.visit(url);
+
 		// login to professor account
 		cy.get("input[id='inputEmail']").type(professor.email);
         cy.get("input[id='inputPassword']").type(professor.password);
@@ -90,6 +93,9 @@ describe("Deliverable Features (Create/View/Submit/Update/Delete)", () => {
             const professor = results[1];
             const class_ = results[3];
 
+            // Visit the Login page.
+            cy.visit(url);
+
             // login to professor account
             cy.get("input[id='inputEmail']").type(professor.email);
             cy.get("input[id='inputPassword']").type(professor.password);
@@ -110,6 +116,9 @@ describe("Deliverable Features (Create/View/Submit/Update/Delete)", () => {
             const professor = results[1];
             const class_ = results[3];
 
+            // Visit the Login page.
+            cy.visit(url);
+
             // login to professor account
             cy.get("input[id='inputEmail']").type(professor.email);
             cy.get("input[id='inputPassword']").type(professor.password);
@@ -129,6 +138,9 @@ describe("Deliverable Features (Create/View/Submit/Update/Delete)", () => {
 		it("Tries to create a Deliverable with an invalid deadline", () => {
             const professor = results[1];
             const class_ = results[3];
+
+            // Visit the Login page.
+            cy.visit(url);
 
             // login to professor account
             cy.get("input[id='inputEmail']").type(professor.email);
@@ -155,6 +167,9 @@ describe("Deliverable Features (Create/View/Submit/Update/Delete)", () => {
             const student = results[0];
             const professor = results[1];
             const class_ = results[3];
+
+            // Visit the Login page.
+            cy.visit(url);
 
             // login to professor account
             cy.get("input[id='inputEmail']").type(professor.email);
@@ -192,6 +207,9 @@ describe("Deliverable Features (Create/View/Submit/Update/Delete)", () => {
             
             // update deliverable deadline
             cy.task("forceUpdateDeadline", { newDeadline: Cypress.moment().format("YYYY-MM-DDTHH:MM"), classId: class_._id, titleParam: "A1" });
+
+            // Visit the Login page.
+            cy.visit(url);
 
             // login to student account
             cy.get("input[id='inputEmail']").type(student.email);
