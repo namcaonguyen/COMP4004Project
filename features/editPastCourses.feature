@@ -1,5 +1,6 @@
 Feature: An student User can edit which Courses they've taken in the past. This is how we will check if prerequisites have been taken.
 
+@editPastCourses
 	Scenario Outline: A student User tries editing their past Courses. The coursesTaken attribute of the student User should be updated.
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12
@@ -26,6 +27,7 @@ Feature: An student User can edit which Courses they've taken in the past. This 
 		# Add and remove Courses.
 		| "COMP4004"					| "COMP4004"					| "NAMO1001"			| "NAMO1001"			|
 
+@tryEditPastCoursesInvalidStudent
 	Scenario: A student User tries editing their past Courses. But the student is deleted before they can update their Courses.
 		Given There is an Academic Deadline set in the database
 		And The administrator wants to update the Academic Deadline to year 3000, month 12, day 12

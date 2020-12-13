@@ -1,5 +1,6 @@
 Feature: View Assigned and Enrolled Classes
 
+@professorViewClasses
 	Scenario Outline: A professor views their classes
 		Given The database is empty
 		And There is a course in the database with code "COMP4004" and title "Software Quality Assurance" before viewing all classes
@@ -11,6 +12,7 @@ Feature: View Assigned and Enrolled Classes
 		| capacity          | prereqs	| precluded	|
 		| 150				| ""		| ""		|
 
+@professorViewNoClasses
 	Scenario Outline: A professor views their classes but there aren't any found
 		Given The database is empty
 		And There is a course in the database with code "COMP4004" and title "Software Quality Assurance" before viewing all classes
@@ -21,6 +23,7 @@ Feature: View Assigned and Enrolled Classes
 		| capacity          | prereqs	| precluded	|
 		| 150				| ""		| ""		|
 
+@studentViewClasses
 	Scenario Outline: A student views their classes
 		Given The database is empty
 		And There is an Academic Deadline set in the database
@@ -36,6 +39,7 @@ Feature: View Assigned and Enrolled Classes
 		| capacity          | prereqs	| precluded	|
 		| 150				| ""		| ""		|
 
+@studentViewNoClasses
 	Scenario Outline: A student views their classes but there aren't any found
 		Given The database is empty
 		And There is a course in the database with code "COMP4004" and title "Software Quality Assurance" before viewing all classes

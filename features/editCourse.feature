@@ -1,5 +1,6 @@
 Feature: An administrator User can edit the information of a Course.
 
+@editCourse
 	Scenario Outline: An administrator User tries editing the Course information (which includes title, prerequisites, and precludes). The Course information should be updated.
 		Given There are no existing Courses in the database
 		And There is a course in the database with code "COMP4004" and title "Software Quality Assurance" and prereqs "" and precludes ""
@@ -40,6 +41,7 @@ Feature: An administrator User can edit the information of a Course.
 		# Add and remove prerequisites and precludes.
 		| "COMP4004"					| "NAMO1001"					| "Top Secret"	| "COMP4004"					| "TEST1001"			| "NAMO1001"					| "COMP4004"			| "TEST1001"			| "COMP4004"			|
 
+@tryEditCourseInvalidInputs
 	Scenario Outline: An administrator User tries editing the Course information, but the inputs are invalid.
 		Given There are no existing Courses in the database
 		And There is a course in the database with code "COMP4004" and title "Software Quality Assurance" and prereqs "" and precludes ""

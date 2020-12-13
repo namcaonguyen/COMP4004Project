@@ -1,5 +1,6 @@
 Feature: Deleting a class
         
+@cancelClass
 	Scenario: An admin creates and deletes a class, then it doesn't exist
         Given There are no existing classes in the database
 		And there are no courses in the database
