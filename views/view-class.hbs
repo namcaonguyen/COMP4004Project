@@ -30,7 +30,7 @@
                         href="/classes/{{this.classId}}/create-deliverable">Create Deliverable</a>
                     <br />
                     <h6 class="card-subtitle mb-2 text-muted">Student Grades:</h6>
-                    <select id="selectStudent" style="width: 100%" onchange="onStudentChange()">
+                    <select id="selectStudent" name="selectStudent" style="width: 100%" onchange="onStudentChange()">
                         <option value="">None</option>
                         {{#each studentsEnrolled}}
                         <option id="selectStudent_{{this.id}}" value="{{this.id}}">{{this.name}}</option>
@@ -41,12 +41,12 @@
 
                     {{#if selectedStudent}}
                     {{#unless withdrawn}}
-                    <h6 class="card-subtitle mb-2 text-muted">Final Grade: {{finalGrade}}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted" id="{{this.finalGrade}}FinalLabel">Final Grade: {{finalGrade}}</h6>
                     <form method="POST" action="/classes/{{classId}}/submitFinalGrade" style="white-space: nowrap">
                         <input type="hidden" name="student_id" value="{{selectedStudent}}" />
                         <label style="display: inline" class="card-subtitle mb-2 text-muted">Calculated Final Grade
                             %:</label>
-                        <input type="submit" value="Submit" style="display: inline; float: right"></input>
+                        <input type="submit" id="submitButton" value="Submit" style="display: inline; float: right"></input>
                         <input type="number" step="0.01" name="finalGrade" min="0" max="100"
                             style="display: inline; float: right" value="{{calculatedGrade}}">
                     </form>
@@ -65,7 +65,7 @@
                             {{#if ../displaySubmissions}}
                             {{#if this.submission_id}}
                                 {{#if this.graded}}
-                                <h6 class="card-subtitle mb-2 text-muted">Grade: {{this.grade}}%</h6>
+                                <h6 class="card-subtitle mb-2 text-muted" id="{{this.grade}}Label">Grade: {{this.grade}}%</h6>
                                 {{else}}
                                 <h6 class="card-subtitle mb-2 text-muted">Not Graded</h6>
                                 {{/if}}
@@ -83,8 +83,8 @@
                                     <input name="action" type="submit" value="Clear"
                                         style="display: inline; float: right"></input>
                                     <input name="action" type="submit" value="Update"
-                                        style="display: inline; float: right"></input>
-                                    <input type="number" step="0.01" name="grade" min="0" max="100"
+                                        style="display: inline; float: right" id="{{this.title}}UpdateButton"></input>
+                                    <input type="number" step="0.01" id="{{this.title}}DeliverableGrade" name="grade" min="0" max="100"
                                         style="width: 25%; display: inline; float: right" placeholder="50">
                                 </form>
                                 <br>
